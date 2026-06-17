@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#f9ce36" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="msapplication-navbutton-color" content="#f9ce36" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'  https://www.googletagmanager.com https://api.ganjibets.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; connect-src 'self' https: wss:; frame-src https: blob:;"
+    />
+    <meta
+      name="description"
+      content="Play Aviator and other exciting casino games online. Real-time cashout, instant deposits, and big wins await!"
+    />
+
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+
+    <!-- DNS Prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://cdn.softswiss.net" />
+    <link rel="dns-prefetch" href="https://ke-game.sirv.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+    <!-- Preconnect to critical origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.softswiss.net" crossorigin />
+
+    <!-- Preload critical fonts - only load weights you need -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Preload critical images (use webp for better performance) -->
+    <link
+      rel="preload"
+      href="/register-banner.webp"
+      as="image"
+      type="image/webp"
+    />
+    <link
+      rel="preload"
+      href="/refer-and-earn.webp"
+      as="image"
+      type="image/webp"
+    />
+    <link rel="preload" href="/cashback.webp" as="image" type="image/webp" />
+
+    <title>ShilingiBet | Play Aviator Online | Real-Time Cashout</title>
+
+    <!-- Cloudflare Turnstile -->
+    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
+  </head>
+  <!-- Google tag (gtag.js) -->
+  <!-- Ganji Support Chat -->
+  <script>
+    window.openSupportChat = function() {
+      if (window.SupportChat) {
+        window.SupportChat.open();
+      } else {
+        console.error("Ganji Support Chat not available");
+      }
+    };
+
+    // Load and initialize Ganji Support Chat
+    var script = document.createElement("script");
+    script.src = "https://api.ganjibets.com/widget/support-chat.js";
+    script.onload = function() {
+      if (window.SupportChat) {
+        SupportChat.init({
+          operatorCode: "BETS123",
+          serverUrl: "https://api.ganjibets.com"
+        });
+      }
+    };
+    document.head.appendChild(script);
+  </script>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
