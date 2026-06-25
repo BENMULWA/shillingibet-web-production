@@ -29,9 +29,9 @@ export default function SearchPage() {
 
   // Providers
   const { games: spribeGames = [] } = useGames();
-  const { turboGames = [] } = useGetTurboGames();
   const showTurboGames = isGameProviderVisible("turbo");
   const showImoonGames = isGameProviderVisible("imoon");
+  const { turboGames = [] } = useGetTurboGames({ enabled: showTurboGames });
 
   // Merge games
   const allGames = useMemo(

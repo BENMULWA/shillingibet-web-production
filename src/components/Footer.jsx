@@ -133,6 +133,7 @@ const Footer = () => {
               </p>
             </div>
 
+            {/*
             <div className="rounded-xl border border-white/10 bg-[#07110b]/80 p-4">
               <h3 className="mb-2 text-sm font-bold text-white">License</h3>
               <p className="text-xs leading-relaxed">
@@ -140,6 +141,7 @@ const Footer = () => {
                 <span className="font-semibold text-primary">BK-0001296</span>.
               </p>
             </div>
+            */}
           </div>
         </div>
 

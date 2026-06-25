@@ -48,6 +48,7 @@ function PromotionsDetails() {
             src={promo.image}
             alt={promo.title}
             className="w-full h-auto object-cover"
+            decoding="async"
           />
         </div>
 

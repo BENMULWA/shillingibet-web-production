@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Drawer } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { IoClose, IoAirplane, IoRocket } from "react-icons/io5";
 import {
@@ -240,6 +239,7 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
 
 
       {/* ── License ── */}
+      {/*
       {!effectiveCollapsed && (
         <div className="px-3 pb-3">
           <p className="mb-2 px-1 text-[11px] font-black uppercase tracking-[0.16em] text-[#8fa195]">
@@ -257,6 +257,7 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
           </div>
         </div>
       )}
+      */}
 
       {/* ── 18+ Only ── */}
       {!effectiveCollapsed && (
@@ -321,26 +322,40 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
   return (
     <>
       {isMobile ? (
-        <Drawer
-          placement="left"
-          open={showSidebar}
-          onClose={() => setShowSidebar(false)}
-          closable={false}
-          styles={{
-            body: { padding: 0, background: "#051305" },
-            mask: { background: "rgba(0,0,0,0.7)" },
-          }}
-          width={260}
+        <div
+          className={`fixed inset-0 z-50 transition ${
+            showSidebar ? "pointer-events-auto" : "pointer-events-none"
+          }`}
+          aria-hidden={!showSidebar}
         >
-          {/* Close button */}
-          <div
-            className="absolute top-3 right-3 z-50 cursor-pointer rounded-full border border-white/10 bg-black/35 p-2 shadow-lg"
+          <button
+            type="button"
+            className={`absolute inset-0 bg-black/70 transition-opacity ${
+              showSidebar ? "opacity-100" : "opacity-0"
+            }`}
             onClick={() => setShowSidebar(false)}
+            aria-label="Close menu"
+          />
+
+          <aside
+            className={`absolute left-0 top-0 h-full w-[260px] overflow-hidden bg-[#051305] shadow-2xl transition-transform duration-300 ${
+              showSidebar ? "translate-x-0" : "-translate-x-full"
+            }`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
           >
-            <IoClose size={18} className="text-white" />
-          </div>
-          {sidebarInner}
-        </Drawer>
+            <button
+              type="button"
+              className="absolute top-3 right-3 z-50 cursor-pointer rounded-full border border-white/10 bg-black/35 p-2 shadow-lg"
+              onClick={() => setShowSidebar(false)}
+              aria-label="Close menu"
+            >
+              <IoClose size={18} className="text-white" />
+            </button>
+            {sidebarInner}
+          </aside>
+        </div>
       ) : (
         <aside
           className={`${desktopWidth} h-full flex-shrink-0 overflow-hidden border-r border-white/5 bg-[#07110b] shadow-[12px_0_34px_rgba(0,0,0,0.2)] transition-all duration-300`}

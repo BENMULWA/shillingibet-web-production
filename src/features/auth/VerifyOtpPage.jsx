@@ -97,6 +97,7 @@ export default function VerifyOtp() {
               alt="Verify promo"
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
               onError={(e) => { e.target.style.display = "none"; }}
             />
             <div className="absolute inset-0 bg-black/30" />
@@ -106,7 +107,13 @@ export default function VerifyOtp() {
         {/* RIGHT: Form */}
         <div className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-background">
           <div className="mb-8">
-            <img src="/shilingibet.png" alt="ShilingiBet" className="h-12 md:hidden mb-4" />
+            <img
+              src="/shilingibet.png"
+              alt="ShilingiBet"
+              className="h-12 md:hidden mb-4"
+              loading="lazy"
+              decoding="async"
+            />
             <h1 className="text-white text-4xl font-black mb-2">Verify OTP</h1>
             <p className="text-zinc-500 text-sm">
               Enter the 6-digit code sent to{" "}

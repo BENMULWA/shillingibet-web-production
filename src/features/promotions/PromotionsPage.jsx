@@ -11,31 +11,31 @@ function Promotions() {
           id="registration"
           title="Registration Bonus"
           description="Register and instantly get Ksh.10 Instant Stake to start playing."
-          src="/5.png"
+          src="/5.jpg"
         />
         <PromotionsCard
           id="refer"
           title="Refer & Earn"
           description="Invite friends and earn weekly rewards every time they deposit & play."
-          src="/3.png"
+          src="/3.jpg"
         />
         <PromotionsCard
           id="daily-cashback"
           title="Daily Cashback"
           description="Get guaranteed cashback daily on your bets. No hidden conditions."
-          src="/2.png"
+          src="/2.jpg"
         />
         <PromotionsCard
           id="aviator-daily"
           title="Aviator Daily Cashback"
           description="Daily Freebets & Free Rains worth Ksh.5M available every day."
-          src="/4.png"
+          src="/4.jpg"
         />
         <PromotionsCard
           id="aviator-challenges"
           title="Aviator Challenges"
           description="Join Missions, Races, and Tournaments to win Freebets, Cash & Merch."
-          src="/1.png"
+          src="/1.jpg"
         />
       </div>{" "}
       <Footer />

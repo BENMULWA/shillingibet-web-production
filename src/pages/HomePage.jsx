@@ -31,14 +31,14 @@ function useMediaQuery(query) {
 }
 
 function Homepage({ chatOpen }) {
+  const showTurboGames = isGameProviderVisible("turbo");
+  const showImoonGames = isGameProviderVisible("imoon");
   const { games: spribeGames = [] } = useGames();
-  const { turboGames = [] } = useGetTurboGames();
-  const { imoonGames = [] } = useImoonGames();
+  const { turboGames = [] } = useGetTurboGames({ enabled: showTurboGames });
+  const { imoonGames = [] } = useImoonGames({ enabled: showImoonGames });
 
   const isMobile = useMediaQuery("(max-width: 767px)");
   const limit = isMobile ? 6 : 12;
-  const showTurboGames = isGameProviderVisible("turbo");
-  const showImoonGames = isGameProviderVisible("imoon");
 
   const [gamesPage, setGamesPage] = useState(0);
 

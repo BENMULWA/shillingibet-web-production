@@ -32,10 +32,11 @@ export function useGameSession() {
 
 // ── Imoon ─────────────────────────────────────────────────────
 
-export function useImoonGames() {
+export function useImoonGames({ enabled = true } = {}) {
   const { data: imoonGames, isLoading, error } = useQuery({
     queryKey: ["imoonGames"],
     queryFn: gameService.getAllImoonGames.bind(gameService),
+    enabled,
     ...GAME_LIST_CACHE_CONFIG,
   });
   return { imoonGames, isLoading, error };
@@ -50,10 +51,11 @@ export function useLaunchImoonGame() {
 
 // ── Turbo ─────────────────────────────────────────────────────
 
-export function useGetTurboGames() {
+export function useGetTurboGames({ enabled = true } = {}) {
   const { data: turboGames, isLoading, error } = useQuery({
     queryKey: ["turboGames"],
     queryFn: gameService.getTurboGames.bind(gameService),
+    enabled,
     ...GAME_LIST_CACHE_CONFIG,
   });
   return { turboGames, isLoading, error };

@@ -140,6 +140,7 @@ export default function Register() {
               alt="Register promo"
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
               onError={(e) => { e.target.style.display = "none"; }}
             />
             <div className="absolute inset-0 bg-black/30" />
@@ -149,7 +150,13 @@ export default function Register() {
         {/* RIGHT: Form */}
         <div className="flex-1 p-8 md:px-16 md:py-14 flex flex-col justify-center bg-background overflow-y-auto max-h-screen">
           <div className="mb-6">
-           <img src="/shilingibet.png" alt="ShilingiBet" className="h-12  " />
+            <img
+              src="/shilingibet.png"
+              alt="ShilingiBet"
+              className="h-12"
+              loading="lazy"
+              decoding="async"
+            />
             <h1 className="text-white text-4xl font-black mb-2">Create account</h1>
           </div>
 

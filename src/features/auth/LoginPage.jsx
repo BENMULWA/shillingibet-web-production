@@ -136,6 +136,7 @@ const LoginModal = ({ onClose }) => {
               alt="Signup promo"
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
               onError={(e) => { e.target.style.display = 'none'; }}
             />
 
@@ -146,7 +147,13 @@ const LoginModal = ({ onClose }) => {
         {/* RIGHT SIDE: Login Form (matches design) */}
         <div className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-background overflow-y-auto">
           <div className="mb-8">
-            <img src="/shilingibet.png" alt="ShilingiBet" className="h-12  " />
+            <img
+              src="/shilingibet.png"
+              alt="ShilingiBet"
+              className="h-12"
+              loading="lazy"
+              decoding="async"
+            />
             <h1 className="text-white text-4xl font-black mb-2">Welcome back</h1>
           </div>
 

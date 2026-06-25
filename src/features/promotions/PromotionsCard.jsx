@@ -6,7 +6,13 @@ function PromotionsCard({ id, src, title, description }) {
     <div className="bg-secondary border border-secondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all flex flex-col">
       {/* Banner Image */}
       <div className="w-full h-48">
-        <img className="w-full h-full object-center" src={src} alt={title} />
+        <img
+          className="w-full h-full object-cover object-center"
+          src={src}
+          alt={title}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       {/* Text Content */}

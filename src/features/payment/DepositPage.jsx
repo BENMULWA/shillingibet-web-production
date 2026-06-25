@@ -23,6 +23,8 @@ const depositAmounts = [
   { value: 10000, hot: false },
 ];
 
+const SHOW_CRYPTO_UI = false;
+
 export default function Deposit() {
   const baseClass = new BaseClass();
 
@@ -37,7 +39,7 @@ export default function Deposit() {
   const [cryptoView, setCryptoView] = useState("form");
   const [cryptoResultMessage, setCryptoResultMessage] = useState("");
 
-  // Crypto address - using the TRC20 USDT address from your modal
+  // Crypto address for USDT deposits on TRC20.
   const cryptoAddress = "TYoAs73kthQKByqBbWBWtLRUj3RUG7b2yY";
 
   const { makingPayment, isLoading } = useDeposit();
@@ -197,17 +199,19 @@ export default function Deposit() {
             >
               Mobile Money
             </button>
-            <button
-              type="button"
-              onClick={() => setTab("crypto")}
-              className={`flex-1 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium transition-all ${
-                tab === "crypto"
-                  ? "bg-primary text-black shadow-md"
-                  : "text-[#9cae9f] hover:text-white"
-              }`}
-            >
-              Crypto (USDT)
-            </button>
+            {SHOW_CRYPTO_UI && (
+              <button
+                type="button"
+                onClick={() => setTab("crypto")}
+                className={`flex-1 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium transition-all ${
+                  tab === "crypto"
+                    ? "bg-primary text-black shadow-md"
+                    : "text-[#9cae9f] hover:text-white"
+                }`}
+              >
+                Crypto (USDT)
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setTab("comet")}
@@ -334,7 +338,7 @@ export default function Deposit() {
           )}
 
           {/* CRYPTO TAB */}
-          {tab === "crypto" && cryptoView !== "form" && (
+          {SHOW_CRYPTO_UI && tab === "crypto" && cryptoView !== "form" && (
             /* M-Pesa-style processing / result card */
             <div className="w-full max-w-sm mx-auto bg-secondary rounded-2xl overflow-hidden">
               <div className="pt-10 pb-8 px-6 flex flex-col items-center">
@@ -505,7 +509,7 @@ export default function Deposit() {
                 />
                 <div className="text-center">
                   <h3 className="text-lg font-bold text-[#d7e1d9]">Comet App</h3>
-                  <p className="text-xs text-[#75877a] mt-0.5">Instant deposits via Comet</p>
+                  <p className="text-xs text-[#75877a] mt-0.5">Deposit from your Comet account</p>
                 </div>
               </div>
 
@@ -533,7 +537,7 @@ export default function Deposit() {
                   placeholder="Enter amount (KES)"
                   value={cometAmount}
                   onChange={(e) => setCometAmount(e.target.value)}
-                  min={1}
+                  min={10}
                   className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-transparent text-[#d7e1d9] focus:outline-none focus:border-primary transition"
                 />
               </div>
@@ -553,9 +557,9 @@ export default function Deposit() {
                 <div className="flex items-start gap-3">
                   <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
                   <p>
-                    Funds are credited{" "}
-                    <span className="font-semibold text-primary">instantly</span>{" "}
-                    to your wallet after Comet App confirms the deposit.
+                    Funds are credited after{" "}
+                    <span className="font-semibold text-primary">Comet App</span>{" "}
+                    confirms the deposit.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
@@ -569,7 +573,7 @@ export default function Deposit() {
             </div>
           )}
 
-          {tab === "crypto" && cryptoView === "form" && (
+          {SHOW_CRYPTO_UI && tab === "crypto" && cryptoView === "form" && (
             <div className="bg-background/60 border border-primary/20 rounded-2xl p-4 md:p-6 space-y-6 md:space-y-8">
               {/* Step 1 */}
               <div>
@@ -578,7 +582,7 @@ export default function Deposit() {
                     1
                   </div>
                   <h3 className="text-base md:text-lg font-semibold text-[#d7e1d9] leading-tight">
-                    Send USDT to this address:
+                    Send USDT TRC20 to this address:
                   </h3>
                 </div>
 
@@ -596,7 +600,7 @@ export default function Deposit() {
                 </div>
 
                 <ul className="list-disc list-inside mt-3 md:mt-4 text-xs md:text-sm text-[#9cae9f] space-y-1 md:space-y-1.5">
-                  <li className="break-words">Send USDT strictly from Binance.</li>
+                  <li className="break-words">Use the TRC20 (Tron) network only.</li>
                   <li className="break-words">Copy the address above and send your USDT.</li>
                   <li className="break-words">
                     After sending, enter your transaction details below.
@@ -637,7 +641,7 @@ export default function Deposit() {
                 >
                   {isDepositingCrypto
                     ? "Processing Transaction..."
-                    : "Complete Transaction"}
+                    : "Submit Transaction ID"}
                 </button>
               </div>
 
@@ -645,8 +649,8 @@ export default function Deposit() {
               <div className="rounded-lg bg-primary/10 border border-primary/20 p-3 md:p-4">
                 <p className="text-xs text-[#aab8ad] leading-relaxed break-words">
                   <span className="font-semibold text-primary">Note:</span> Your
-                  account will be credited after we verify your transaction on
-                  the blockchain. This usually takes 5-10 minutes.
+                  account will be credited after we verify your USDT TRC20
+                  transaction on the blockchain. This usually takes 5-10 minutes.
                 </p>
               </div>
             </div>

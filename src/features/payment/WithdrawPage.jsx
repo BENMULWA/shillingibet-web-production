@@ -10,7 +10,22 @@ import { SiTether } from "react-icons/si";
 import toast from "react-hot-toast";
 import { debouncedWithdraw } from "../../utils/debounce";
 
-const TABS = ["M-Pesa", "Crypto (USDT)", "Comet App"];
+const SHOW_CRYPTO_UI = false;
+const TABS = [
+  "M-Pesa",
+  ...(SHOW_CRYPTO_UI ? ["Crypto (USDT)"] : []),
+  "Comet App",
+];
+const MIN_CRYPTO_WITHDRAWAL = 10;
+const TRC20_ADDRESS_LENGTH = 34;
+
+function isValidTrc20Address(address) {
+  const trimmedAddress = address.trim();
+  return (
+    trimmedAddress.startsWith("T") &&
+    trimmedAddress.length === TRC20_ADDRESS_LENGTH
+  );
+}
 
 export default function Withdraw() {
   const [activeTab, setActiveTab] = useState("M-Pesa");
@@ -35,6 +50,11 @@ export default function Withdraw() {
   const { balance } = useUpdateBalance();
   const { withdrawingCash, isLoading: isWithdrawing } = useWithdraw();
   const { withdrawCrypto, isLoading: isCryptoWithdrawing, data: cryptoResult, reset: resetCrypto } = useWithdrawCrypto();
+  const cryptoAmountNumber = Number(cryptoAmount);
+  const canSubmitCryptoWithdrawal =
+    isValidTrc20Address(cryptoAddress) &&
+    cryptoAmountNumber >= MIN_CRYPTO_WITHDRAWAL &&
+    !isCryptoWithdrawing;
 
   // ── M-Pesa handler ──────────────────────────────────────────────────────────
   function handleWithdraw() {
@@ -72,10 +92,13 @@ export default function Withdraw() {
     if (!cryptoAddress.trim()) {
       return toast.error("Please enter a valid TRC20 wallet address.");
     }
-    if (!cryptoAmount || +cryptoAmount < 1) {
-      return toast.error("Minimum withdrawal is 1 USDT.");
+    if (!isValidTrc20Address(cryptoAddress)) {
+      return toast.error("TRC20 wallet address must start with T and be 34 characters long.");
     }
-    withdrawCrypto({ address: cryptoAddress.trim(), amount: +cryptoAmount });
+    if (!cryptoAmount || cryptoAmountNumber < MIN_CRYPTO_WITHDRAWAL) {
+      return toast.error(`Minimum withdrawal is ${MIN_CRYPTO_WITHDRAWAL} USDT.`);
+    }
+    withdrawCrypto({ address: cryptoAddress.trim(), amount: cryptoAmountNumber });
   }
 
   function handleCryptoReset() {
@@ -85,7 +108,7 @@ export default function Withdraw() {
   }
 
   // ── Crypto result screen ─────────────────────────────────────────────────────
-  if (activeTab === "Crypto (USDT)" && cryptoResult) {
+  if (SHOW_CRYPTO_UI && activeTab === "Crypto (USDT)" && cryptoResult) {
     const isComplete = cryptoResult?.status === "complete";
     return (
       <div className="text-[#b7c4ba] flex justify-center p-4">
@@ -341,36 +364,51 @@ export default function Withdraw() {
           )}
 
           {/* ── Crypto Tab ─────────────────────────────────────────────────── */}
-          {activeTab === "Crypto (USDT)" && (
+          {SHOW_CRYPTO_UI && activeTab === "Crypto (USDT)" && (
             <>
               <div className="flex items-center gap-3 bg-[#07110b]/85 border border-white/10 rounded-lg px-4 py-3">
                 <SiTether className="text-2xl text-green-400 shrink-0" />
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-primary">USDT — TRC20 (Tron)</p>
-                  <p className="text-xs text-[#75877a]">Minimum withdrawal: 10 USDT</p>
+                  <p className="text-xs text-[#75877a]">
+                    Minimum withdrawal: {MIN_CRYPTO_WITHDRAWAL} USDT
+                  </p>
                 </div>
+              </div>
+
+              <div className="rounded-lg bg-primary/10 border border-primary/20 p-4 text-sm">
+                <div className="flex justify-between gap-4">
+                  <span className="text-[#9cae9f]">Withdrawable balance</span>
+                  <span className="font-semibold text-primary">
+                    KES {balance?.balance?.toLocaleString() ?? 0}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-[#9cae9f]">
+                  Enter the amount in USDT. Your KES wallet balance will be
+                  converted and checked when you submit.
+                </p>
               </div>
 
               <input
                 value={cryptoAddress}
                 onChange={(e) => setCryptoAddress(e.target.value)}
                 className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-[#07110b] text-white focus:outline-none focus:border-primary"
-                placeholder="TRC20 Wallet Address (e.g. TYoAs73k...)"
+                placeholder="TRC20 wallet address"
               />
 
               <input
                 type="number"
                 value={cryptoAmount}
                 onChange={(e) => setCryptoAmount(e.target.value)}
-                min={1}
+                min={MIN_CRYPTO_WITHDRAWAL}
                 className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-[#07110b] text-white focus:outline-none focus:border-primary"
                 placeholder="Amount (USDT)"
               />
 
               <button
                 onClick={handleCryptoWithdraw}
-                disabled={isCryptoWithdrawing}
-                className="w-full bg-primary text-black py-4 rounded-lg text-lg font-bold disabled:opacity-60"
+                disabled={!canSubmitCryptoWithdrawal}
+                className="w-full bg-primary text-black py-4 rounded-lg text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCryptoWithdrawing ? "Processing..." : "Withdraw USDT"}
               </button>
@@ -389,7 +427,9 @@ export default function Withdraw() {
                   <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
                   <p>
                     Minimum withdrawal is{" "}
-                    <span className="font-semibold text-primary">10 USDT</span>.
+                    <span className="font-semibold text-primary">
+                      {MIN_CRYPTO_WITHDRAWAL} USDT
+                    </span>.
                   </p>
                 </div>
               </div>

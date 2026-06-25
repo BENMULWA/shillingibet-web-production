@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../layouts/Navbar";
 import BottomNav from "../layouts/BottomNav";
-import AppDownloadPopup from "../components/AppDownloadPopup";
 import DownloadBanner from "../components/DownloadBanner";
 import Sidebar from "../layouts/Sidebar";
-import ChatSidebar from "../features/chat/ChatSidebar/ChatSidebar";
-import { ChatProvider } from "../context/ChatProvider";
-import FloatingActions from "../components/FloatingActions";
 import HomePage from "../pages/HomePage";
+
+const AppDownloadPopup = lazy(() => import("../components/AppDownloadPopup"));
+const FloatingActions = lazy(() => import("../components/FloatingActions"));
+const ChatPanel = lazy(() => import("../features/chat/ChatPanel"));
 
 function DashboardLayout() {
   const location = useLocation();
@@ -97,18 +97,27 @@ function DashboardLayout() {
         />
       )}
 
-      <AppDownloadPopup isOpen={isAppModalOpen} onClose={() => setIsAppModalOpen(false)} />
+      {isAppModalOpen && (
+        <Suspense fallback={null}>
+          <AppDownloadPopup isOpen={isAppModalOpen} onClose={() => setIsAppModalOpen(false)} />
+        </Suspense>
+      )}
 
-      <FloatingActions onOpenChat={() => setShowChat(true)} />
+      <Suspense fallback={null}>
+        <FloatingActions onOpenChat={() => setShowChat(true)} />
+      </Suspense>
 
-      <ChatProvider token={cleanToken} enabled={showChat}>
-        <ChatSidebar
-          open={showChat}
-          onClose={() => setShowChat(false)}
-          collapsed={chatCollapsed}
-          onToggleCollapse={() => setChatCollapsed((prev) => !prev)}
-        />
-      </ChatProvider>
+      {showChat && (
+        <Suspense fallback={null}>
+          <ChatPanel
+            token={cleanToken}
+            open={showChat}
+            onClose={() => setShowChat(false)}
+            collapsed={chatCollapsed}
+            onToggleCollapse={() => setChatCollapsed((prev) => !prev)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
