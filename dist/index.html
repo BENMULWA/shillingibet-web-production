@@ -59,35 +59,18 @@
 
     <!-- Cloudflare Turnstile -->
     <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
-    <script type="module" crossorigin src="/assets/index-D9Vyplmw.js"></script>
+    <script type="module" crossorigin src="/assets/index-C6HodfMn.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/react-vendor-DSb8USX_.js">
     <link rel="modulepreload" crossorigin href="/assets/query-vendor-GGzEswVW.js">
     <link rel="modulepreload" crossorigin href="/assets/ui-vendor-uajTRVFY.js">
     <link rel="stylesheet" crossorigin href="/assets/index-DzvGEswh.css">
   </head>
   <!-- Google tag (gtag.js) -->
-  <!-- Ganji Support Chat -->
+  <!-- App Support Chat -->
   <script>
     window.openSupportChat = function() {
-      if (window.SupportChat) {
-        window.SupportChat.open();
-      } else {
-        console.error("Ganji Support Chat not available");
-      }
+      window.dispatchEvent(new CustomEvent("open-support-chat"));
     };
-
-    // Load and initialize Ganji Support Chat
-    var script = document.createElement("script");
-    script.src = "https://api.ganjibets.com/widget/support-chat.js";
-    script.onload = function() {
-      if (window.SupportChat) {
-        SupportChat.init({
-          operatorCode: "BETS123",
-          serverUrl: "https://api.ganjibets.com"
-        });
-      }
-    };
-    document.head.appendChild(script);
   </script>
   <body>
     <div id="root"></div>

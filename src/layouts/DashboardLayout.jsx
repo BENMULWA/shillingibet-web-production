@@ -39,6 +39,12 @@ function DashboardLayout() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const openSupportChat = () => setShowChat(true);
+    window.addEventListener("open-support-chat", openSupportChat);
+    return () => window.removeEventListener("open-support-chat", openSupportChat);
+  }, []);
+
   // Show popup once on first visit
   useEffect(() => {
     const seen = localStorage.getItem("seenAppPopup");

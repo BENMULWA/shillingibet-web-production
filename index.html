@@ -61,28 +61,11 @@
     <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
   </head>
   <!-- Google tag (gtag.js) -->
-  <!-- Ganji Support Chat -->
+  <!-- App Support Chat -->
   <script>
     window.openSupportChat = function() {
-      if (window.SupportChat) {
-        window.SupportChat.open();
-      } else {
-        console.error("Ganji Support Chat not available");
-      }
+      window.dispatchEvent(new CustomEvent("open-support-chat"));
     };
-
-    // Load and initialize Ganji Support Chat
-    var script = document.createElement("script");
-    script.src = "https://api.ganjibets.com/widget/support-chat.js";
-    script.onload = function() {
-      if (window.SupportChat) {
-        SupportChat.init({
-          operatorCode: "BETS123",
-          serverUrl: "https://api.ganjibets.com"
-        });
-      }
-    };
-    document.head.appendChild(script);
   </script>
   <body>
     <div id="root"></div>
