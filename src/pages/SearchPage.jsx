@@ -5,6 +5,7 @@ import SpribeBetsCard from "../components/SpribeBetsCard";
 import { useGames, useGetTurboGames } from "../hooks/useGames";
 import { MdOutlineSportsSoccer } from "react-icons/md";
 import { FiSearch, FiChevronDown } from "react-icons/fi";
+import { isGameProviderVisible } from "../config/gameVisibility";
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -29,11 +30,13 @@ export default function SearchPage() {
   // Providers
   const { games: spribeGames = [] } = useGames();
   const { turboGames = [] } = useGetTurboGames();
+  const showTurboGames = isGameProviderVisible("turbo");
+  const showImoonGames = isGameProviderVisible("imoon");
 
   // Merge games
   const allGames = useMemo(
     () => {
-      const turboSpecific = turboGames.map(g => {
+      const turboSpecific = showTurboGames ? turboGames.map(g => {
          const rawTitle = String(g.gameName || g.name || g.title || "").toLowerCase().replace(/\s/g, "");
          const alias = g.gameAlias || (rawTitle === "crashx" ? "crash" : rawTitle);
          return {
@@ -44,7 +47,7 @@ export default function SearchPage() {
            gameName: g.gameName || g.name || g.title,
            linkPath: `/turbo/${alias}`
          };
-      });
+      }) : [];
 
       return [
         { title: "Sports", provider: "sports" },
@@ -64,17 +67,17 @@ export default function SearchPage() {
           gameName: "Aviatrix",
           linkPath: "/aviatrix"
         },
-        {
+        ...(showImoonGames ? [{
           title: "Crash Royale",
           src: "/icons/airport.png",
           provider: "imoon",
           gameID: "imoon-1001",
           gameName: "Crash Royale",
           linkPath: "/imoon/1001"
-        }
+        }] : [])
       ];
     },
-    [spribeGames, turboGames]
+    [spribeGames, turboGames, showTurboGames, showImoonGames]
   );
 
   // Partial search logic

@@ -10,6 +10,7 @@ import Footer from "../components/Footer";
 import SpribeBetsCard from "../components/SpribeBetsCard";
 import GameCategoryTabs from "../components/GameCategoryTabs";
 import { useGames, useGetTurboGames, useImoonGames } from "../hooks/useGames";
+import { isGameProviderVisible } from "../config/gameVisibility";
 
 //  Media Query Hook
 
@@ -36,6 +37,8 @@ function Homepage({ chatOpen }) {
 
   const isMobile = useMediaQuery("(max-width: 767px)");
   const limit = isMobile ? 6 : 12;
+  const showTurboGames = isGameProviderVisible("turbo");
+  const showImoonGames = isGameProviderVisible("imoon");
 
   const [gamesPage, setGamesPage] = useState(0);
 
@@ -74,7 +77,7 @@ function Homepage({ chatOpen }) {
     let games = spribeGames.map((g) => ({ ...g, __provider: "spribe", linkPath: `/${g.title?.toLowerCase()}` }));
     
     // Inject Crash X and Aero from turbo games
-    const specificTurbo = turboGames.filter(g => {
+    const specificTurbo = showTurboGames ? turboGames.filter(g => {
        const titleStr = String(g.gameName || g.name || g.title || "").toLowerCase().replace(/\s/g, "");
        return titleStr === "crashx" || titleStr === "aero";
     }).map(g => {
@@ -88,7 +91,7 @@ function Homepage({ chatOpen }) {
          gameAlias: alias,
          linkPath: `/turbo/${alias}`
        };
-    });
+    }) : [];
 
     // Manually inject Aviatrix
     const aviatrixGame = {
@@ -117,7 +120,13 @@ function Homepage({ chatOpen }) {
       linkPath: "/sports"
     };
 
-    games = [...games, ...specificTurbo, aviatrixGame, crashRoyaleGame, sportsGame];
+    games = [
+      ...games,
+      ...specificTurbo,
+      aviatrixGame,
+      ...(showImoonGames ? [crashRoyaleGame] : []),
+      sportsGame,
+    ];
 
     // Sort to put Aviator first
     return games.sort((a, b) => {
@@ -127,9 +136,11 @@ function Homepage({ chatOpen }) {
       if (!aIsAviator && bIsAviator) return 1;
       return 0;
     });
-  }, [spribeGames, turboGames]);
+  }, [spribeGames, turboGames, showTurboGames, showImoonGames]);
 
   const crashXGames = useMemo(() => {
+    if (!showTurboGames) return [];
+
     const fallback = [
       { _id: "turbo-crash", title: "Crash X", image: "/icons/rocket.png", __provider: "turbo", linkPath: "/turbo/crash" },
       { _id: "turbo-crashfootball", title: "Crash Football", image: "/icons/football.png", __provider: "turbo", linkPath: "/turbo/crashfootball" },
@@ -179,9 +190,11 @@ function Homepage({ chatOpen }) {
       .filter((game) => wanted.has(game.normalized) || wanted.has(game.gameAlias));
 
     return uniqueByPath([...apiGames, ...fallback]).slice(0, limit);
-  }, [turboGames, limit]);
+  }, [turboGames, limit, showTurboGames]);
 
   const crashRoyaleGames = useMemo(() => {
+    if (!showImoonGames) return [];
+
     const fallback = [
       { _id: "imoon-1001", title: "Crash Royale", image: "/icons/airport.png", __provider: "imoon", linkPath: "/imoon/1001" },
       { _id: "imoon-1917", title: "Crash 1917", image: "/icons/flight.png", __provider: "imoon", linkPath: "/imoon/1010:1917" },
@@ -229,12 +242,18 @@ function Homepage({ chatOpen }) {
       .filter((game) => wanted.has(game.gameId) || wanted.has(game.normalized));
 
     return uniqueByPath([...apiGames, ...fallback]).slice(0, limit);
-  }, [imoonGames, limit]);
+  }, [imoonGames, limit, showImoonGames]);
 
   const gridClass = `
   grid gap-3 transition-all duration-300
   ${chatOpen ? "grid-cols-2 md:grid-cols-4" : "grid-cols-3 md:grid-cols-6"}
 `;
+  const popularGridClass = `
+  grid gap-3 transition-all duration-300
+  ${chatOpen ? "grid-cols-2 md:grid-cols-3" : "grid-cols-3"}
+  max-w-[820px] mx-auto
+`;
+  const visiblePopularGames = paginate(allSpribeGames, gamesPage);
 
   return (
     <div>
@@ -247,6 +266,7 @@ function Homepage({ chatOpen }) {
       <GameCategoryTabs />
 
       {/* ================= JACKPOT CTA ================= */}
+      {/*
       <section className="px-2 pt-4">
         <Link
           to="/jackpot"
@@ -281,6 +301,7 @@ function Homepage({ chatOpen }) {
           </div>
         </Link>
       </section>
+      */}
 
       {/* ================= SPRIBE GAMES ================= */}
       <section className="px-2 pt-4">
@@ -293,8 +314,8 @@ function Homepage({ chatOpen }) {
           viewAllState={{ title: "Most Popular", games: allSpribeGames }}
         />
 
-        <div className={gridClass}>
-          {paginate(allSpribeGames, gamesPage).map((g, idx) => (
+        <div className={popularGridClass}>
+          {visiblePopularGames.map((g, idx) => (
             <SpribeBetsCard
               key={idx}
               title={g.title}
@@ -308,50 +329,54 @@ function Homepage({ chatOpen }) {
       </section>
 
       {/* ================= CRASH X COMMUNITY ================= */}
-      <section className="px-2 pt-4">
-        <CategoryHeader
-          title="Crash X Community"
-          icon={FaFire}
-          provider="turbo"
-          showNav={false}
-          viewAllState={{ title: "Crash X Community", games: crashXGames }}
-        />
+      {showTurboGames && (
+        <section className="px-2 pt-4">
+          <CategoryHeader
+            title="Crash X Community"
+            icon={FaFire}
+            provider="turbo"
+            showNav={false}
+            viewAllState={{ title: "Crash X Community", games: crashXGames }}
+          />
 
-        <div className={gridClass}>
-          {crashXGames.map((g, idx) => (
-            <SpribeBetsCard
-              key={`${g.__provider}-${g._id || g.title || idx}`}
-              title={g.title}
-              src={g.image}
-              gameID={g._id}
-              linkToPath={g.linkPath}
-            />
-          ))}
-        </div>
-      </section>
+          <div className={gridClass}>
+            {crashXGames.map((g, idx) => (
+              <SpribeBetsCard
+                key={`${g.__provider}-${g._id || g.title || idx}`}
+                title={g.title}
+                src={g.image}
+                gameID={g._id}
+                linkToPath={g.linkPath}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ================= CRASH ROYALE ================= */}
-      <section className="px-2 pt-4">
-        <CategoryHeader
-          title="Crash Royale"
-          icon={FaFire}
-          provider="imoon"
-          showNav={false}
-          viewAllState={{ title: "Crash Royale", games: crashRoyaleGames }}
-        />
+      {showImoonGames && (
+        <section className="px-2 pt-4">
+          <CategoryHeader
+            title="Crash Royale"
+            icon={FaFire}
+            provider="imoon"
+            showNav={false}
+            viewAllState={{ title: "Crash Royale", games: crashRoyaleGames }}
+          />
 
-        <div className={gridClass}>
-          {crashRoyaleGames.map((g, idx) => (
-            <SpribeBetsCard
-              key={`${g.__provider}-${g._id || g.title || idx}`}
-              title={g.title}
-              src={g.image}
-              gameID={g._id}
-              linkToPath={g.linkPath}
-            />
-          ))}
-        </div>
-      </section>
+          <div className={gridClass}>
+            {crashRoyaleGames.map((g, idx) => (
+              <SpribeBetsCard
+                key={`${g.__provider}-${g._id || g.title || idx}`}
+                title={g.title}
+                src={g.image}
+                gameID={g._id}
+                linkToPath={g.linkPath}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ================= LEADERBOARD ================= */}
       <LeaderboardSection />

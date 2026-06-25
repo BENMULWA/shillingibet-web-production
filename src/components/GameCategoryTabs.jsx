@@ -3,15 +3,16 @@ import BaseClass from "../services/BaseClass";
 import { FaFutbol, FaSpaceShuttle, FaPlane } from "react-icons/fa";
 import { IoAirplane, IoRocket } from "react-icons/io5";
 import { GiCastle } from "react-icons/gi";
+import { isGameProviderVisible } from "../config/gameVisibility";
 
 const categories = [
   { id: "sports", label: "SPORTS", path: "/sports", icon: <FaFutbol size={24} /> },
   { id: "aviator", label: "AVIATOR", path: "/aviator", icon: <IoAirplane size={24} className="-rotate-45" /> },
   { id: "aviatrix", label: "AVIATRIX", path: "/aviatrix", icon: <FaSpaceShuttle size={24} className="-rotate-45" /> },
-  { id: "crashx", label: "CRASH X", path: "/turbo/crash", icon: <IoRocket size={24} /> },
-  { id: "aero", label: "AERO", path: "/turbo/aero", icon: <FaPlane size={24} /> },
-  { id: "crashroyale", label: "CRASH ROYALE", path: "/imoon/1001", icon: <GiCastle size={24} /> },
-];
+  { id: "crashx", label: "CRASH X", path: "/turbo/crash", provider: "turbo", icon: <IoRocket size={24} /> },
+  { id: "aero", label: "AERO", path: "/turbo/aero", provider: "turbo", icon: <FaPlane size={24} /> },
+  { id: "crashroyale", label: "CRASH ROYALE", path: "/imoon/1001", provider: "imoon", icon: <GiCastle size={24} /> },
+].filter((category) => !category.provider || isGameProviderVisible(category.provider));
 
 export default function GameCategoryTabs() {
   const navigate = useNavigate();

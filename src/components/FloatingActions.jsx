@@ -1,20 +1,18 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaRightToBracket, FaXmark } from "react-icons/fa6";
-import BaseClass from "../services/BaseClass";
+import { FaXmark } from "react-icons/fa6";
 
 export default function FloatingActions({ onOpenChat }) {
   const [showSupport, setShowSupport] = useState(true);
   const [showDeposit, setShowDeposit] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const base = new BaseClass();
-  const isAuth = base.isAuthenticated();
   const isHomePage = location.pathname === "/";
   const mobileHomeVisibility = isHomePage ? "block md:block" : "hidden md:block";
 
   return (
     <>
+      {/*
       <div className="pointer-events-none fixed left-3 top-[38%] z-40 hidden -translate-y-1/2 flex-col gap-4 md:flex">
         {!isAuth && (
           <button
@@ -30,6 +28,7 @@ export default function FloatingActions({ onOpenChat }) {
           </button>
         )}
       </div>
+      */}
 
       {showDeposit && (
         <div
