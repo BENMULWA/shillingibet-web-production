@@ -1,14 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { TfiMenu } from "react-icons/tfi";
-import { SiChatbot } from "react-icons/si";
-import { MdPersonPin, MdOutlineSportsSoccer } from "react-icons/md";
-import { LuHouse } from "react-icons/lu";
-import { FaCirclePlus } from "react-icons/fa6";
 import BaseClass from "../services/BaseClass";
 
 export default function BottomNav({
-  onMenuClick,
   closeAll,
   isSomethingOpen,
 }) {
@@ -69,7 +63,6 @@ export default function BottomNav({
     <div className="fixed bottom-0 left-0 right-0 h-[70px] bg-[#0a0a0a] border-t border-white/5 flex justify-around items-center md:hidden z-50 px-2 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
       <RenderNavItem icon="/icons/house.png" label="Home" path="/" />
       <RenderNavItem icon="/aviator.svg" label="Aviator" path="/aviator" isAuthRequired={true} />
-      <RenderNavItem icon="/icons/football.png" label="Sports" path="/sports" isAuthRequired={true} />
       <RenderNavItem icon="/icons/add-payment.png" label="Deposit" path="/deposit" isAuthRequired={true} />
       <RenderNavItem icon="/icons/boy.png" label="Profile" path="/profile" isAuthRequired={true} />
 

@@ -22,11 +22,7 @@ const VerifyOtpPage    = lazy(() => import("./features/auth/VerifyOtpPage"));
 
 /* ── Game features ── */
 const AviatorPage      = lazy(() => import("./features/aviator/AviatorPage"));
-const SportsPage       = lazy(() => import("./features/sports/SportsPage"));
-const ComingSoonPage   = lazy(() => import("./pages/ComingSoonPage"));
-const ImoonPage        = lazy(() => import("./features/imoon/ImoonPage"));
-const AviatrixPage     = lazy(() => import("./features/aviatrix/AviatrixPage"));
-const TurboPage        = lazy(() => import("./features/turbo/TurboPage"));
+const VirtualGamePage  = lazy(() => import("./features/games/VirtualGamePage"));
 
 /* ── Profile feature ── */
 const ProfilePage      = lazy(() => import("./features/profile/ProfilePage"));
@@ -111,11 +107,8 @@ function App() {
 
           {/* ── Game launchers (protected) ── */}
           <Route path="aviator"            element={<Protected><AviatorPage /></Protected>} />
-          {/* <Route path="sports"             element={<Protected><SportsPage /></Protected>} /> */}
-          <Route path="sports"             element={<ComingSoonPage />} />
-          <Route path="imoon/:gameID"      element={<Protected><ImoonPage /></Protected>} />
-          <Route path="aviatrix"           element={<Protected><AviatrixPage /></Protected>} />
-          <Route path="turbo/:gameAlias"   element={<Protected><TurboPage /></Protected>} />
+          <Route path="virtual/:gameUuid"  element={<Protected><VirtualGamePage /></Protected>} />
+          <Route path="virtual/name/:gameName" element={<Protected><VirtualGamePage /></Protected>} />
 
           {/* ── Promotions (public) ── */}
           <Route path="promotions"     element={<PromotionsPage />} />

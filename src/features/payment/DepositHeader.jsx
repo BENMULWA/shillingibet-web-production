@@ -1,18 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoChevronDown } from "react-icons/io5";
-import { isVisibleGameRoute } from "../../config/gameVisibility";
 
 const popularGames = [
-  { name: "Aviator", route: "/playGame/aviator" },
-  { name: "Aviatrix", route: "/aviatrix" },
-  { name: "Aero", route: "/turbo/aero" },
-  { name: "Rocketman", route: "/elbet/rocketman/101" },
-  { name: "Crash 1917", route: "/imoon/1010:1917" },
-  { name: "CrashX", route: "/turbo/crash" },
-  { name: "Crash Royale", route: "/imoon/1001" },
-  { name: "City Wheel", route: "/imoon/5014" },
-].filter((game) => isVisibleGameRoute(game.route));
+  { name: "Aviator", route: "/aviator" },
+];
 
 export default function DepositHeader() {
   const [dropdownOpen, setDropdownOpen] = useState(false);

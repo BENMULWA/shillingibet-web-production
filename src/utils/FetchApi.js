@@ -1,5 +1,3 @@
-import { tenantId } from "./configs";
-
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchAPI = async (
@@ -22,17 +20,10 @@ export const fetchAPI = async (
     const options = { method, headers };
 
     if (data) {
-      // POST/PUT — tenantId already included in body by each service method
       options.body = JSON.stringify(data);
     }
 
-    // For GET requests, append tenantId as a query param so the backend
-    // can identify the tenant without requiring a custom header (avoids CORS preflight block)
-    let fullUrl = `${API_URL}/${url}`;
-    if (method === "GET" && tenantId) {
-      const separator = fullUrl.includes("?") ? "&" : "?";
-      fullUrl = `${fullUrl}${separator}tenantId=${tenantId}`;
-    }
+    const fullUrl = `${API_URL.replace(/\/+$/, "")}/${url.replace(/^\/+/, "")}`;
 
     const response = await fetch(fullUrl, options);
 
@@ -42,11 +33,26 @@ export const fetchAPI = async (
       throw new Error("Session expired. Please log in again.");
     }
 
-    const result = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+    const result = contentType.includes("application/json")
+      ? await response.json()
+      : { message: await response.text() };
 
-    if (!response.ok || result?.status === false) {
+    const providerError =
+      Number.isFinite(Number(result?.status_code)) &&
+      Number(result.status_code) >= 400;
+
+    if (
+      !response.ok ||
+      result?.success === false ||
+      result?.status === false ||
+      providerError
+    ) {
       throw new Error(
-        result?.message || result?.error || "Something went wrong"
+        result?.message ||
+          result?.status_description ||
+          result?.error ||
+          "Something went wrong"
       );
     }
 

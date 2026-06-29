@@ -14,7 +14,7 @@ class BaseClass {
 
   // Get the userId
   get userId() {
-    return this.user?.userId || null;
+    return this.user?.userId || this.user?._id || this.user?.id || null;
   }
 
   // Get the phone

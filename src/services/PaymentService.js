@@ -1,4 +1,3 @@
-import { tenantId } from "../utils/configs";
 import { fetchAPI } from "../utils/FetchApi";
 import BaseClass from "./BaseClass";
 
@@ -11,9 +10,9 @@ export class PaymentService extends BaseClass {
   async depositCash({ amount }) {
     try {
       return await fetchAPI(
-        "wallet/mamlaka/deposit",
+        "transactions/deposit",
         "POST",
-        { amount: +amount },
+        { amount: +amount, ...(this.phone ? { phone: this.phone } : {}) },
         this.token
       );
     } catch (error) {
@@ -22,7 +21,9 @@ export class PaymentService extends BaseClass {
   }
   async updateBalance() {
     try {
-      return await fetchAPI(`user/getUserBalance`, "GET", null, this.token);
+      const response = await fetchAPI("users/me", "GET", null, this.token);
+      const payload = response?.data ?? response;
+      return payload?.user ?? payload;
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }
@@ -30,9 +31,12 @@ export class PaymentService extends BaseClass {
   async withdrawCash({ withdrawAmount }) {
     try {
       return await fetchAPI(
-        "wallet/mamlaka/withdraw",
+        "transactions/withdraw",
         "POST",
-        { amount: +withdrawAmount },
+        {
+          amount: +withdrawAmount,
+          ...(this.phone ? { phone: this.phone } : {}),
+        },
         this.token
       );
     } catch (error) {
@@ -41,12 +45,7 @@ export class PaymentService extends BaseClass {
   }
   async transactionHistory() {
     try {
-      return await fetchAPI(
-        `user/getUserTransactions`,
-        "GET",
-        null,
-        this.token
-      );
+      return await fetchAPI("transactions", "GET", null, this.token);
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }
@@ -54,9 +53,9 @@ export class PaymentService extends BaseClass {
   async getTransactionStatus(uniqueID) {
     try {
       return await fetchAPI(
-        `wallet/checkDepositStatus`,
-        "POST",
-        { uniqueID, tenantId },
+        `transactions/${uniqueID}`,
+        "GET",
+        null,
         this.token
       );
     } catch (error) {
@@ -65,9 +64,9 @@ export class PaymentService extends BaseClass {
   } // Get withdrawal transaction status
   async getWithdrawalTransactionStatus(uniqueID) {
     const response = await fetchAPI(
-      "wallet/checkDepositStatus",
-      "POST",
-      { uniqueID },
+      `transactions/${uniqueID}`,
+      "GET",
+      null,
       this.token
     );
 
@@ -120,7 +119,6 @@ export class PaymentService extends BaseClass {
   async redeemBonus({ amount, type }) {
     const payload = {
       amount: +amount,
-      tenantId,
       type,
     };
     try {

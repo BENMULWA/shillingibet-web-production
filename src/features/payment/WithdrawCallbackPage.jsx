@@ -25,7 +25,12 @@ function WithdrawView() {
           await paymentService.getWithdrawalTransactionStatus.bind(
             paymentService
           )(id);
-        const newStatus = response.data.status;
+        const rawStatus = response?.data?.status ?? response?.status ?? "pending";
+        const newStatus = ["complete", "completed"].includes(
+          String(rawStatus).toLowerCase()
+        )
+          ? "success"
+          : String(rawStatus).toLowerCase();
 
         setStatus(newStatus);
         // ✅ Save banner type but don’t show yet
@@ -35,8 +40,8 @@ function WithdrawView() {
 
         if (newStatus === "success" || newStatus === "failed") {
           clearInterval(interval);
-          queryClient.invalidateQueries("balance");
-          queryClient.invalidateQueries("user");
+          queryClient.invalidateQueries({ queryKey: ["user-balance"] });
+          queryClient.invalidateQueries({ queryKey: ["user"] });
           window.dispatchEvent(new Event("refreshGame"));
         }
       } catch (error) {

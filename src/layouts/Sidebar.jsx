@@ -11,7 +11,6 @@ import SidebarItem from "./SidebarItem";
 import BaseClass from "../services/BaseClass";
 import { useLogOut } from "../hooks/useAuth";
 import toast from "react-hot-toast";
-import { isVisibleGameRoute } from "../config/gameVisibility";
 
 /* ─── Promotion action button ────────────────────────────── */
 function PromoAction({ label, icon, to, badge, requiresAuth = false }) {
@@ -88,18 +87,13 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
   /* ── Game navigation items ── */
   const navItems = [
     { label: "Home", icon: "/icons/house.png", to: "/", requiresAuth: false },
-    { label: "Sports", icon: "/icons/football copy.png", to: p("/sports"), requiresAuth: true },
     // { label: "Jackpot", icon: "/icons/badge.png", to: p("/jackpot"), requiresAuth: true, badge: "New" },
     { label: "Aviator", icon: "/aviator.svg", to: p("/aviator"), requiresAuth: true },
-    { label: "Aviatrix", icon: "/icons/old.png", to: p("/aviatrix"), requiresAuth: true, badge: "New" },
-    // { label: "Crash X", icon: "/icons/rocket.png", to: p("/turbo/crash"), requiresAuth: true, badge: "Hot" },
-    // { label: "Crash Royale", icon:"/icons/flight.png", to: p("/imoon/1001"), requiresAuth: true },
-    // { label: "Aero", icon: "/icons/transport.png", to: p("/turbo/aero"), requiresAuth: true },
 
     { label: "Refer a friend", icon: "/refer.png", to: p("/refer"), requiresAuth: true, badge: "Hot" },
     { label: "Promotions", icon: "/promo.svg", to: "/promotions", requiresAuth: false, badge: "New", animate: true },
     { label: "Download app", icon: "/deposit.svg", to: "/download", requiresAuth: false },
-  ].filter((item) => isVisibleGameRoute(item.to));
+  ];
 
   /* Filter by search */
   const filtered = searchQuery.trim()

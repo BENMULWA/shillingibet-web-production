@@ -52,7 +52,12 @@ function HistoryPage() {
   const [customRange, setCustomRange] = useState([null, null]);
 
   // Handle both direct response and axios wrapped response
-  const data = transactions?.data?.data ?? transactions?.data ?? [];
+  const data =
+    transactions?.data?.data ??
+    transactions?.data?.transactions ??
+    transactions?.data ??
+    transactions?.transactions ??
+    [];
   const totalItems =
     transactions?.data?.totalItems ?? transactions?.totalItems ?? 0;
 
@@ -102,7 +107,9 @@ function HistoryPage() {
   const { totalCount, depositsSum, withdrawalsSum, taxSum } = useMemo(() => {
     return filteredTransactions.reduce(
       (acc, t) => {
-        const isSuccess = (t?.status || "").toLowerCase() === "success";
+        const isSuccess = ["success", "complete", "completed"].includes(
+          (t?.status || "").toLowerCase()
+        );
         if (!isSuccess) return acc;
 
         acc.totalCount += 1;

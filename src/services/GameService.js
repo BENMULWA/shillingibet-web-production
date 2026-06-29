@@ -1,154 +1,57 @@
 import { fetchAPI } from "../utils/FetchApi";
 import BaseClass from "./BaseClass";
-import { tenantId } from "../utils/configs";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { normalizeGameName } from "../features/games/virtualGameCatalog";
 
 class GameService extends BaseClass {
-  constructor() {
-    super();
-  }
-
-  // ── Spribe (Aviator) ──────────────────────────────────────────
   async getAllGames() {
     try {
-      const res = await fetchAPI("spribe/getGames", "GET");
-      return res?.data;
+      const res = await fetchAPI("virtuals/games", "GET", null, this.token);
+      const games = res?.data?.data ?? res?.data ?? [];
+      const list = Array.isArray(games?.data) ? games.data : games;
+
+      return (Array.isArray(list) ? list : [])
+        .filter((game) => Number(game?.status) === 1)
+        .map((game) => ({
+          ...game,
+          _id: game.game_uuid,
+          title: game.game_name,
+          image: game.thumbnail,
+          linkPath: `/virtual/${game.game_uuid}`,
+        }));
     } catch (error) {
       throw new Error(error?.message || "Unable to fetch all games");
     }
   }
 
-  async generateGameSession({ game, userId }) {
+  async generateGameSession({ game_uuid: gameUuid, game }) {
     try {
-      return await fetchAPI(
-        "session/createGameSession",
+      let resolvedUuid = gameUuid;
+
+      // Keep the existing /aviator entry working while using the new catalog.
+      if (!resolvedUuid && game) {
+        const requestedGame = normalizeGameName(game);
+        const games = await this.getAllGames();
+        resolvedUuid = games.find(
+          (item) =>
+            normalizeGameName(item.game_name) === requestedGame
+        )?.game_uuid;
+      }
+
+      if (!resolvedUuid) throw new Error("Game is unavailable");
+
+      const res = await fetchAPI(
+        "virtuals/launch",
         "POST",
-        { userId, game },
+        { game_uuid: resolvedUuid },
         this.token
       );
+
+      const url = res?.data?.url ?? res?.url;
+      if (!url) throw new Error(res?.status_description || "Launch URL missing");
+
+      return { ...res, launchUrl: url };
     } catch (error) {
       throw new Error(error?.message || "Unable to launch game session");
-    }
-  }
-
-  // ── Imoon ─────────────────────────────────────────────────────
-  async getAllImoonGames() {
-    try {
-      const res = await fetchAPI("imoon/getGames", "GET");
-      return res?.data;
-    } catch (error) {
-      throw new Error(error?.message || "Unable to fetch Imoon games");
-    }
-  }
-
-  async launchImoonGame({ gameID }) {
-    const userID =
-      this.user?.userId ||
-      this.user?.userID ||
-      this.user?.id ||
-      this.userId;
-    if (!userID) throw new Error("User not authenticated");
-
-    try {
-      const res = await fetchAPI(
-        "imoon/launchGame",
-        "POST",
-        { gameId: gameID, userID, tenantId },
-        this.token
-      );
-      console.log("iMoon launch raw response:", res);
-      return res;
-    } catch (error) {
-      throw new Error(error?.message || "Failed to launch Imoon game");
-    }
-  }
-
-  // ── Turbo ─────────────────────────────────────────────────────
-  async getTurboGames() {
-    try {
-      const res = await fetchAPI("turbo/getGames", "GET");
-      return res?.data?.games;
-    } catch (error) {
-      throw new Error(error?.message || "Unable to fetch Turbo games");
-    }
-  }
-
-  async launchTurboGame({ game }) {
-    const userID =
-      this.user?.userId ||
-      this.user?.userID ||
-      this.user?.id ||
-      this.userId;
-    try {
-      const res = await fetchAPI(
-        "turbo/launch",
-        "POST",
-        { game, tenantId, userId: userID },
-        this.token
-      );
-      console.log("Turbo launch raw response:", res);
-      return res;
-    } catch (error) {
-      throw new Error(error?.message || "Failed to launch Turbo game");
-    }
-  }
-
-  // ── Aviatrix ──────────────────────────────────────────────────
-  async launchAviatrix() {
-    try {
-      const res = await fetchAPI("aviatrix/game/url", "GET", null, this.token);
-      return res;
-    } catch (error) {
-      throw new Error(error?.message || "Failed to launch Aviatrix game");
-    }
-  }
-
-  // ── Sports ────────────────────────────────────────────────────
-  async launchSportsbook() {
-    try {
-      const res = await fetch(`${API_URL}/sports/launch`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: this.userId,
-          tenantId,
-        }),
-      });
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      throw new Error(error?.message || "Failed to launch Sportsbook");
-    }
-  }
-
-  // ── Analytics ─────────────────────────────────────────────────
-  async getWagerLeaderboard() {
-    try {
-      const res = await fetchAPI("analytics/getWagerLeaderboard", "GET", null, this.token);
-      return res?.data || [];
-    } catch (error) {
-      throw new Error(error?.message || "Unable to fetch leaderboard");
-    }
-  }
-
-  async getUserBetProfile(userId) {
-    try {
-      const res = await fetchAPI(`analytics/getUserBetProfile?userId=${userId}`, "GET", null, this.token);
-      return res?.data || null;
-    } catch (error) {
-      throw new Error(error?.message || "Unable to fetch user bet profile");
-    }
-  }
-
-  async getTopGames() {
-    try {
-      const res = await fetchAPI("analytics/getTopGames", "GET", null, this.token);
-      return res?.data || [];
-    } catch (error) {
-      throw new Error(error?.message || "Unable to fetch top games");
     }
   }
 }

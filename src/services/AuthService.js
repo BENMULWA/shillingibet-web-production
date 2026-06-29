@@ -1,19 +1,28 @@
-import { tenantId } from "../utils/configs";
 import { fetchAPI } from "../utils/FetchApi";
 import BaseClass from "./BaseClass";
+
+const normalizeAuthResponse = (response) => {
+  const payload = response?.data ?? response ?? {};
+  const user = payload?.user ?? payload?.profile ?? payload;
+  const token =
+    payload?.token ?? payload?.accessToken ?? payload?.access_token ?? null;
+
+  return {
+    ...response,
+    status: response?.success ?? response?.status ?? true,
+    token,
+    user,
+  };
+};
 
 export class AuthService extends BaseClass {
   constructor() {
     super();
   }
-  async logIn({ phone, password, turnstileToken }) {
+  async logIn({ phone, password }) {
     try {
-      return await fetchAPI("user/login", "POST", {
-        phone,
-        password,
-        tenantId,
-        turnstileToken,
-      });
+      const response = await fetchAPI("users/login", "POST", { phone, password });
+      return normalizeAuthResponse(response);
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }
@@ -21,84 +30,46 @@ export class AuthService extends BaseClass {
 
   async register({ phone, password, referralCode = "" }) {
     try {
-      return await fetchAPI("user/create-account", "POST", {
+      const response = await fetchAPI("users/register", "POST", {
         phone,
         password,
-        tenantId,
-        referralCode,
+        ...(referralCode ? { referralCode } : {}),
       });
+      return normalizeAuthResponse(response);
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }
   }
 
   async forgotPassword({ phone }) {
-    try {
-      return await fetchAPI("user/forgot-password", "POST", {
-        phone,
-        tenantId,
-      });
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
+    void phone;
+    throw new Error("Password recovery is not supported by the new backend.");
   }
 
   async resetPassword({ phone, otp, newPassword }) {
-    try {
-      return await fetchAPI("user/reset-password", "POST", {
-        phone,
-        otp,
-        newPassword,
-        tenantId,
-      });
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
+    void phone;
+    void otp;
+    void newPassword;
+    throw new Error("Password recovery is not supported by the new backend.");
   }
 
   async deleteAccount({ duration }) {
-    try {
-      return await fetchAPI(
-        `user/delete-account?duration=${duration}`,
-        "DELETE",
-        tenantId
-      );
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
+    void duration;
+    throw new Error("Account deletion is not supported by the new backend.");
   }
 
   async logOut() {
-    try {
-      if (!this.token) {
-        throw new Error("Something went wrong");
-      }
-
-      return await fetchAPI("user/logOut", "POST", tenantId, this.token);
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
+    this.clearUser();
+    return { success: true, status: true, message: "Logged out" };
   }
 
   async activateAccount({ code, phone }) {
-    try {
-      return await fetchAPI("user/activate-account", "POST", {
-        code,
-        phone,
-        tenantId,
-      });
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
+    void code;
+    void phone;
+    throw new Error("OTP activation is not required by the new backend.");
   }
   async resendActivationCode({ phone }) {
-    try {
-      return await fetchAPI("user/resend-otp", "POST", {
-        phone,
-        tenantId,
-      });
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
+    void phone;
+    throw new Error("OTP activation is not required by the new backend.");
   }
 }

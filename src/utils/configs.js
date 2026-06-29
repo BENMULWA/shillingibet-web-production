@@ -1,8 +1,3 @@
-// export const tenantId = "6943002589b5cc2e2cb52042";
-// export const tenantId = "69cf5e7a2768c13f61f33d33";
-export const tenantId = "69d8c1a51807400ce8cea129";
-
-
 export const promotionsData = {
   registration: {
     title: "Registration Bonus",

@@ -23,6 +23,7 @@ export function useDeposit() {
         res?.data?.transactionsID ||
         res?.data?.transactionID ||
         res?.data?.transactionId ||
+        res?.data?._id ||
         res?.txnID ||
         res?.transactionsID;
 
@@ -50,7 +51,7 @@ export function useWithdraw() {
   } = useMutation({
     mutationFn: paymentService.withdrawCash.bind(paymentService),
     onSuccess: (res) => {
-      if (res.status !== "success") {
+      if (res?.success === false || res?.status === false) {
         toast.error(
           res?.data?.message ?? "Something went wrong try again later"
         );
@@ -62,6 +63,7 @@ export function useWithdraw() {
           res?.data?.txnID ||
           res?.data?.transactionID ||
           res?.data?.transactionId ||
+          res?.data?._id ||
           res?.transactionsID;
 
         if (transactionId) {

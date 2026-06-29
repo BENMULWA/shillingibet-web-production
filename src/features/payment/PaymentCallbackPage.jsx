@@ -21,7 +21,12 @@ function PaymentView() {
     const checkTransactionStatus = async () => {
       try {
         const response = await paymentService.getTransactionStatus(id);
-        const newStatus = response.data.status;
+        const rawStatus = response?.data?.status ?? response?.status ?? "pending";
+        const newStatus = ["complete", "completed"].includes(
+          String(rawStatus).toLowerCase()
+        )
+          ? "success"
+          : String(rawStatus).toLowerCase();
 
         setStatus(newStatus);
 
@@ -32,7 +37,7 @@ function PaymentView() {
 
         if (newStatus === "success" && response?.data?.banner?.showBanner) {
           setBannerType(response?.data?.banner?.currentBanner);
-          queryClient.invalidateQueries("balance");
+          queryClient.invalidateQueries({ queryKey: ["user-balance"] });
         }
 
         if (newStatus === "success" || newStatus === "failed") {
