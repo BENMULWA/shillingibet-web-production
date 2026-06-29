@@ -23,7 +23,7 @@ export default function HomePage() {
       <section className="pt-4 md:px-2">
         <CategoryHeader title="EuroVirtuals" icon={FaFire} showNav={false} />
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-6 md:gap-3">
           {euroVirtualGames.map((game) => (
             <SpribeBetsCard
               key={game.game_uuid || game._id}

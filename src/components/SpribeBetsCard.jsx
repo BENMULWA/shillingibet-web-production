@@ -12,12 +12,12 @@ const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, link
     <Link to={linkTo} className="block w-full">
       <div className="group relative flex w-full min-w-0 flex-col overflow-hidden rounded-[4px] border border-[#9b7c25] bg-[#271f0d] shadow-lg transition-all duration-300 hover:scale-[1.02]">
         {/* Image Section */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-black">
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#050806] md:aspect-[4/5]">
           <img
             src={src}
             alt={title || game}
             loading="lazy"
-            className="block h-full w-full object-contain transition-all duration-300"
+            className="block h-full w-full object-cover transition-all duration-300"
           />
           {/* Default Dark Overlay */}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/40 transition-colors duration-300"></div>
@@ -31,8 +31,8 @@ const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, link
         </div>
         
         {/* Title Section */}
-        <div className="w-full py-2.5 px-2 bg-[#2a220e] flex items-center justify-center border-t border-[#463914]">
-          <span className="text-white text-xs md:text-sm font-bold tracking-wide truncate capitalize">
+        <div className="flex w-full items-center justify-center border-t border-[#463914] bg-[#2a220e] px-2 py-2 md:py-2.5">
+          <span className="truncate text-[11px] font-bold tracking-wide text-white capitalize md:text-sm">
             {title || gameName}
           </span>
         </div>

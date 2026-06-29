@@ -50,8 +50,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="mt-10 px-4 py-6 text-[#9cae9f] md:px-6">
-      <div className="mx-auto w-full overflow-hidden rounded-2xl border border-white/10 bg-surface/75 shadow-2xl">
+    <footer className="mt-10 px-0 py-6 text-[#9cae9f] md:px-6">
+      <div className="mx-auto w-full overflow-hidden rounded-none border-y border-white/10 bg-surface/75 shadow-2xl md:rounded-2xl md:border">
         <div className="border-b border-white/10 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.14),transparent_28rem),linear-gradient(135deg,rgba(21,128,61,0.18),rgba(7,17,11,0.72))] px-5 py-6 md:px-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
