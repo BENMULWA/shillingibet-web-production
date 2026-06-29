@@ -1,57 +1,23 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect } from "react";
 
 const GameContext = createContext(null);
 
 export const GameProvider = ({ children }) => {
-  const [launchURL, setLaunchURLState] = useState("");
-  const [sessionUserId, setSessionUserId] = useState(null);
-
-  // Save URL + userId
-  const setLaunchURL = (url, userId = null) => {
-    setLaunchURLState(url);
-    setSessionUserId(userId);
-    if (url) {
-      localStorage.setItem(
-        "launchURL",
-        JSON.stringify({ url, userId, savedAt: Date.now() })
-      );
-    } else {
-      localStorage.removeItem("launchURL");
-    }
-  };
-
-  // Reset on logout/login
+  // Provider launch URLs are short-lived credentials. Never persist or restore
+  // them; GameLauncher requests a fresh URL whenever a game is entered.
   const resetGame = () => {
-    setLaunchURLState("");
-    setSessionUserId(null);
     localStorage.removeItem("launchURL");
+    sessionStorage.removeItem("launchURL");
   };
 
-  // Restore on mount
+  // Remove values written by older frontend versions.
   useEffect(() => {
-    const saved = localStorage.getItem("launchURL");
-    if (saved) {
-      try {
-        const { url, userId } = JSON.parse(saved);
-        if (url) {
-          setLaunchURLState(url);
-          setSessionUserId(userId);
-        }
-      } catch {
-        localStorage.removeItem("launchURL");
-      }
-    }
+    localStorage.removeItem("launchURL");
+    sessionStorage.removeItem("launchURL");
   }, []);
 
   return (
-    <GameContext.Provider
-      value={{
-        launchURL,
-        setLaunchURL,
-        resetGame,
-        sessionUserId,
-      }}
-    >
+    <GameContext.Provider value={{ resetGame }}>
       {children}
     </GameContext.Provider>
   );

@@ -21,8 +21,13 @@ export function useGames() {
 }
 
 export function useGameSession() {
-  const { mutate: launchGame, isPending: isLoading, error } = useMutation({
+  const {
+    mutate: launchGame,
+    mutateAsync: launchGameAsync,
+    isPending: isLoading,
+    error,
+  } = useMutation({
     mutationFn: gameService.generateGameSession.bind(gameService),
   });
-  return { launchGame, isLoading, error };
+  return { launchGame, launchGameAsync, isLoading, error };
 }

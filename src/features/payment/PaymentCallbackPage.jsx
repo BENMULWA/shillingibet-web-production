@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 function PaymentView() {
   const [status, setStatus] = useState("Pending");
   const [transactionCode, setTransactionCode] = useState(null);
+  const [timedOut, setTimedOut] = useState(false);
   const { showBanner } = useBanner();
   const [bannerType, setBannerType] = useState(null);
   const navigate = useNavigate();
@@ -17,10 +18,14 @@ function PaymentView() {
 
   useEffect(() => {
     if (!id) return;
+    let stopped = false;
+    let interval;
+    let timeout;
 
     const checkTransactionStatus = async () => {
       try {
         const response = await paymentService.getTransactionStatus(id);
+        if (stopped) return;
         const rawStatus = response?.data?.status ?? response?.status ?? "pending";
         const newStatus = ["complete", "completed"].includes(
           String(rawStatus).toLowerCase()
@@ -41,25 +46,28 @@ function PaymentView() {
         }
 
         if (newStatus === "success" || newStatus === "failed") {
-          clearInterval(interval);
+          if (interval) clearInterval(interval);
+          if (timeout) clearTimeout(timeout);
         }
       } catch (error) {
         console.error("Error checking transaction status:", error);
       }
     };
 
-    // Check status every 5 seconds
-    const interval = setInterval(() => {
+    checkTransactionStatus();
+
+    interval = setInterval(() => {
       checkTransactionStatus();
     }, 5000);
 
-    // Stop checking after 1 minute
-    const timeout = setTimeout(() => {
+    timeout = setTimeout(() => {
+      stopped = true;
       clearInterval(interval);
-    }, 60000);
+      setTimedOut(true);
+    }, 90000);
 
-    // Cleanup
     return () => {
+      stopped = true;
       clearInterval(interval);
       clearTimeout(timeout);
     };
@@ -74,6 +82,7 @@ function PaymentView() {
 
   const statusLower = status.toLowerCase();
   const isPending = statusLower === "pending";
+  const showWaiting = isPending && timedOut;
   const isSuccess = statusLower === "success";
   const isFailed = statusLower === "failed";
 
@@ -208,14 +217,16 @@ function PaymentView() {
                     : "text-primary"
                 }`}
               >
-                {isPending && "Processing..."}
+                {isPending && (showWaiting ? "Still Waiting" : "Processing...")}
                 {isSuccess && "Deposit Successful!"}
                 {isFailed && "Deposit Failed"}
               </h2>
 
               <p className="text-[#9cae9f] text-center text-sm leading-relaxed max-w-[280px]">
                 {isPending &&
-                  "Please wait while we confirm your payment. This may take a few moments."}
+                  (showWaiting
+                    ? "We have not received confirmation yet. If no STK prompt appeared, try again."
+                    : "Please wait while we confirm your payment. This may take a few moments.")}
                 {isSuccess &&
                   "Your funds have been added to your account successfully."}
                 {isFailed &&
@@ -269,13 +280,33 @@ function PaymentView() {
               {isPending && (
                 <div className="bg-background/30 rounded-lg p-3 mb-4">
                   <p className="text-[#75877a] text-xs leading-relaxed text-center">
-                    Please don't close this page. Your payment is being verified
-                    with M-Pesa.
+                    {showWaiting
+                      ? "Your transaction is still pending. You can safely go back and start a new deposit if no prompt reached your phone."
+                      : "Please don't close this page. Your payment is being verified with M-Pesa."}
                   </p>
                 </div>
               )}
 
               {/* Action Button */}
+              {showWaiting && (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => window.location.reload()}
+                    className="w-full py-3.5 rounded-lg bg-white/10 text-white font-semibold text-sm transition-all duration-200 active:scale-[0.98]"
+                  >
+                    Check Again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/deposit")}
+                    className="w-full py-3.5 rounded-lg bg-primary text-black font-semibold text-sm transition-all duration-200 active:scale-[0.98]"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
               {!isPending && (
                 <button
                   type="button"
