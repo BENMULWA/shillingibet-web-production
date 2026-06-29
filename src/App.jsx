@@ -43,6 +43,7 @@ const PromotionsDetailsPage = lazy(() => import("./features/promotions/Promotion
 /* ── Support & Search ── */
 const SupportPage  = lazy(() => import("./features/support/SupportPage"));
 const SearchPage   = lazy(() => import("./pages/SearchPage"));
+const ComingSoonPage = lazy(() => import("./pages/ComingSoonPage"));
 const JackpotPage = lazy(() => import("./features/jackpot/JackpotPage"));
 const JackpotResultsPage = lazy(() => import("./features/jackpot/JackpotResultsPage"));
 const JackpotDrawDetailPage = lazy(() => import("./features/jackpot/JackpotDrawDetailPage"));
@@ -99,6 +100,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="download" element={<DownloadPage />} />
           <Route path="search"   element={<SearchPage />} />
+          <Route path="sports" element={<ComingSoonPage />} />
           <Route path="jackpot" element={<Protected><JackpotPage /></Protected>} />
           <Route path="jackpot/results" element={<Protected><JackpotResultsPage /></Protected>} />
           <Route path="jackpot/results/:drawId" element={<Protected><JackpotDrawDetailPage /></Protected>} />

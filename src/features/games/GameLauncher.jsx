@@ -124,7 +124,7 @@ export default function GameLauncher({ game, gameUuid, title }) {
       allow="fullscreen; autoplay"
       allowFullScreen
       onError={() => requestLaunch(true)}
-      className="h-[calc(100vh-80px)] w-full border-none"
+      className="block h-[calc(100dvh-134px)] w-full rounded-none border-0 md:h-[calc(100dvh-64px)] md:rounded-[4px]"
     />
   );
 }

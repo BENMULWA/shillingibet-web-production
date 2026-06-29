@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoClose, IoAirplane, IoRocket } from "react-icons/io5";
 import {
@@ -56,12 +56,30 @@ function HelpItem({ icon, label, onClick }) {
 /* ─── Main Sidebar ───────────────────────────────────────── */
 export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collapsed }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileDrawerTop, setMobileDrawerTop] = useState(0);
+  const sidebarScrollRef = useRef(null);
   const navigate = useNavigate();
   const base = new BaseClass();
   const isAuth = base.isAuthenticated();
   const { logOutFn } = useLogOut();
 
   const effectiveCollapsed = isMobile ? false : collapsed;
+
+  useEffect(() => {
+    if (!isMobile || !showSidebar) return;
+
+    const positionBelowHeader = () => {
+      const navbar = document.getElementById("main-navbar");
+      setMobileDrawerTop(Math.max(0, navbar?.getBoundingClientRect().bottom ?? 0));
+    };
+
+    positionBelowHeader();
+    // The drawer remains mounted between openings, so browsers retain its
+    // previous scroll offset. Always reveal Home when the menu opens.
+    sidebarScrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+    window.addEventListener("resize", positionBelowHeader);
+    return () => window.removeEventListener("resize", positionBelowHeader);
+  }, [isMobile, showSidebar]);
 
   /* Auth-aware route */
   const p = (path) => (isAuth ? path : "/login");
@@ -104,7 +122,8 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
 
   const sidebarInner = (
     <div
-      className="flex h-full flex-col overflow-y-auto bg-[linear-gradient(180deg,rgba(5,14,9,0.98),rgba(8,18,12,0.98))] no-scrollbar"
+      ref={sidebarScrollRef}
+      className="flex h-full flex-col overflow-y-auto bg-[linear-gradient(180deg,rgba(5,14,9,0.98),rgba(8,18,12,0.98))] pb-[calc(70px+env(safe-area-inset-bottom))] no-scrollbar md:pb-0"
     >
       {/* Mobile close spacer */}
       {isMobile && <div className="h-14" />}
@@ -332,9 +351,13 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
           />
 
           <aside
-            className={`absolute left-0 top-0 h-full w-[260px] overflow-hidden bg-[#051305] shadow-2xl transition-transform duration-300 ${
+            className={`absolute left-0 w-[260px] overflow-hidden bg-[#051305] shadow-2xl transition-transform duration-300 ${
               showSidebar ? "translate-x-0" : "-translate-x-full"
             }`}
+            style={{
+              top: `${mobileDrawerTop}px`,
+              height: `calc(100dvh - ${mobileDrawerTop}px)`,
+            }}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"

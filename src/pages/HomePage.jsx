@@ -14,13 +14,13 @@ export default function HomePage() {
 
   return (
     <div>
-      <div className="pt-2 px-2 md:px-4">
+      <div className="pt-2 md:px-4">
         <Banner />
       </div>
 
-      <GameCategoryTabs />
+      <GameCategoryTabs games={euroVirtualGames} />
 
-      <section className="px-2 pt-4">
+      <section className="pt-4 md:px-2">
         <CategoryHeader title="EuroVirtuals" icon={FaFire} showNav={false} />
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">

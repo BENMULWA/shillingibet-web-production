@@ -10,14 +10,14 @@ const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, link
 
   return (
     <Link to={linkTo} className="block w-full">
-      <div className="relative w-full rounded-xl overflow-hidden border border-[#9b7c25] bg-[#271f0d] transition-all duration-300 hover:scale-[1.03] group flex flex-col shadow-lg">
+      <div className="group relative flex w-full min-w-0 flex-col overflow-hidden rounded-[4px] border border-[#9b7c25] bg-[#271f0d] shadow-lg transition-all duration-300 hover:scale-[1.02]">
         {/* Image Section */}
-        <div className="relative w-full aspect-[4/5]">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-black">
           <img
             src={src}
             alt={title || game}
             loading="lazy"
-            className="w-full h-full object-cover transition-all duration-300"
+            className="block h-full w-full object-contain transition-all duration-300"
           />
           {/* Default Dark Overlay */}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/40 transition-colors duration-300"></div>

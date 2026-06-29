@@ -69,6 +69,9 @@ function DashboardLayout() {
     "/reset",
     "/verify",
   ].includes(location.pathname);
+  const isGameRoute =
+    location.pathname === "/aviator" ||
+    location.pathname.startsWith("/virtual/");
 
   return (
     <div
@@ -78,7 +81,11 @@ function DashboardLayout() {
       <DownloadBanner />
       <Navbar collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} onMenuClick={() => setShowSidebar(true)} />
 
-      <div className="relative z-[1] flex flex-1 overflow-hidden no-scrollbar md:gap-2 lg:gap-2 pt-4 px-2 md:px-2">
+      <div
+        className={`relative z-[1] flex flex-1 overflow-hidden no-scrollbar md:gap-2 lg:gap-2 ${
+          isGameRoute ? "p-0 md:px-2 md:pt-4" : "px-0 pt-4 md:px-2"
+        }`}
+      >
         <Sidebar
           collapsed={collapsed}
           setCollapsed={setCollapsed}
@@ -86,15 +93,25 @@ function DashboardLayout() {
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
         />
-        <main className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(11,20,14,0.88),rgba(3,5,4,0.94))] pb-12 md:pb-0 appscroll no-scrollbar rounded-xl border border-white/5 backdrop-blur-[1px]">
-          <div className="max-w-[3000px] mx-auto w-full lg:px-4 2xl:px-8">
+        <main
+          className={`flex-1 overflow-y-auto border border-white/5 bg-[linear-gradient(180deg,rgba(11,20,14,0.88),rgba(3,5,4,0.94))] pb-12 backdrop-blur-[1px] appscroll no-scrollbar md:pb-0 ${
+            isGameRoute
+              ? "overflow-hidden rounded-none border-x-0 md:rounded-[4px] md:border-x"
+              : "rounded-xl"
+          }`}
+        >
+          <div
+            className={`mx-auto w-full max-w-[3000px] ${
+              isGameRoute ? "p-0" : "lg:px-4 2xl:px-8"
+            }`}
+          >
             {isAuthOverlayRoute && <HomePage />}
             <Outlet />
           </div>
         </main>
       </div>
 
-      {isMobile && (
+      {isMobile && !isGameRoute && (
         <BottomNav
           onMenuClick={() => setShowSidebar(true)}
           onChatClick={() => setShowChat((prev) => !prev)}
