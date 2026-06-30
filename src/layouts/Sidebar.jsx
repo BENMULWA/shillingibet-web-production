@@ -11,6 +11,7 @@ import SidebarItem from "./SidebarItem";
 import BaseClass from "../services/BaseClass";
 import { useLogOut } from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import { gameSlug } from "../features/games/virtualGameCatalog";
 
 /* ─── Promotion action button ────────────────────────────── */
 function PromoAction({ label, icon, to, badge, requiresAuth = false }) {
@@ -107,7 +108,30 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
     { label: "Home", icon: "/icons/house.png", to: "/", requiresAuth: false },
     // { label: "Jackpot", icon: "/icons/badge.png", to: p("/jackpot"), requiresAuth: true, badge: "New" },
     { label: "Aviator", icon: "/aviator.svg", to: p("/aviator"), requiresAuth: true },
-
+    {
+      label: "Euro League",
+      icon: "https://storage.googleapis.com/eurovirtuals/assets/ev_thumbnail_vl_legacy_ui.png",
+      to: p("/virtual/gfhjdghvfdvsaddd"),
+      requiresAuth: true,
+    },
+    {
+      label: "Virtual Jackpot",
+      icon: "https://storage.googleapis.com/eurovirtuals/assets/ev_thumbnail_virtual_jackpot.png",
+      to: p("/virtual/ea8dfcc7-2f3d-4a0c-929c-37f90cb75d41"),
+      requiresAuth: true,
+    },
+    {
+      label: "Betting League",
+      icon: "https://storage.googleapis.com/eurovirtuals/assets/ev_thumbnail_vl_next_gen_ui.png",
+      to: p("/virtual/6a1f06c2-91a2-41cb-bb39-0c9673c1e7e2"),
+      requiresAuth: true,
+    },
+    {
+      label: "World Cup",
+      icon: "/virtuals.png",
+      to: p(`/virtual/name/${gameSlug("Euro World Cup")}`),
+      requiresAuth: true,
+    },
     { label: "Refer a friend", icon: "/refer.png", to: p("/refer"), requiresAuth: true, badge: "Hot" },
     { label: "Promotions", icon: "/promo.svg", to: "/promotions", requiresAuth: false, badge: "New", animate: true },
     { label: "Download app", icon: "/deposit.svg", to: "/download", requiresAuth: false },
@@ -330,7 +354,7 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
   );
 
   /* ── Width ── */
-  const desktopWidth = collapsed ? "w-16" : "w-[230px]";
+  const desktopWidth = collapsed ? "w-18" : "w-[250px]";
 
   return (
     <>
@@ -351,7 +375,7 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
           />
 
           <aside
-            className={`absolute left-0 w-[260px] overflow-hidden bg-[#051305] shadow-2xl transition-transform duration-300 ${
+            className={`absolute left-0 w-[278px] overflow-hidden bg-[#051305] shadow-2xl transition-transform duration-300 ${
               showSidebar ? "translate-x-0" : "-translate-x-full"
             }`}
             style={{

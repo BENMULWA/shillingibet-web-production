@@ -12,7 +12,7 @@ const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, link
     <Link to={linkTo} className="block w-full">
       <div className="group relative flex w-full min-w-0 flex-col overflow-hidden rounded-[4px] border border-[#9b7c25] bg-[#271f0d] shadow-lg transition-all duration-300 hover:scale-[1.02]">
         {/* Image Section */}
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#050806] md:aspect-[4/5]">
+        <div className="relative aspect-square w-full overflow-hidden bg-[#050806]">
           <img
             src={src}
             alt={title || game}
@@ -28,13 +28,6 @@ const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, link
                <FaPlay className="text-white text-xl md:text-2xl ml-1 shadow-black/50" />
             </div>
           </div>
-        </div>
-        
-        {/* Title Section */}
-        <div className="flex w-full items-center justify-center border-t border-[#463914] bg-[#2a220e] px-2 py-2 md:py-2.5">
-          <span className="truncate text-[11px] font-bold tracking-wide text-white capitalize md:text-sm">
-            {title || gameName}
-          </span>
         </div>
       </div>
     </Link>

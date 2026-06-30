@@ -87,11 +87,13 @@ export default function Navbar({
         )}
 
         <Link to="/" className="flex items-center">
-           <div className="flex items-center gap-2">
-            {/* <img src="/favicons.svg" alt="Logo" className="h-11" /> */}
-            <img src="/shilingibet.png" alt="shilingibet" className="h-10" />
+          <div className={`flex items-center gap-2 ${isMobile ? "mx-1" : ""}`}>
+            {isMobile ? (
+              <img src="/favicons.svg" alt="Logo" className="h-11 w-11 object-contain" />
+            ) : (
+              <img src="/shilingibet.png" alt="shilingibet" className="h-10" />
+            )}
           </div>
-          {/* <img src="/favicons.svg" alt="Logo" className="h-11 object-contain" /> */}
         </Link>
 
         {/* Promotions — icon-only on mobile, full pill on desktop */}

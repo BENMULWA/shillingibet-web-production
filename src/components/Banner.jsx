@@ -27,7 +27,7 @@ const Banner = () => {
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
 
   return (
-    <div className="relative w-full overflow-hidden rounded-md md:rounded-xl group aspect-[293/102] md:aspect-[4/1] lg:aspect-[21/5]">
+    <div className="relative w-full overflow-hidden rounded-md md:rounded-xl group aspect-[293/120] md:aspect-[4/1] lg:aspect-[21/5]">
       {/* Slides */}
       <div
         className="flex transition-transform duration-700 ease-in-out h-full"

@@ -32,7 +32,7 @@ export default function SidebarItem({ icon, label, to, onClick, badge, download,
       tabIndex={0}
       title={collapsed ? label : undefined}
       className={`group relative flex items-center overflow-hidden border ${
-        collapsed ? "justify-center px-1 py-2" : "justify-between px-2.5 py-2"
+        collapsed ? "justify-center px-1.5 py-2.5" : "justify-between px-3 py-2.5"
       } rounded-lg cursor-pointer transition-all duration-200 select-none ${
         isActive
           ? "border-green-300/35 bg-[linear-gradient(90deg,rgba(0,200,83,0.22),rgba(13,23,17,0.92))] shadow-[inset_3px_0_0_#00c853,0_10px_24px_rgba(0,0,0,0.26)]"

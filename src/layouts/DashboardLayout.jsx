@@ -94,10 +94,8 @@ function DashboardLayout() {
           setShowSidebar={setShowSidebar}
         />
         <main
-          className={`flex-1 overflow-y-auto border border-white/5 bg-[linear-gradient(180deg,rgba(11,20,14,0.88),rgba(3,5,4,0.94))] pb-12 backdrop-blur-[1px] appscroll no-scrollbar md:pb-0 ${
-            isGameRoute
-              ? "overflow-hidden rounded-none border-x-0 md:rounded-[4px] md:border-x"
-              : "rounded-xl"
+          className={`flex-1 overflow-y-auto pb-12 appscroll no-scrollbar md:pb-0 ${
+            isGameRoute ? "overflow-hidden" : ""
           }`}
         >
           <div
