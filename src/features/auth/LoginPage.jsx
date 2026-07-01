@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useLogIn } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { useBanner } from "../../context/BannerContext";
+import { normalizeKenyanPhone } from "../../utils/phone";
 
 const LoginModal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -51,26 +52,10 @@ const LoginModal = ({ onClose }) => {
   const { logInFn, isLoading } = useLogIn();
   const { showBanner } = useBanner();
 
-  function normalizeKenyanPhoneClient(input = "") {
-    const digits = String(input).replace(/\D/g, "");
-
-    // International format: +254 7XX or +254 1XX
-    if ((digits.startsWith("2547") || digits.startsWith("2541")) && digits.length === 12)
-      return digits;
-    // Local 9-digit starting with 7 or 1
-    if ((digits.startsWith("7") || digits.startsWith("1")) && digits.length === 9)
-      return `254${digits}`;
-    // Already normalised: 07X or 01X
-    if ((digits.startsWith("07") || digits.startsWith("01")) && digits.length === 10)
-      return `254${digits.slice(1)}`;
-
-    return input;
-  }
-
   function submitData(e) {
     e.preventDefault();
 
-    const normalizedPhone = normalizeKenyanPhoneClient(phone);
+    const normalizedPhone = normalizeKenyanPhone(phone);
 
     logInFn(
       { phone: normalizedPhone, password },

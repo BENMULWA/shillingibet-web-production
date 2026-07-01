@@ -8,12 +8,13 @@ import { useResetPassword } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { BounceLoading } from "respinner";
+import { normalizeKenyanPhone } from "../../utils/phone";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
   const { resetPasswordAPI, isPending } = useResetPassword();
   const [searchParams] = useSearchParams();
-  const phone = searchParams.get("phone");
+  const phone = normalizeKenyanPhone(searchParams.get("phone") || "");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { handleSubmit, register } = useForm();
 

@@ -2,6 +2,8 @@
 
 Betting platform REST API built with Express and MongoDB (Mongoose), organised by domain.
 
+Admin-only routes and examples are documented in [ADMIN.md](./ADMIN.md).
+
 ## Stack
 
 - **Express 4** — HTTP framework
@@ -79,8 +81,12 @@ Base prefix: `/api/v1`
 | Method | Endpoint              | Auth   | Description                       |
 | ------ | --------------------- | ------ | -------------------------------- |
 | GET    | `/health`             | —      | Health check                     |
-| POST   | `/users/register`             | —      | Create account (phone + password), returns token |
+| POST   | `/users/register`             | —      | Create account and send SMS verification code |
 | POST   | `/users/login`                | —      | Login (phone + password), returns token |
+| POST   | `/users/verify-phone`         | —      | Verify phone number using SMS code, returns token |
+| POST   | `/users/resend-phone-code`    | —      | Resend SMS phone verification code |
+| POST   | `/users/request-password-reset` | —    | Send SMS reset code to a registered phone |
+| POST   | `/users/reset-password`       | —      | Reset password using phone + SMS code |
 | GET    | `/users/me`                   | user   | Current profile                  |
 | POST   | `/users/credit`               | admin  | Manual wallet credit (bonus/fix) |
 | GET    | `/events`                     | —      | List events (filter + paginate)  |
@@ -103,7 +109,7 @@ Deposits and withdrawals run through the [Mamlaka mobile-money API](https://gith
 **Deposit (collection / STK push)**
 1. `POST /transactions/deposit { amount, phone, provider? }` — creates a `pending` transaction and triggers an STK push to the phone.
 2. Customer approves on their handset.
-3. Mamlaka calls `POST /transactions/callback/deposit`. On `COMPLETE` the wallet is credited exactly once (idempotent).
+3. Mamlaka calls `POST /transactions/callback/deposit`. On `COMPLETE`, the transaction status and wallet credit commit together in one MongoDB transaction. Duplicate callbacks are ignored.
 
 **Withdrawal (payout / B2C)**
 1. `POST /transactions/withdraw { amount, phone, provider? }` — wallet is debited atomically up-front (blocks overdraft).
@@ -133,7 +139,7 @@ Virtual games use a **seamless (transfer) wallet**: the provider calls back into
 | GET    | `/virtuals/bet/status/:game_uuid?bet_id=`  | Bet status lookup                    |
 | POST   | `/virtuals/shortcode/:game_uuid` (admin)   | USSD/SMS session                     |
 
-**Provider → Operator** seamless-wallet callbacks (signature-verified, in the `virtual` domain). The provider posts to the registered base `https://api.shilingibet.com/api/v1/virtuals`, appending the action:
+**Provider → Operator** seamless-wallet callbacks (signature-verified, in the `virtual` domain). The provider posts to the registered base `https://stagging.shilingibet.com/api/v1/virtuals`, appending the action:
 
 | Method | Endpoint                  | Effect                                            |
 | ------ | ------------------------- | ------------------------------------------------- |
@@ -144,19 +150,70 @@ Virtual games use a **seamless (transfer) wallet**: the provider calls back into
 
 **Auth / signing** (in [src/integrations/eurovirtuals/eurovirtuals.signature.js](src/integrations/eurovirtuals/eurovirtuals.signature.js)):
 - Token Key = `MD5_hex(SHA1_hex(appKey + timestamp))`.
-- Signature = `MD5_hex(sortedHashString + suffixKey)`. Outbound calls use the **App Key** as suffix; inbound callback validation uses the **Token Key**.
+- Signature = `MD5_hex(sortedHashString + suffixKey)`. Outbound calls use the **App Key** as suffix. Inbound callback validation accepts the documented **App Key** signature and the older **Token Key** variant for compatibility.
 - Headers: `x-api-key` (outbound), `x-token-key` + `x-signature-key` + `x-timestamp` (callbacks).
 - **GET requests sign the query parameters**; POST requests sign the JSON body.
 
 **Behaviour**
 - All callbacks return **HTTP 200** regardless of outcome (the body carries `status_code`); any non-200 makes the provider treat the request as undelivered and retry.
 - Every wallet mutation is idempotent on `(bet_id, action)` and uses a `$round` aggregation-pipeline update so decimal payouts never drift.
+- `/virtuals/win` accepts payout values from both the top-level body and nested `data` payloads (`payout_amount`, `amount`, `payout`, `won_amount`).
+- If a win callback arrives with `payout_amount: 0` and no alternate positive payout value, Betnare treats it as a provider payload issue and does not credit the wallet.
+- If a `/virtuals/win` callback fails auth but includes a known `bet_id`, Betnare now attempts a background provider reconciliation by `bet_id` and `game_uuid`. Any recovered positive payout is still applied through the same idempotent `result_bet` path, so the same bet cannot be credited twice.
 - `player_id` = the Betnare user `_id`; `player_token` = a short-lived `VirtualSession` issued at launch.
 - Config: `EUROVIRTUALS_API_KEY`, `EUROVIRTUALS_APP_KEY`, `EUROVIRTUALS_BASE_URL`, `EUROVIRTUALS_VERIFY_CALLBACKS` (set `false` only for local testing).
 
+**Troubleshooting**
+- If Aviator credits correctly but sports virtual wins do not, inspect the `/virtuals/win` callback logs first. A successful HTTP 200 only means the callback reached Betnare; the response body `status_code` still determines whether the wallet credit was accepted.
+- Signature failures are logged by [src/middlewares/verifyEurovirtuals.js](src/middlewares/verifyEurovirtuals.js) with the callback `path`, `timestamp`, `body_keys`, and detected payout fields.
+- Accepted `/virtuals/win` requests are logged by [src/domains/virtual/virtual.controller.js](src/domains/virtual/virtual.controller.js), including payout debug values, so provider payload mismatches can be compared between games.
+
 Send the token as `Authorization: Bearer <token>`.
 
-Accounts use **phone + password**. Registration requires only `phone` and `password` (`name` and `email` optional). Phone numbers are normalized to `2547XXXXXXXX`.
+Accounts use **phone + password**. Registration requires only `phone` and `password` (`name` and `email` optional). Phone numbers are normalized to `2547XXXXXXXX`. New signups must verify the phone number by SMS before they can log in.
+
+## Referrals
+
+- Every user gets a unique `referralCode`.
+- New signups can pass an optional `referralCode` to `POST /users/register`.
+- `/users/me` now returns a `referral` object with the user's code, referrer, and referred-user count.
+- Admin overview now reports real `referredUsers` totals instead of a hardcoded zero.
+- If a referred user reaches more than `KES 100` in completed deposits, the referrer gets a one-time `KES 20` bonus.
+
+## SMS notifications and password reset
+
+Betnare can send SMS through the Celcom Africa gateway for:
+
+- phone verification codes on signup
+- first-time signup welcome messages
+- password reset codes
+- deposit success/failure updates
+- withdrawal success/failure updates
+
+Required `.env` values:
+
+- `SMS_ENABLED=true`
+- `SMS_BASE_URL=https://isms.celcomafrica.com`
+- `SMS_PARTNER_ID=323`
+- `SMS_API_KEY=...`
+- `SMS_SHORTCODE=IMPALA LTD`
+- `SMS_PASS_TYPE=plain`
+- `SMS_PHPSESSID=...` (only if the gateway session cookie is required in your environment)
+- `SMS_RESET_CODE_TTL_MINUTES=10`
+- `SMS_PHONE_VERIFICATION_TTL_MINUTES=10`
+
+Signup verification flow:
+
+1. `POST /users/register` with `{ "phone": "0717126550", "password": "password123" }`
+2. Player receives a 6-digit verification code by SMS.
+3. `POST /users/verify-phone` with `{ "phone": "0717126550", "code": "123456" }`
+4. If needed, `POST /users/resend-phone-code` with `{ "phone": "0717126550" }`
+
+Reset flow:
+
+1. `POST /users/request-password-reset` with `{ "phone": "0717126550" }`
+2. Player receives a 6-digit code by SMS.
+3. `POST /users/reset-password` with `{ "phone": "0717126550", "code": "123456", "newPassword": "newpass123" }`
 
 ### Seeded accounts
 

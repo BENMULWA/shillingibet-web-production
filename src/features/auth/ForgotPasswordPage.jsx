@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useForgotPassword } from "../../hooks/useAuth";
 import { BounceLoading } from "respinner";
+import { normalizeKenyanPhone } from "../../utils/phone";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -23,9 +24,11 @@ export default function ForgotPassword() {
   const { handleSubmit, register } = useForm();
 
   function submitData(data) {
-    forgotPasswordAPI(data, {
+    const phone = normalizeKenyanPhone(data.phone);
+
+    forgotPasswordAPI({ ...data, phone }, {
       onSuccess: (dt) => {
-        navigate(`/reset?phone=${data.phone}`);
+        navigate(`/reset?phone=${encodeURIComponent(phone)}`);
         toast.success(dt?.message);
       },
       onError: (dt) => {

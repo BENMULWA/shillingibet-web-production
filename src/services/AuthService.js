@@ -1,4 +1,5 @@
 import { fetchAPI } from "../utils/FetchApi";
+import { normalizeKenyanPhone } from "../utils/phone";
 import BaseClass from "./BaseClass";
 
 const normalizeAuthResponse = (response) => {
@@ -21,7 +22,10 @@ export class AuthService extends BaseClass {
   }
   async logIn({ phone, password }) {
     try {
-      const response = await fetchAPI("users/login", "POST", { phone, password });
+      const response = await fetchAPI("users/login", "POST", {
+        phone: normalizeKenyanPhone(phone),
+        password,
+      });
       return normalizeAuthResponse(response);
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
@@ -31,7 +35,7 @@ export class AuthService extends BaseClass {
   async register({ phone, password, referralCode = "" }) {
     try {
       const response = await fetchAPI("users/register", "POST", {
-        phone,
+        phone: normalizeKenyanPhone(phone),
         password,
         ...(referralCode ? { referralCode } : {}),
       });
@@ -42,15 +46,25 @@ export class AuthService extends BaseClass {
   }
 
   async forgotPassword({ phone }) {
-    void phone;
-    throw new Error("Password recovery is not supported by the new backend.");
+    try {
+      return await fetchAPI("users/request-password-reset", "POST", {
+        phone: normalizeKenyanPhone(phone),
+      });
+    } catch (error) {
+      throw new Error(error?.message || "Something went wrong");
+    }
   }
 
   async resetPassword({ phone, otp, newPassword }) {
-    void phone;
-    void otp;
-    void newPassword;
-    throw new Error("Password recovery is not supported by the new backend.");
+    try {
+      return await fetchAPI("users/reset-password", "POST", {
+        phone: normalizeKenyanPhone(phone),
+        code: String(otp).trim(),
+        newPassword,
+      });
+    } catch (error) {
+      throw new Error(error?.message || "Something went wrong");
+    }
   }
 
   async deleteAccount({ duration }) {
@@ -64,12 +78,23 @@ export class AuthService extends BaseClass {
   }
 
   async activateAccount({ code, phone }) {
-    void code;
-    void phone;
-    throw new Error("OTP activation is not required by the new backend.");
+    try {
+      const response = await fetchAPI("users/verify-phone", "POST", {
+        phone: normalizeKenyanPhone(phone),
+        code: String(code).trim(),
+      });
+      return normalizeAuthResponse(response);
+    } catch (error) {
+      throw new Error(error?.message || "Something went wrong");
+    }
   }
   async resendActivationCode({ phone }) {
-    void phone;
-    throw new Error("OTP activation is not required by the new backend.");
+    try {
+      return await fetchAPI("users/resend-phone-code", "POST", {
+        phone: normalizeKenyanPhone(phone),
+      });
+    } catch (error) {
+      throw new Error(error?.message || "Something went wrong");
+    }
   }
 }

@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { BounceLoading } from "respinner";
 import { useBanner } from "../../context/BannerContext";
 import Turnstile from "../../components/auth/Turnstile";
+import { normalizeKenyanPhone } from "../../utils/phone";
 
 export default function Register() {
   const [showReferral, setShowReferral] = useState(true);
@@ -44,27 +45,13 @@ export default function Register() {
     setReferral(params.get("ref") || "");
   }, [location]);
 
-  function normalizeKenyanPhoneClient(input = "") {
-    const digits = String(input).replace(/\D/g, "");
-    // International: +254 7XX or +254 1XX
-    if ((digits.startsWith("2547") || digits.startsWith("2541")) && digits.length === 12)
-      return digits;
-    // 9-digit without leading 0
-    if ((digits.startsWith("7") || digits.startsWith("1")) && digits.length === 9)
-      return `254${digits}`;
-    // Already normalised: 07X or 01X
-    if ((digits.startsWith("07") || digits.startsWith("01")) && digits.length === 10)
-      return `254${digits.slice(1)}`;
-    return input;
-  }
-
   function submitData(data) {
     // if (!turnstileToken) {
     //   toast.error("Please wait for security verification to complete");
     //   return;
     // }
 
-    const phone = normalizeKenyanPhoneClient(data.phone);
+    const phone = normalizeKenyanPhone(data.phone);
 
     registerFn(
       { ...data, phone, referralCode: referral || "" },
@@ -84,7 +71,10 @@ export default function Register() {
               toast.success(response?.message || "Account created successfully");
               navigate("/");
             } else {
-              navigate("/verify", { state: { phone: response?.user?.phone } });
+              const verificationPhone = response?.user?.phone || phone;
+              navigate(`/verify?phone=${encodeURIComponent(verificationPhone)}`, {
+                state: { phone: verificationPhone },
+              });
             }
           } else {
             toast.error(response?.message || "Registration failed");

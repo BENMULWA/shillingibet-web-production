@@ -7,11 +7,13 @@ import toast from "react-hot-toast";
 import { BounceLoading } from "respinner";
 import { useActivateAccount, useResendOTP } from "../../hooks/useAuth";
 import { useBanner } from "../../context/BannerContext";
+import { normalizeKenyanPhone } from "../../utils/phone";
 
 export default function VerifyOtp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const phone = location.state?.phone || "";
+  const phoneFromQuery = new URLSearchParams(location.search).get("phone") || "";
+  const phone = normalizeKenyanPhone(location.state?.phone || phoneFromQuery);
   const { showBanner } = useBanner();
   const { handleSubmit, register } = useForm();
   const [resendTimer, setResendTimer] = useState(30);
@@ -27,6 +29,12 @@ export default function VerifyOtp() {
   }, [resendTimer]);
 
   function submitOtp(data) {
+    if (!phone) {
+      toast.error("Phone number missing. Please register again.");
+      navigate("/register");
+      return;
+    }
+
     activateAccountFn(
       { code: data.otp, phone },
       {
@@ -51,6 +59,12 @@ export default function VerifyOtp() {
   }
 
   function resendOtp() {
+    if (!phone) {
+      toast.error("Phone number missing. Please register again.");
+      navigate("/register");
+      return;
+    }
+
     resendOTPFn(
       { phone },
       {
