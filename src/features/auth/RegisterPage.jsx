@@ -13,6 +13,7 @@ import { BounceLoading } from "respinner";
 import { useBanner } from "../../context/BannerContext";
 import Turnstile from "../../components/auth/Turnstile";
 import { normalizeKenyanPhone } from "../../utils/phone";
+import { isUserPhoneVerified } from "../../utils/verification";
 
 export default function Register() {
   const [showReferral, setShowReferral] = useState(true);
@@ -67,7 +68,7 @@ export default function Register() {
               showBanner(response?.banner?.currentBanner || "registration");
             }
 
-            if (response?.user?.isActive !== false) {
+            if (isUserPhoneVerified(response?.user)) {
               toast.success(response?.message || "Account created successfully");
               navigate("/");
             } else {

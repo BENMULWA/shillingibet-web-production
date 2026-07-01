@@ -1,3 +1,5 @@
+import { isUserPhoneVerified } from "../utils/verification";
+
 class BaseClass {
   // Get the current user from localStorage
   get user() {
@@ -20,6 +22,11 @@ class BaseClass {
   // Get the phone
   get phone() {
     return this.user?.phone || null;
+  }
+
+  // Phone verification follows the backend's `isActive` flag.
+  isPhoneVerified() {
+    return isUserPhoneVerified(this.user);
   }
 
   // Get the referralCode

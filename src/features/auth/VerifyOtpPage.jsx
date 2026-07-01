@@ -13,7 +13,11 @@ export default function VerifyOtp() {
   const navigate = useNavigate();
   const location = useLocation();
   const phoneFromQuery = new URLSearchParams(location.search).get("phone") || "";
-  const phone = normalizeKenyanPhone(location.state?.phone || phoneFromQuery);
+  const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+  const phone = normalizeKenyanPhone(
+    location.state?.phone || phoneFromQuery || storedUser?.phone || ""
+  );
+  const redirectTo = location.state?.from?.pathname || "/";
   const { showBanner } = useBanner();
   const { handleSubmit, register } = useForm();
   const [resendTimer, setResendTimer] = useState(30);
@@ -43,7 +47,7 @@ export default function VerifyOtp() {
             toast.success("OTP Verified Successfully");
             const userData = { token: res?.token, ...res.user };
             localStorage.setItem("user", JSON.stringify(userData));
-            navigate("/");
+            navigate(redirectTo, { replace: true });
             if (res?.banner?.showBanner) {
               showBanner(res?.banner?.currentBanner || "registration");
             }
@@ -107,7 +111,7 @@ export default function VerifyOtp() {
         <div className="hidden md:flex flex-1 items-center justify-center bg-black">
           <div className="relative w-full h-full min-h-[460px]">
             <img
-              src="/banners/a1.png"
+              src="/a1.png"
               alt="Verify promo"
               className="w-full h-full object-cover"
               loading="lazy"

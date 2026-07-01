@@ -8,6 +8,7 @@ import { useLogIn } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { useBanner } from "../../context/BannerContext";
 import { normalizeKenyanPhone } from "../../utils/phone";
+import { isUserPhoneVerified } from "../../utils/verification";
 
 const LoginModal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -66,6 +67,16 @@ const LoginModal = ({ onClose }) => {
           if (!data?.user) return;
           const userData = { token: data.token, ...data.user };
           localStorage.setItem("user", JSON.stringify(userData));
+          if (!isUserPhoneVerified(data?.user)) {
+            toast.success(data?.message || "Please verify your phone number");
+            navigate(`/verify?phone=${encodeURIComponent(data?.user?.phone || normalizedPhone)}`, {
+              state: {
+                phone: data?.user?.phone || normalizedPhone,
+              },
+            });
+            return;
+          }
+
           toast.success(data?.message || "Log in successful");
           if (data?.banner?.showBanner) showBanner(data.banner.currentBanner);
           if (onClose) onClose();

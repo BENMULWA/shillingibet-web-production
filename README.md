@@ -170,7 +170,7 @@ Virtual games use a **seamless (transfer) wallet**: the provider calls back into
 
 Send the token as `Authorization: Bearer <token>`.
 
-Accounts use **phone + password**. Registration requires only `phone` and `password` (`name` and `email` optional). Phone numbers are normalized to `2547XXXXXXXX`. New signups must verify the phone number by SMS before they can log in.
+Accounts use **phone + password**. Registration requires only `phone` and `password` (`name` and `email` optional). Phone numbers are normalized to `2547XXXXXXXX`. Every account phone number must be verified by SMS before login or access to protected API routes.
 
 ## Referrals
 
@@ -208,6 +208,37 @@ Signup verification flow:
 2. Player receives a 6-digit verification code by SMS.
 3. `POST /users/verify-phone` with `{ "phone": "0717126550", "code": "123456" }`
 4. If needed, `POST /users/resend-phone-code` with `{ "phone": "0717126550" }`
+
+Auth payloads:
+
+`POST /users/register`
+
+```json
+{
+  "phone": "0717126550",
+  "password": "password123",
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "referralCode": "SB79E9EBB8"
+}
+```
+
+`POST /users/verify-phone`
+
+```json
+{
+  "phone": "0717126550",
+  "code": "123456"
+}
+```
+
+`POST /users/resend-phone-code`
+
+```json
+{
+  "phone": "0717126550"
+}
+```
 
 Reset flow:
 
