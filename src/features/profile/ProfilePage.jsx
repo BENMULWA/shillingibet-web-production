@@ -54,10 +54,10 @@ export default function Profile() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-5xl mx-auto px-4 py-6">
         {/* User Header */}
-        <div className="bg-secondary rounded-2xl p-6 mb-6">
+        <div className="mb-6 rounded-2xl bg-secondary p-6">
           <div className="flex items-center gap-4">
             <div className="relative">
               <img
@@ -79,7 +79,7 @@ export default function Profile() {
         {/* Wallet Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {/* Main Wallet */}
-          <div className="bg-secondary rounded-2xl p-5">
+          <div className="rounded-2xl bg-secondary p-5">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 flex items-center justify-center">
                 <img src="/icons/add-payment.png" alt="Wallet" className="w-full h-full object-contain" />
@@ -96,7 +96,7 @@ export default function Profile() {
           </div>
 
           {/* Referral Bonus */}
-          <div className="bg-secondary rounded-2xl p-5">
+          <div className="rounded-2xl bg-secondary p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 flex items-center justify-center">
@@ -125,7 +125,7 @@ export default function Profile() {
           </div>
 
           {/* Cashback */}
-          <div className="bg-secondary rounded-2xl p-5">
+          <div className="rounded-2xl bg-secondary p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 flex items-center justify-center">
@@ -175,7 +175,7 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Menu Section */}
           <div className="order-2 lg:order-1">
-            <div className="bg-secondary rounded-2xl overflow-hidden">
+            <div className="overflow-hidden rounded-2xl bg-secondary">
               <div className="px-5 py-4 border-b border-white/5">
                 <h2 className="font-semibold text-white">Quick Actions</h2>
               </div>
@@ -196,7 +196,7 @@ export default function Profile() {
 
           {/* Referral Section */}
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="bg-secondary rounded-2xl p-6">
+            <div className="rounded-2xl bg-secondary p-6">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-11 h-11 bg-primary/20 rounded-xl flex items-center justify-center">
                   <BsBoxes className="text-primary text-xl" />
@@ -210,7 +210,7 @@ export default function Profile() {
               </div>
 
               {/* Referral Link */}
-              <div className="bg-background/50 rounded-xl p-4 mb-5">
+              <div className="mb-5 rounded-xl bg-background/50 p-4">
                 <p className="text-xs text-[#75877a] mb-2">Your referral link</p>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-secondary rounded-lg px-4 py-3 text-sm text-[#d7e1d9] truncate">
@@ -264,7 +264,7 @@ export default function Profile() {
             </div>
 
             {/* Supported Networks */}
-            <div className="mt-4 bg-secondary rounded-2xl p-4">
+            <div className="mt-4 rounded-2xl bg-secondary p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-white">Supported Networks</p>

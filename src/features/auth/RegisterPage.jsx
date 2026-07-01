@@ -150,13 +150,23 @@ export default function Register() {
         {/* RIGHT: Form */}
         <div className="flex-1 p-8 md:px-16 md:py-14 flex flex-col justify-center bg-background overflow-y-auto max-h-screen">
           <div className="mb-6">
-            <img
-              src="/shilingibet.png"
-              alt="ShilingiBet"
-              className="h-12"
-              loading="lazy"
-              decoding="async"
-            />
+            {window.innerWidth < 768 ? (
+              <img
+                src="/favicon.ico"
+                alt="ShilingiBet"
+                className="h-12 w-12 object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <img
+                src="/shilingibet.png"
+                alt="ShilingiBet"
+                className="h-12"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
             <h1 className="text-white text-4xl font-black mb-2">Create account</h1>
           </div>
 

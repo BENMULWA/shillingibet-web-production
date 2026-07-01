@@ -27,16 +27,16 @@ export const fetchAPI = async (
 
     const response = await fetch(fullUrl, options);
 
-    // On 401: silently clear the stale token — do NOT redirect (causes reload loop)
-    if (response.status === 401) {
-      localStorage.removeItem("user");
-      throw new Error("Session expired. Please log in again.");
-    }
-
     const contentType = response.headers.get("content-type") || "";
     const result = contentType.includes("application/json")
       ? await response.json()
       : { message: await response.text() };
+
+    // On 401 with an authenticated request, clear the stale user session.
+    // Keep backend-provided messages for login/register style requests.
+    if (response.status === 401 && token) {
+      localStorage.removeItem("user");
+    }
 
     const providerError =
       Number.isFinite(Number(result?.status_code)) &&
@@ -48,11 +48,16 @@ export const fetchAPI = async (
       result?.status === false ||
       providerError
     ) {
+      const fallbackMessage =
+        response.status === 401 && token
+          ? "Session expired. Please log in again."
+          : "Something went wrong";
+
       throw new Error(
         result?.message ||
           result?.status_description ||
           result?.error ||
-          "Something went wrong"
+          fallbackMessage
       );
     }
 

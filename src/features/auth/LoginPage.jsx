@@ -147,13 +147,23 @@ const LoginModal = ({ onClose }) => {
         {/* RIGHT SIDE: Login Form (matches design) */}
         <div className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-background overflow-y-auto">
           <div className="mb-8">
-            <img
-              src="/shilingibet.png"
-              alt="ShilingiBet"
-              className="h-12"
-              loading="lazy"
-              decoding="async"
-            />
+            {window.innerWidth < 768 ? (
+              <img
+                src="/favicon.ico"
+                alt="ShilingiBet"
+                className="h-12 w-12 object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <img
+                src="/shilingibet.png"
+                alt="ShilingiBet"
+                className="h-12"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
             <h1 className="text-white text-4xl font-black mb-2">Welcome back</h1>
           </div>
 

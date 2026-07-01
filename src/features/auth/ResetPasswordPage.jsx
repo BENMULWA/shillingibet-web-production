@@ -83,9 +83,16 @@ export default function ResetPassword() {
         <div className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-background">
           <div className="mb-8">
             <img
+              src="/favicon.ico"
+              alt="ShilingiBet"
+              className="mb-4 h-12 w-12 object-contain md:hidden"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
               src="/shilingibet.png"
               alt="ShilingiBet"
-              className="h-12 md:hidden mb-4"
+              className="hidden h-12 md:block"
               loading="lazy"
               decoding="async"
             />
