@@ -2,10 +2,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { imageToWebpPlugin } from "vite-plugin-image-to-webp";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    imageToWebpPlugin({
+      imageFormats: ["jpg", "jpeg", "png"],
+      webpQuality: {
+        quality: 80,
+      },
+    }),
+  ],
 
   server: {
     allowedHosts: true, // This will stop the 403 Forbidden error
