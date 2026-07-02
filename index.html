@@ -57,6 +57,197 @@
 
     <title>ShilingiBet | Play Aviator Online | Real-Time Cashout</title>
 
+    <style>
+      :root {
+        color-scheme: dark;
+        background: #050806;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 50% 18%, rgba(250, 204, 21, 0.08), transparent 18rem),
+          radial-gradient(circle at 78% 80%, rgba(34, 197, 94, 0.08), transparent 22rem),
+          #050806;
+        color: #fff;
+        font-family: "Nunito", sans-serif;
+      }
+
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: opacity 260ms ease, visibility 260ms ease;
+      }
+
+      #boot-splash.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .boot-shell {
+        position: relative;
+        width: 100%;
+        max-width: 22rem;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+      }
+
+      .boot-glow {
+        position: absolute;
+        inset: 2rem 2.5rem auto;
+        height: 10rem;
+        border-radius: 9999px;
+        background: rgba(250, 204, 21, 0.08);
+        filter: blur(48px);
+      }
+
+      .boot-spinner {
+        position: relative;
+        width: 7rem;
+        height: 7rem;
+        margin: 0 auto;
+      }
+
+      .boot-ring,
+      .boot-core,
+      .boot-orbit,
+      .boot-dot {
+        position: absolute;
+        inset: 0;
+        border-radius: 9999px;
+      }
+
+      .boot-ring.outer {
+        border: 1px solid rgba(250, 204, 21, 0.14);
+        border-top-color: rgba(250, 204, 21, 0.92);
+        border-right-color: rgba(34, 197, 94, 0.42);
+        animation: boot-spin 3.2s linear infinite;
+      }
+
+      .boot-ring.mid {
+        inset: 0.65rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom-color: rgba(250, 204, 21, 0.7);
+        border-left-color: rgba(34, 197, 94, 0.34);
+        animation: boot-spin-reverse 2.4s linear infinite;
+      }
+
+      .boot-ring.inner {
+        inset: 1.45rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-top-color: rgba(255, 255, 255, 0.3);
+        animation: boot-pulse 2s ease-in-out infinite;
+      }
+
+      .boot-core {
+        inset: 1.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12), transparent 45%),
+          linear-gradient(145deg, rgba(15, 28, 20, 0.96), rgba(8, 17, 12, 0.98));
+        border: 1px solid rgba(250, 204, 21, 0.12);
+        box-shadow:
+          0 0 0 1px rgba(250, 204, 21, 0.08),
+          0 0 28px rgba(250, 204, 21, 0.12),
+          0 0 55px rgba(34, 197, 94, 0.08);
+        animation: boot-glow 2.6s ease-in-out infinite;
+      }
+
+      .boot-core img {
+        width: 2.9rem;
+        height: 2.9rem;
+        object-fit: contain;
+      }
+
+      .boot-orbit {
+        animation: boot-spin 4.8s linear infinite;
+      }
+
+      .boot-dot::after {
+        content: "";
+        position: absolute;
+        top: -0.18rem;
+        left: 50%;
+        width: 0.65rem;
+        height: 0.65rem;
+        transform: translateX(-50%);
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #facc15, #fde68a);
+        box-shadow: 0 0 16px rgba(250, 204, 21, 0.88);
+      }
+
+      .boot-copy {
+        position: relative;
+        margin-top: 1.75rem;
+      }
+
+      .boot-copy p {
+        margin: 0;
+      }
+
+      .boot-eyebrow {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.42em;
+        text-transform: uppercase;
+        color: rgba(250, 204, 21, 0.78);
+      }
+
+      .boot-title {
+        margin-top: 0.75rem !important;
+        font-size: 1.65rem;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: #fff;
+      }
+
+      .boot-subtitle {
+        margin: 0.6rem auto 0 !important;
+        max-width: 16rem;
+        font-size: 0.92rem;
+        line-height: 1.65;
+        color: #95a59a;
+      }
+
+      @keyframes boot-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes boot-spin-reverse {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+      }
+
+      @keyframes boot-pulse {
+        0%, 100% { transform: scale(0.98); opacity: 0.88; }
+        50% { transform: scale(1.03); opacity: 1; }
+      }
+
+      @keyframes boot-glow {
+        0%, 100% {
+          box-shadow:
+            0 0 0 1px rgba(250, 204, 21, 0.08),
+            0 0 28px rgba(250, 204, 21, 0.12),
+            0 0 55px rgba(34, 197, 94, 0.08);
+        }
+        50% {
+          box-shadow:
+            0 0 0 1px rgba(250, 204, 21, 0.18),
+            0 0 36px rgba(250, 204, 21, 0.2),
+            0 0 70px rgba(34, 197, 94, 0.14);
+        }
+      }
+    </style>
+
     <!-- Cloudflare Turnstile -->
     <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
   </head>
@@ -66,8 +257,36 @@
     window.openSupportChat = function() {
       window.dispatchEvent(new CustomEvent("open-support-chat"));
     };
+
+    window.hideBootSplash = function() {
+      const splash = document.getElementById("boot-splash");
+      if (!splash) return;
+      splash.classList.add("is-hidden");
+      window.setTimeout(() => splash.remove(), 320);
+    };
   </script>
   <body>
+    <div id="boot-splash" role="status" aria-live="polite" aria-label="Loading ShilingiBet">
+      <div class="boot-shell">
+        <div class="boot-glow"></div>
+        <div class="boot-spinner">
+          <div class="boot-ring outer"></div>
+          <div class="boot-ring mid"></div>
+          <div class="boot-ring inner"></div>
+          <div class="boot-core">
+            <img src="/shilingibet.png" alt="ShilingiBet" />
+          </div>
+          <div class="boot-orbit">
+            <span class="boot-dot"></span>
+          </div>
+        </div>
+        <div class="boot-copy">
+          <p class="boot-eyebrow">ShilingiBet</p>
+          <p class="boot-title">Loading your premium play</p>
+          <p class="boot-subtitle">Preparing games, wallet, and live action.</p>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

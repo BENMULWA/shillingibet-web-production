@@ -46,6 +46,22 @@ function DashboardLayout() {
     return () => window.removeEventListener("open-support-chat", openSupportChat);
   }, []);
 
+  useEffect(() => {
+    let frameOne = 0;
+    let frameTwo = 0;
+
+    frameOne = window.requestAnimationFrame(() => {
+      frameTwo = window.requestAnimationFrame(() => {
+        window.hideBootSplash?.();
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameOne);
+      window.cancelAnimationFrame(frameTwo);
+    };
+  }, []);
+
   // Show popup once on first visit
   useEffect(() => {
     const seen = localStorage.getItem("seenAppPopup");
