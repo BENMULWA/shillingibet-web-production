@@ -14,6 +14,12 @@ import { useBanner } from "../../context/BannerContext";
 import Turnstile from "../../components/auth/Turnstile";
 import { normalizeKenyanPhone } from "../../utils/phone";
 import { isUserPhoneVerified } from "../../utils/verification";
+import {
+  clearPendingVerificationPhone,
+  clearStoredUser,
+  setPendingVerificationPhone,
+  setStoredUser,
+} from "../../utils/authStorage";
 
 export default function Register() {
   const [showReferral, setShowReferral] = useState(true);
@@ -61,18 +67,21 @@ export default function Register() {
           // turnstileRef.current?.reset();
           // setTurnstileToken(null);
           if (response?.status) {
-            const userData = { token: response?.token, ...response?.user };
-            localStorage.setItem("user", JSON.stringify(userData));
-
             if (response?.banner?.showBanner) {
               showBanner(response?.banner?.currentBanner || "registration");
             }
 
             if (isUserPhoneVerified(response?.user)) {
+              const userData = { token: response?.token, ...response?.user };
+              setStoredUser(userData);
+              clearPendingVerificationPhone();
               toast.success(response?.message || "Account created successfully");
               navigate("/");
             } else {
               const verificationPhone = response?.user?.phone || phone;
+              clearStoredUser();
+              setPendingVerificationPhone(verificationPhone);
+              toast.success(response?.message || "Account created. Enter the SMS code to verify your number.");
               navigate(`/verify?phone=${encodeURIComponent(verificationPhone)}`, {
                 state: { phone: verificationPhone },
               });

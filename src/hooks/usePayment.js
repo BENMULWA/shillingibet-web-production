@@ -187,18 +187,20 @@ export function useWithdrawCrypto() {
   return { withdrawCrypto, isLoading, data, reset };
 }
 
-export function useCometDeposit() {
+export function useFusionDeposit() {
   const paymentService = new PaymentService();
   const queryClient = useQueryClient();
 
   const {
-    mutate: depositViaComet,
+    mutate: depositViaFusion,
     isPending: isLoading,
     error,
   } = useMutation({
-    mutationFn: paymentService.depositComet.bind(paymentService),
+    mutationFn: paymentService.depositFusion.bind(paymentService),
     onSuccess: (res) => {
-      toast.success(res?.message || "Comet deposit initiated successfully");
+      toast.success(
+        res?.message || "Fusion Fi deposit order created successfully"
+      );
       queryClient.invalidateQueries({ queryKey: ["user-balance"] });
     },
     onError: (err) => {
@@ -206,7 +208,7 @@ export function useCometDeposit() {
     },
   });
 
-  return { depositViaComet, isLoading, error };
+  return { depositViaFusion, isLoading, error };
 }
 
 export function useCryptoUpdateDeposit() {

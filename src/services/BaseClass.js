@@ -1,10 +1,10 @@
 import { isUserPhoneVerified } from "../utils/verification";
+import { clearStoredUser, getStoredUser } from "../utils/authStorage";
 
 class BaseClass {
   // Get the current user from localStorage
   get user() {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
+    return getStoredUser();
   }
 
   // Get the token from user (always returns raw token without 'Bearer ' prefix)
@@ -70,7 +70,7 @@ class BaseClass {
 
   // Logout / clear user
   clearUser() {
-    localStorage.removeItem("user");
+    clearStoredUser();
   }
 }
 

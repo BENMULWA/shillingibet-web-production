@@ -101,8 +101,11 @@ Base prefix: `/api/v1`
 | GET    | `/transactions`               | user   | List own transactions            |
 | GET    | `/transactions/:id`           | user   | Transaction detail               |
 | POST   | `/transactions/callback/:type`| —      | Mamlaka webhook (`deposit`/`withdraw`) |
+| POST   | `/wallet/billOrder`           | user   | Fusion external bill-order deposit |
 
-## Payments (Mamlaka)
+## Payments
+
+### Mamlaka (mobile money)
 
 Deposits and withdrawals run through the [Mamlaka mobile-money API](https://github.com/Mamlaka-Hub-and-Spoke/Mobile-Payment-Docs). The wallet balance is the source of truth for betting; Mamlaka moves the real money.
 
@@ -125,6 +128,60 @@ Deposits and withdrawals run through the [Mamlaka mobile-money API](https://gith
 **Test numbers** (from the docs): `0710000000` → success, `0720000000` → failed.
 
 > Auth uses HTTP Basic against `GET /api/v1/` (trailing slash required) to mint a JWT, which is cached and auto-refreshed. The provider may IP-whitelist your server — the assigned live IP is `52.204.58.147`; deposits/withdrawals must originate from there in production.
+
+### Fusion bill-order deposits
+
+Fusion bill orders create a hosted external payment order that the frontend can present to the player. This path creates a **pending** deposit transaction in Betnare for traceability, but it does **not** credit the wallet immediately because the completion callback / reconciliation contract is not part of this repo yet.
+
+`POST /wallet/billOrder`
+
+```json
+{
+  "amount": 1,
+  "currency": "KES",
+  "comment": "amazon-cart-123",
+  "email": "mburumary556@gmail.com",
+  "description": "Amazon order #123",
+  "external_ref": "AMZ-ORDER-123"
+}
+```
+
+- `email` is optional only if the authenticated Betnare account already has one saved.
+- If `external_ref` is omitted, Betnare generates a unique `FUS-...` reference.
+- The route proxies to Fusion `POST /bill-orders/external` using `FUSION_BASE_URL` and returns both the internal `transaction` and the raw `provider` response.
+- Betnare understands Fusion's nested response shape and stores:
+  `order.ID` as `transaction.secureId`,
+  `order.external_ref` as `transaction.externalId`,
+  `order.comment_ref` as `transaction.receipt`.
+
+Example Fusion response:
+
+```json
+{
+  "order": {
+    "CreatedAt": "2026-07-02T10:34:53.471Z",
+    "UpdatedAt": "2026-07-02T10:34:53.471Z",
+    "DeletedAt": null,
+    "ID": 41,
+    "external_ref": "AMZ-ORDER-123",
+    "comment_ref": "amazon-cart-123",
+    "payer_email": "mburumary556@gmail.com",
+    "user_id": 22,
+    "amount": 1,
+    "currency": "KES",
+    "status": "pending",
+    "description": "Amazon order #123",
+    "callback_url": ""
+  },
+  "status": "success"
+}
+```
+
+Fusion `.env` values:
+- `FUSION_BASE_URL` — default `https://sandbox.fusionfi.io/api/v1`
+- `FUSION_API_KEY` — optional API key, if Fusion requires one in your environment
+- `FUSION_API_KEY_HEADER` — header name for `FUSION_API_KEY` (default `x-api-key`)
+- `FUSION_CURRENCY` — default currency fallback (`KES`)
 
 ## Virtual betting (EuroVirtuals / BetKraft)
 

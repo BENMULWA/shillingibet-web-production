@@ -8,14 +8,25 @@ import { BounceLoading } from "respinner";
 import { useActivateAccount, useResendOTP } from "../../hooks/useAuth";
 import { useBanner } from "../../context/BannerContext";
 import { normalizeKenyanPhone } from "../../utils/phone";
+import {
+  clearPendingVerificationPhone,
+  getPendingVerificationPhone,
+  getStoredUser,
+  setPendingVerificationPhone,
+  setStoredUser,
+} from "../../utils/authStorage";
 
 export default function VerifyOtp() {
   const navigate = useNavigate();
   const location = useLocation();
   const phoneFromQuery = new URLSearchParams(location.search).get("phone") || "";
-  const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+  const storedUser = getStoredUser();
   const phone = normalizeKenyanPhone(
-    location.state?.phone || phoneFromQuery || storedUser?.phone || ""
+    location.state?.phone ||
+      phoneFromQuery ||
+      getPendingVerificationPhone() ||
+      storedUser?.phone ||
+      ""
   );
   const redirectTo = location.state?.from?.pathname || "/";
   const { showBanner } = useBanner();
@@ -32,6 +43,12 @@ export default function VerifyOtp() {
     }
   }, [resendTimer]);
 
+  useEffect(() => {
+    if (phone) {
+      setPendingVerificationPhone(phone);
+    }
+  }, [phone]);
+
   function submitOtp(data) {
     if (!phone) {
       toast.error("Phone number missing. Please register again.");
@@ -46,7 +63,8 @@ export default function VerifyOtp() {
           if (res?.status) {
             toast.success("OTP Verified Successfully");
             const userData = { token: res?.token, ...res.user };
-            localStorage.setItem("user", JSON.stringify(userData));
+            setStoredUser(userData);
+            clearPendingVerificationPhone();
             navigate(redirectTo, { replace: true });
             if (res?.banner?.showBanner) {
               showBanner(res?.banner?.currentBanner || "registration");
@@ -75,6 +93,7 @@ export default function VerifyOtp() {
         onSuccess: (res) => {
           if (res?.status) {
             toast.success("OTP resent successfully");
+            setPendingVerificationPhone(phone);
             setResendTimer(90);
           } else {
             toast.error(res?.message || "Could not resend OTP");

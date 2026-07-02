@@ -98,10 +98,14 @@ export class PaymentService extends BaseClass {
     }
   }
 
-  async depositComet({ amount, email }) {
+  async depositFusion({ amount, email, currency, comment, description, external_ref }) {
     const payload = {
       amount: +amount,
       email,
+      ...(currency ? { currency } : {}),
+      ...(comment ? { comment } : {}),
+      ...(description ? { description } : {}),
+      ...(external_ref ? { external_ref } : {}),
     };
 
     try {

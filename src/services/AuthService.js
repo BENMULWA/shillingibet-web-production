@@ -28,7 +28,9 @@ export class AuthService extends BaseClass {
       });
       return normalizeAuthResponse(response);
     } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
+      throw error instanceof Error
+        ? error
+        : new Error(error?.message || "Something went wrong");
     }
   }
 
@@ -41,7 +43,9 @@ export class AuthService extends BaseClass {
       });
       return normalizeAuthResponse(response);
     } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
+      throw error instanceof Error
+        ? error
+        : new Error(error?.message || "Something went wrong");
     }
   }
 
@@ -51,7 +55,9 @@ export class AuthService extends BaseClass {
         phone: normalizeKenyanPhone(phone),
       });
     } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
+      throw error instanceof Error
+        ? error
+        : new Error(error?.message || "Something went wrong");
     }
   }
 
@@ -63,7 +69,9 @@ export class AuthService extends BaseClass {
         newPassword,
       });
     } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
+      throw error instanceof Error
+        ? error
+        : new Error(error?.message || "Something went wrong");
     }
   }
 
@@ -85,7 +93,9 @@ export class AuthService extends BaseClass {
       });
       return normalizeAuthResponse(response);
     } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
+      throw error instanceof Error
+        ? error
+        : new Error(error?.message || "Something went wrong");
     }
   }
   async resendActivationCode({ phone }) {
@@ -94,7 +104,9 @@ export class AuthService extends BaseClass {
         phone: normalizeKenyanPhone(phone),
       });
     } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
+      throw error instanceof Error
+        ? error
+        : new Error(error?.message || "Something went wrong");
     }
   }
 }

@@ -7,7 +7,7 @@ import BaseClass from "../../services/BaseClass";
 import {
   useDeposit,
   useCryptoUpdateDeposit,
-  useCometDeposit,
+  useFusionDeposit,
 } from "../../hooks/usePayment";
 import { BsInfoCircle } from "react-icons/bs";
 
@@ -25,6 +25,39 @@ const depositAmounts = [
 
 const SHOW_CRYPTO_UI = false;
 
+const getFusionCheckoutUrl = (response) => {
+  const candidates = [
+    response?.checkout_url,
+    response?.checkoutUrl,
+    response?.payment_url,
+    response?.paymentUrl,
+    response?.url,
+    response?.link,
+    response?.provider?.checkout_url,
+    response?.provider?.checkoutUrl,
+    response?.provider?.payment_url,
+    response?.provider?.paymentUrl,
+    response?.provider?.url,
+    response?.provider?.link,
+    response?.provider?.order?.checkout_url,
+    response?.provider?.order?.checkoutUrl,
+    response?.provider?.order?.payment_url,
+    response?.provider?.order?.paymentUrl,
+    response?.provider?.order?.url,
+    response?.provider?.order?.link,
+    response?.order?.checkout_url,
+    response?.order?.checkoutUrl,
+    response?.order?.payment_url,
+    response?.order?.paymentUrl,
+    response?.order?.url,
+    response?.order?.link,
+  ];
+
+  return candidates.find(
+    (value) => typeof value === "string" && /^https?:\/\//i.test(value)
+  );
+};
+
 export default function Deposit() {
   const baseClass = new BaseClass();
 
@@ -32,9 +65,9 @@ export default function Deposit() {
   const [copied, setCopied] = useState(false);
   const [transactionID, setTransactionID] = useState("");
 
-  // Comet App state
-  const [cometEmail, setCometEmail] = useState("");
-  const [cometAmount, setCometAmount] = useState("");
+  // Fusion Fi state
+  const [fusionEmail, setFusionEmail] = useState("");
+  const [fusionAmount, setFusionAmount] = useState("");
   // Crypto: M-Pesa-style processing view — 'form' | 'processing' | 'success' | 'failed' | 'waiting'
   const [cryptoView, setCryptoView] = useState("form");
   const [cryptoResultMessage, setCryptoResultMessage] = useState("");
@@ -44,7 +77,7 @@ export default function Deposit() {
 
   const { makingPayment, isLoading } = useDeposit();
   const { depositCrypto: updatingCryptoBalance, isLoading: isDepositingCrypto } = useCryptoUpdateDeposit();
-  const { depositViaComet, isLoading: isCometLoading } = useCometDeposit();
+  const { depositViaFusion, isLoading: isFusionLoading } = useFusionDeposit();
 
   const {
     register,
@@ -88,25 +121,41 @@ export default function Deposit() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleCometDeposit = () => {
-    const email = cometEmail.trim();
-    const amountNum = Number(cometAmount);
+  const handleFusionDeposit = () => {
+    const email = fusionEmail.trim();
+    const amountNum = Number(fusionAmount);
 
     if (!email || !email.includes("@")) {
-      toast.error("Please enter a valid Comet App email");
+      toast.error("Please enter a valid Fusion Fi email");
       return;
     }
 
     if (!amountNum || amountNum < 10) {
-      toast.error("Minimum Comet deposit is KES 10");
+      toast.error("Minimum Fusion Fi deposit is KES 10");
       return;
     }
 
-    depositViaComet(
-      { amount: amountNum, email },
+    depositViaFusion(
       {
-        onSuccess: () => {
-          setCometAmount("");
+        amount: amountNum,
+        email,
+        currency: "KES",
+        comment: `shilingibet-deposit-${baseClass.userId || "guest"}`,
+        description: "ShilingiBet wallet deposit",
+      },
+      {
+        onSuccess: (response) => {
+          setFusionAmount("");
+
+          const checkoutUrl = getFusionCheckoutUrl(response);
+          if (checkoutUrl) {
+            window.location.href = checkoutUrl;
+            return;
+          }
+
+          toast.success(
+            "Fusion Fi order created. Complete the payment from the provider page once it becomes available."
+          );
         },
       }
     );
@@ -221,7 +270,7 @@ export default function Deposit() {
                   : "text-[#9cae9f] hover:text-white"
               }`}
             >
-              Comet App
+              Fusion Fi
             </button>
           </div>
 
@@ -497,32 +546,34 @@ export default function Deposit() {
               </div>
             </div>
           )}
-          {/* COMET APP TAB */}
+          {/* FUSION FI TAB */}
           {tab === "comet" && (
             <div className="space-y-6">
-              {/* Comet App Logo / Header */}
+              {/* Fusion Fi Logo / Header */}
               <div className="flex flex-col items-center gap-3 bg-background/60 border border-white/10 rounded-2xl p-6">
                 <img
-                  src="/Comet Logo.png"
-                  alt="Comet App"
-                  className="w-20 h-20 object-contain"
+                  src="/fusion.png"
+                  alt="Fusion Fi"
+                  className="h-24 w-24 object-contain"
                 />
                 <div className="text-center">
-                  <h3 className="text-lg font-bold text-[#d7e1d9]">Comet App</h3>
-                  <p className="text-xs text-[#75877a] mt-0.5">Deposit from your Comet account</p>
+                  <h3 className="text-lg font-bold text-[#d7e1d9]">Fusion Fi</h3>
+                  <p className="text-xs text-[#75877a] mt-0.5">
+                    Create a hosted bill order and complete payment on Fusion Fi
+                  </p>
                 </div>
               </div>
 
               {/* Email Input */}
               <div>
                 <label className="block text-xs md:text-sm text-[#9cae9f] mb-2">
-                  Comet App Email
+                  Fusion Fi Email
                 </label>
                 <input
                   type="email"
-                  placeholder="Enter your Comet App email"
-                  value={cometEmail}
-                  onChange={(e) => setCometEmail(e.target.value)}
+                  placeholder="Enter your Fusion Fi email"
+                  value={fusionEmail}
+                  onChange={(e) => setFusionEmail(e.target.value)}
                   className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-transparent text-[#d7e1d9] focus:outline-none focus:border-primary transition"
                 />
               </div>
@@ -535,8 +586,8 @@ export default function Deposit() {
                 <input
                   type="number"
                   placeholder="Enter amount (KES)"
-                  value={cometAmount}
-                  onChange={(e) => setCometAmount(e.target.value)}
+                  value={fusionAmount}
+                  onChange={(e) => setFusionAmount(e.target.value)}
                   min={10}
                   className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-transparent text-[#d7e1d9] focus:outline-none focus:border-primary transition"
                 />
@@ -545,11 +596,11 @@ export default function Deposit() {
               {/* Submit */}
               <button
                 type="button"
-                onClick={handleCometDeposit}
-                disabled={isCometLoading}
+                onClick={handleFusionDeposit}
+                disabled={isFusionLoading}
                 className="w-full rounded-lg bg-primary py-4 text-lg font-bold text-black transition hover:brightness-110 disabled:opacity-60"
               >
-                {isCometLoading ? "Processing…" : "Deposit via Comet App"}
+                {isFusionLoading ? "Processing…" : "Continue to Fusion Fi"}
               </button>
 
               {/* Info */}
@@ -557,16 +608,16 @@ export default function Deposit() {
                 <div className="flex items-start gap-3">
                   <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
                   <p>
-                    Funds are credited after{" "}
-                    <span className="font-semibold text-primary">Comet App</span>{" "}
-                    confirms the deposit.
+                    The backend contract creates a pending Fusion Fi bill order
+                    first. Your wallet is credited only after the provider side
+                    is completed and reconciled.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
                   <p>
                     Make sure you use your registered{" "}
-                    <span className="font-semibold text-primary">Comet App email</span>.
+                    <span className="font-semibold text-primary">Fusion Fi email</span>.
                   </p>
                 </div>
               </div>

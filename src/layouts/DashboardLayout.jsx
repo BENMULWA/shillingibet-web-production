@@ -5,6 +5,7 @@ import BottomNav from "../layouts/BottomNav";
 import DownloadBanner from "../components/DownloadBanner";
 import Sidebar from "../layouts/Sidebar";
 import HomePage from "../pages/HomePage";
+import { getStoredUser } from "../utils/authStorage";
 
 const AppDownloadPopup = lazy(() => import("../components/AppDownloadPopup"));
 const FloatingActions = lazy(() => import("../components/FloatingActions"));
@@ -27,7 +28,7 @@ function DashboardLayout() {
     setShowChat(false);
   };
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = getStoredUser();
 
   useEffect(() => {
     const handleResize = () => {

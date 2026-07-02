@@ -53,16 +53,23 @@ export const fetchAPI = async (
           ? "Session expired. Please log in again."
           : "Something went wrong";
 
-      throw new Error(
+      const apiError = new Error(
         result?.message ||
           result?.status_description ||
           result?.error ||
           fallbackMessage
       );
+      apiError.response = result;
+      apiError.status = response.status;
+      throw apiError;
     }
 
     return result;
   } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
     throw new Error(error?.message || error?.error || "Something went wrong");
   }
 };

@@ -1,5 +1,5 @@
 // import { useEffect } from "react";
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { IoMdClose } from "react-icons/io";
 import { AiOutlineEyeInvisible } from "react-icons/ai";
@@ -9,6 +9,35 @@ import toast from "react-hot-toast";
 import { useBanner } from "../../context/BannerContext";
 import { normalizeKenyanPhone } from "../../utils/phone";
 import { isUserPhoneVerified } from "../../utils/verification";
+import {
+  clearStoredUser,
+  setPendingVerificationPhone,
+  setStoredUser,
+} from "../../utils/authStorage";
+
+function isVerificationRequiredError(errorResponse, message = "") {
+  if (!errorResponse || typeof errorResponse !== "object") {
+    return /verify.*phone|phone.*verify|not verified|unverified/i.test(message);
+  }
+
+  if (
+    errorResponse.verificationRequired === true ||
+    errorResponse.requireVerification === true
+  ) {
+    return true;
+  }
+
+  return /verify.*phone|phone.*verify|not verified|unverified/i.test(
+    [
+      errorResponse.message,
+      errorResponse.error,
+      errorResponse.status_description,
+      message,
+    ]
+      .filter(Boolean)
+      .join(" ")
+  );
+}
 
 const LoginModal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -20,7 +49,7 @@ const LoginModal = ({ onClose }) => {
 
   // Close handler: prefer onClose prop (when used as a child modal),
   // otherwise fall back to navigating back so /login nested route closes.
-  function handleCloseBase() {
+  const handleCloseBase = useCallback(() => {
     if (typeof onClose === "function") {
       onClose();
       return;
@@ -33,14 +62,14 @@ const LoginModal = ({ onClose }) => {
     } catch {
       navigate("/");
     }
-  }
+  }, [navigate, onClose]);
 
-  function handleClose() {
+  const handleClose = useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
       handleCloseBase();
     }, 300);
-  }
+  }, [handleCloseBase]);
 
   // Close on Escape key
   useEffect(() => {
@@ -49,7 +78,7 @@ const LoginModal = ({ onClose }) => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [handleClose]);
   const { logInFn, isLoading } = useLogIn();
   const { showBanner } = useBanner();
 
@@ -58,6 +87,11 @@ const LoginModal = ({ onClose }) => {
 
     const normalizedPhone = normalizeKenyanPhone(phone);
 
+    if (!/^254[71]\d{8}$/.test(normalizedPhone)) {
+      toast.error("Enter a valid Kenyan phone number");
+      return;
+    }
+
     logInFn(
       { phone: normalizedPhone, password },
       {
@@ -65,9 +99,9 @@ const LoginModal = ({ onClose }) => {
           console.log("LOGIN SUCCESS RESPONSE:", data); // View the whole response
           console.log("LOGIN TOKEN:", data?.token || data?.data?.token || data?.access_token);
           if (!data?.user) return;
-          const userData = { token: data.token, ...data.user };
-          localStorage.setItem("user", JSON.stringify(userData));
           if (!isUserPhoneVerified(data?.user)) {
+            clearStoredUser();
+            setPendingVerificationPhone(data?.user?.phone || normalizedPhone);
             toast.success(data?.message || "Please verify your phone number");
             navigate(`/verify?phone=${encodeURIComponent(data?.user?.phone || normalizedPhone)}`, {
               state: {
@@ -77,12 +111,34 @@ const LoginModal = ({ onClose }) => {
             return;
           }
 
+          const userData = { token: data.token, ...data.user };
+          setStoredUser(userData);
           toast.success(data?.message || "Log in successful");
           if (data?.banner?.showBanner) showBanner(data.banner.currentBanner);
           if (onClose) onClose();
           else navigate("/");
         },
         onError: (err) => {
+          const errorResponse = err?.response;
+          const verificationPhone =
+            errorResponse?.user?.phone ||
+            errorResponse?.data?.user?.phone ||
+            errorResponse?.phone ||
+            errorResponse?.data?.phone ||
+            normalizedPhone;
+
+          if (isVerificationRequiredError(errorResponse, err?.message || "")) {
+            clearStoredUser();
+            setPendingVerificationPhone(verificationPhone);
+            toast.success(errorResponse?.message || err?.message || "Please verify your phone number");
+            navigate(`/verify?phone=${encodeURIComponent(verificationPhone)}`, {
+              state: {
+                phone: verificationPhone,
+              },
+            });
+            return;
+          }
+
           toast.error(err?.message || "Something went wrong");
         },
       }
