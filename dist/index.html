@@ -217,6 +217,61 @@
         color: #95a59a;
       }
 
+      .boot-progress {
+        position: relative;
+        margin: 1.35rem auto 0;
+        width: min(100%, 17rem);
+      }
+
+      .boot-progress-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.55rem;
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .boot-progress-label {
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #95a59a;
+      }
+
+      .boot-progress-value {
+        font-weight: 800;
+        color: #facc15;
+        min-width: 3rem;
+        text-align: right;
+      }
+
+      .boot-progress-track {
+        position: relative;
+        height: 0.45rem;
+        overflow: hidden;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+
+      .boot-progress-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 1%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #facc15 0%, #fde68a 45%, #22c55e 100%);
+        box-shadow: 0 0 18px rgba(250, 204, 21, 0.35);
+        transition: width 120ms linear;
+      }
+
+      .boot-progress-fill::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.38) 50%, transparent 100%);
+        animation: boot-shimmer 1.6s linear infinite;
+      }
+
       @keyframes boot-spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
@@ -246,6 +301,11 @@
             0 0 70px rgba(34, 197, 94, 0.14);
         }
       }
+
+      @keyframes boot-shimmer {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(100%); }
+      }
     </style>
 
     <!-- Cloudflare Turnstile -->
@@ -263,11 +323,54 @@
       window.dispatchEvent(new CustomEvent("open-support-chat"));
     };
 
+    window.bootSplashProgress = 1;
+    window.bootSplashTimer = null;
+
+    window.setBootSplashProgress = function(value) {
+      const safeValue = Math.max(1, Math.min(100, Math.round(value)));
+      window.bootSplashProgress = safeValue;
+
+      const bar = document.getElementById("boot-progress-fill");
+      const label = document.getElementById("boot-progress-value");
+
+      if (bar) bar.style.width = safeValue + "%";
+      if (label) label.textContent = safeValue + "%";
+    };
+
+    window.startBootSplashProgress = function() {
+      if (window.bootSplashTimer) return;
+
+      window.setBootSplashProgress(1);
+
+      window.bootSplashTimer = window.setInterval(() => {
+        const current = window.bootSplashProgress;
+        if (current >= 96) return;
+
+        const nextStep =
+          current < 35 ? 3 :
+          current < 65 ? 2 :
+          current < 85 ? 1 :
+          0.5;
+
+        window.setBootSplashProgress(current + nextStep);
+      }, 70);
+    };
+
     window.hideBootSplash = function() {
       const splash = document.getElementById("boot-splash");
       if (!splash) return;
-      splash.classList.add("is-hidden");
-      window.setTimeout(() => splash.remove(), 320);
+
+      if (window.bootSplashTimer) {
+        window.clearInterval(window.bootSplashTimer);
+        window.bootSplashTimer = null;
+      }
+
+      window.setBootSplashProgress(100);
+
+      window.setTimeout(() => {
+        splash.classList.add("is-hidden");
+        window.setTimeout(() => splash.remove(), 320);
+      }, 180);
     };
   </script>
   <body>
@@ -289,9 +392,21 @@
           <p class="boot-eyebrow">ShilingiBet</p>
           <p class="boot-title">Loading your premium play</p>
           <p class="boot-subtitle">Preparing games, wallet, and live action.</p>
+          <div class="boot-progress" aria-hidden="true">
+            <div class="boot-progress-meta">
+              <span class="boot-progress-label">Loading Dashboard</span>
+              <span class="boot-progress-value" id="boot-progress-value">1%</span>
+            </div>
+            <div class="boot-progress-track">
+              <div class="boot-progress-fill" id="boot-progress-fill"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div id="root"></div>
+    <script>
+      window.startBootSplashProgress?.();
+    </script>
   </body>
 </html>
