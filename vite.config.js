@@ -4,6 +4,43 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { imageToWebpPlugin } from "vite-plugin-image-to-webp";
 
+const packageChunkMap = [
+  ["antd", "antd"],
+  ["@ant-design", "antd"],
+  ["rc-", "antd"],
+  ["@rc-component", "antd"],
+  ["dayjs", "antd"],
+  ["react-dom", "react-core"],
+  ["react-router-dom", "react-core"],
+  ["react/", "react-core"],
+  ["scheduler", "react-core"],
+  ["@tanstack/react-query", "query-vendor"],
+  ["react-hot-toast", "ui-vendor"],
+  ["framer-motion", "ui-vendor"],
+  ["socket.io-client", "chat-vendor"],
+  ["engine.io-client", "chat-vendor"],
+  ["socket.io-parser", "chat-vendor"],
+  ["moment", "date-vendor"],
+  ["lodash", "utils-vendor"],
+  ["react-icons", "icons-vendor"],
+  ["lucide-react", "icons-vendor"],
+  ["iconsax-react", "icons-vendor"],
+  ["@heroicons", "icons-vendor"],
+  ["@headlessui/react", "ui-primitives"],
+  ["react-hook-form", "form-vendor"],
+  ["react-turnstile", "security-vendor"],
+];
+
+const getVendorChunkName = (id) => {
+  if (!id.includes("node_modules")) return null;
+
+  for (const [pkg, chunkName] of packageChunkMap) {
+    if (id.includes(pkg)) return chunkName;
+  }
+
+  return undefined;
+};
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -39,13 +76,8 @@ export default defineConfig({
     // Code splitting configuration
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks - split large dependencies
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
-          "query-vendor": ["@tanstack/react-query"],
-          "ui-vendor": ["framer-motion", "react-hot-toast"],
-          // Antd is huge - isolate it
-          antd: ["antd"],
+        manualChunks(id) {
+          return getVendorChunkName(id);
         },
       },
     },
