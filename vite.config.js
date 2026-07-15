@@ -64,6 +64,8 @@ export default defineConfig(({ mode }) => {
     allowedHosts: [
       "localhost",
       "127.0.0.1",
+      "shilingibet.com",
+      "www.shilingibet.com",
       apiProxyHost,
     ],
     proxy: {
