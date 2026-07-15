@@ -73,41 +73,28 @@ export function gameTitleFromSlug(slug = "") {
 }
 
 export function buildEuroVirtualGames(providerGames = []) {
-  const gamesByName = new Map(
-    providerGames.map((game) => [normalizeGameName(game.game_name || game.title), game])
-  );
-
-  const knownGames = KNOWN_EUROVIRTUAL_GAMES.map((fallback) => {
-    const providerGame = gamesByName.get(normalizeGameName(fallback.game_name));
-    const mergedGame = {
-      ...fallback,
-      ...providerGame,
-      provider: EUROVIRTUALS_PROVIDER_NAME,
-    };
-
-    return {
-      ...mergedGame,
-      _id: mergedGame.game_uuid || gameSlug(mergedGame.game_name),
-      title: mergedGame.title || mergedGame.game_name,
-      image: mergedGame.image || mergedGame.thumbnail,
-      linkPath: mergedGame.game_uuid
-        ? `/virtual/${mergedGame.game_uuid}`
-        : `/virtual/name/${gameSlug(mergedGame.game_name)}`,
-    };
-  });
-
-  const knownNames = new Set(
-    knownGames.map((game) => normalizeGameName(game.game_name || game.title))
-  );
-  const extraProviderGames = providerGames
-    .filter((game) => !knownNames.has(normalizeGameName(game.game_name || game.title)))
-    .map((game) => ({
+  return providerGames.map((game) => ({
       ...game,
       provider: game.provider || EUROVIRTUALS_PROVIDER_NAME,
       linkPath: game.game_uuid
         ? `/virtual/${game.game_uuid}`
         : `/virtual/name/${gameSlug(game.game_name || game.title)}`,
     }));
+}
 
-  return [...knownGames, ...extraProviderGames];
+function byDisplayOrder(a, b) {
+  return Number(a.display_order ?? 0) - Number(b.display_order ?? 0);
+}
+
+export function categorizeGames(games = []) {
+  const sorted = (predicate) => games.filter(predicate).sort(byDisplayOrder);
+
+  // Each collection is intentionally independent: a popular game also
+  // remains visible in its backend-assigned category.
+  return {
+    mostPopular: sorted((game) => game.is_popular === true),
+    crashGames: sorted((game) => game.category === "crash"),
+    virtualGames: sorted((game) => game.category === "virtual"),
+    others: sorted((game) => game.category === "others"),
+  };
 }

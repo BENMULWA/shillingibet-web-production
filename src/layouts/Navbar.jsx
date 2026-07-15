@@ -29,9 +29,10 @@ export default function Navbar({
   const { balance } = useUpdateBalance();
   const { logOutFn } = useLogOut();
 
-  const mainBalance = isAuth
-    ? (balance?.balance ?? base.user?.balance ?? 0).toFixed(2)
-    : null;
+  const mainBalance =
+    isAuth && balance?.balance != null
+      ? Number(balance.balance).toFixed(2)
+      : null;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function Navbar({
             onClick={() => setCollapsed?.((prev) => !prev)}
             className="p-1 rounded hover:bg-white/5 transition-colors"
           >
-            {collapsed ? <RiMenuUnfold3Line size={20} /> : <RiMenuFold3Line size={20} />}
+            {collapsed ? <RiMenuUnfold3Line size={30} /> : <RiMenuFold3Line size={30} />}
           </button>
         )}
 
@@ -82,7 +83,7 @@ export default function Navbar({
             className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white"
             aria-label="Open menu"
           >
-            <RiMenuUnfold3Line size={22} />
+            <RiMenuUnfold3Line size={28} />
           </button>
         )}
 
@@ -133,7 +134,7 @@ export default function Navbar({
             {/* Balance Capsule */}
             <div className="hidden items-center gap-1.5 rounded-full border border-white/5 bg-[#07110b] px-3 py-1.5 md:flex">
               <span className="text-sm font-bold text-white leading-none">
-                {mainBalance}
+                {mainBalance ?? "—"}
               </span>
               <span className="text-[10px] text-gray-400 font-normal">KES</span>
             </div>

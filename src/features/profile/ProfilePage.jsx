@@ -90,7 +90,9 @@ export default function Profile() {
               {gettingBalance ? (
                 <BounceLoading fill="#f9ce36" barHeight={12} />
               ) : (
-                `KES ${balance?.balance?.toLocaleString() ?? 0}`
+                balance?.balance != null
+                  ? `KES ${Number(balance.balance).toLocaleString()}`
+                  : "KES —"
               )}
             </div>
           </div>

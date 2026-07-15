@@ -5,19 +5,29 @@ import { normalizeGameName } from "../features/games/virtualGameCatalog";
 class GameService extends BaseClass {
   async getAllGames() {
     try {
-      const res = await fetchAPI("virtuals/games", "GET", null, this.token);
+      // The game catalog is public. Authentication is only required when a
+      // player requests a launch session.
+      const res = await fetchAPI("virtuals/games", "GET");
       const games = res?.data?.data ?? res?.data ?? [];
       const list = Array.isArray(games?.data) ? games.data : games;
 
       return (Array.isArray(list) ? list : [])
         .filter((game) => Number(game?.status) === 1)
-        .map((game) => ({
-          ...game,
-          _id: game.game_uuid,
-          title: game.game_name,
-          image: game.thumbnail,
-          linkPath: `/virtual/${game.game_uuid}`,
-        }));
+        .map((game) => {
+          const gameUuid =
+            game.game_uuid ?? game.game_uid ?? game.uuid ?? game.uid ?? game._id;
+
+          return {
+            ...game,
+            game_uuid: gameUuid,
+            _id: gameUuid,
+            title: game.game_name,
+            image: game.thumbnail,
+            linkPath: gameUuid
+              ? `/virtual/${gameUuid}`
+              : `/virtual/name/${normalizeGameName(game.game_name).replace(/\s+/g, "-")}`,
+          };
+        });
     } catch (error) {
       throw new Error(error?.message || "Unable to fetch all games");
     }

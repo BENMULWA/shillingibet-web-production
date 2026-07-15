@@ -111,19 +111,19 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
     {
       label: "Euro League",
       icon: "https://storage.googleapis.com/eurovirtuals/assets/ev_thumbnail_vl_legacy_ui.png",
-      to: p("/virtual/gfhjdghvfdvsaddd"),
+      to: p(`/virtual/name/${gameSlug("Euro League")}`),
       requiresAuth: true,
     },
     {
       label: "Virtual Jackpot",
       icon: "https://storage.googleapis.com/eurovirtuals/assets/ev_thumbnail_virtual_jackpot.png",
-      to: p("/virtual/ea8dfcc7-2f3d-4a0c-929c-37f90cb75d41"),
+      to: p(`/virtual/name/${gameSlug("Virtual Jackpot")}`),
       requiresAuth: true,
     },
     {
       label: "Betting League",
       icon: "https://storage.googleapis.com/eurovirtuals/assets/ev_thumbnail_vl_next_gen_ui.png",
-      to: p("/virtual/6a1f06c2-91a2-41cb-bb39-0c9673c1e7e2"),
+      to: p(`/virtual/name/${gameSlug("Virtual League - Next Gen UI")}`),
       requiresAuth: true,
     },
     {

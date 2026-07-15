@@ -111,7 +111,7 @@ function DashboardLayout() {
           setShowSidebar={setShowSidebar}
         />
         <main
-          className={`flex-1 overflow-y-auto pb-12 appscroll no-scrollbar md:pb-0 ${
+          className={`flex-1 overflow-y-auto pb-[calc(6rem+env(safe-area-inset-bottom))] appscroll no-scrollbar md:pb-0 ${
             isGameRoute ? "overflow-hidden" : ""
           }`}
         >

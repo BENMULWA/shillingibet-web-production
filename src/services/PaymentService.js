@@ -1,7 +1,7 @@
 import { fetchAPI } from "../utils/FetchApi";
 import BaseClass from "./BaseClass";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.DEV ? "/api/v1" : import.meta.env.VITE_API_URL;
 
 export class PaymentService extends BaseClass {
   constructor() {
@@ -22,8 +22,14 @@ export class PaymentService extends BaseClass {
   async updateBalance() {
     try {
       const response = await fetchAPI("users/me", "GET", null, this.token);
-      const payload = response?.data ?? response;
-      return payload?.user ?? payload;
+      // GET /users/me returns the authenticated user at data.data. Read this
+      // path before considering legacy response shapes so balance is not lost.
+      return (
+        response?.data?.data ??
+        response?.data?.user ??
+        response?.data ??
+        response
+      );
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }

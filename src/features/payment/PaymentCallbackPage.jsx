@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PaymentService } from "../../services/PaymentService";
 import { useBanner } from "../../context/BannerContext";
@@ -14,7 +14,7 @@ function PaymentView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { id } = useParams();
-  const paymentService = new PaymentService();
+  const paymentService = useMemo(() => new PaymentService(), []);
 
   useEffect(() => {
     if (!id) return;
@@ -38,11 +38,11 @@ function PaymentView() {
         if (newStatus === "success") {
           const txCode = response?.data?.data?.transactionCode ?? response?.data?.transactionCode ?? response?.transactionCode;
           setTransactionCode(txCode);
+          queryClient.invalidateQueries({ queryKey: ["user-balance"] });
         }
 
         if (newStatus === "success" && response?.data?.banner?.showBanner) {
           setBannerType(response?.data?.banner?.currentBanner);
-          queryClient.invalidateQueries({ queryKey: ["user-balance"] });
         }
 
         if (newStatus === "success" || newStatus === "failed") {
@@ -71,7 +71,7 @@ function PaymentView() {
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [id]);
+  }, [id, paymentService, queryClient]);
 
   const handleGoBack = () => {
     if (bannerType) {

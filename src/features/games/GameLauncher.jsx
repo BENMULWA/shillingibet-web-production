@@ -83,11 +83,15 @@ export default function GameLauncher({ game, gameUuid, title }) {
       if (/player[\s_-]*token.*expir|token.*expir|session.*expir/i.test(message)) {
         requestLaunch(true);
       }
+
+      if (/balance|wallet|bet|win|cash[\s_-]*out|payout/i.test(message)) {
+        queryClient.invalidateQueries({ queryKey: ["user-balance"] });
+      }
     };
 
     window.addEventListener("message", handleProviderMessage);
     return () => window.removeEventListener("message", handleProviderMessage);
-  }, [requestLaunch]);
+  }, [queryClient, requestLaunch]);
 
   if ((isLoading && !launchUrl) || isReconnecting) {
     return (

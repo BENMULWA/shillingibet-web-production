@@ -77,13 +77,15 @@ export function useWithdraw() {
 }
 export function useUpdateBalance() {
   const paymentService = new PaymentService();
-  const isAuth = paymentService.isAuthenticated();
+  const hasToken = Boolean(paymentService.token);
 
   const { data: balance, isLoading } = useQuery({
     queryKey: ["user-balance"],
     queryFn: paymentService.updateBalance.bind(paymentService),
-    enabled: isAuth,
+    enabled: hasToken,
     refetchInterval: 5000, // Refresh every 5 seconds to keep live balance updated while playing games
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   return { balance, isLoading };

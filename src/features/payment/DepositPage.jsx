@@ -24,6 +24,8 @@ const depositAmounts = [
 ];
 
 const SHOW_CRYPTO_UI = false;
+// Fusion Fi integration remains implemented; only its deposit UI is hidden.
+const SHOW_FUSION_UI = false;
 
 const getFusionCheckoutUrl = (response) => {
   const candidates = [
@@ -261,17 +263,19 @@ export default function Deposit() {
                 Crypto (USDT)
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => setTab("comet")}
-              className={`flex-1 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium transition-all ${
-                tab === "comet"
-                  ? "bg-primary text-black shadow-md"
-                  : "text-[#9cae9f] hover:text-white"
-              }`}
-            >
-              Fusion Fi
-            </button>
+            {SHOW_FUSION_UI && (
+              <button
+                type="button"
+                onClick={() => setTab("comet")}
+                className={`flex-1 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium transition-all ${
+                  tab === "comet"
+                    ? "bg-primary text-black shadow-md"
+                    : "text-[#9cae9f] hover:text-white"
+                }`}
+              >
+                Fusion Fi
+              </button>
+            )}
           </div>
 
           {/* MOBILE MONEY TAB */}
@@ -547,7 +551,7 @@ export default function Deposit() {
             </div>
           )}
           {/* FUSION FI TAB */}
-          {tab === "comet" && (
+          {SHOW_FUSION_UI && tab === "comet" && (
             <div className="space-y-6">
               {/* Fusion Fi Logo / Header */}
               <div className="flex flex-col items-center gap-3 bg-background/60 border border-white/10 rounded-2xl p-6">
