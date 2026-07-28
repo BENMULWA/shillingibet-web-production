@@ -90,21 +90,37 @@ export function useUpdateBalance() {
 
   return { balance, isLoading };
 }
-export function useTransactionsHistory() {
+export function useTransactionsHistory(page = 1, limit = 20) {
   const paymentService = new PaymentService();
   const {
     data: transactions,
     isLoading,
+    isFetching,
     error,
   } = useQuery({
-    queryFn: paymentService.transactionHistory.bind(paymentService),
-    queryKey: ["transactions"],
+    queryFn: () => paymentService.transactionHistory(page, limit),
+    queryKey: ["transactions", page, limit],
     onError: (err) => {
       toast.error(err?.message ?? "Something went wrong fetching your history");
     },
   });
 
-  return { transactions, isLoading, error };
+  return { transactions, isLoading, isFetching, error };
+}
+
+export function useBetHistory(page = 1, limit = 20) {
+  const paymentService = new PaymentService();
+  const {
+    data: bets,
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery({
+    queryFn: () => paymentService.betHistory(page, limit),
+    queryKey: ["bet-history", page, limit],
+  });
+
+  return { bets, isLoading, isFetching, error };
 }
 export function useGetTransactionStatus() {
   const paymentService = new PaymentService();

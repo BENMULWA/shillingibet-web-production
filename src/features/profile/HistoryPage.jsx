@@ -1,6 +1,9 @@
 import PropTypes from "prop-types";
-import { useMemo, useState } from "react";
-import { useTransactionsHistory } from "../../hooks/usePayment";
+import { useCallback, useMemo, useState } from "react";
+import {
+  useBetHistory,
+  useTransactionsHistory,
+} from "../../hooks/usePayment";
 import {
   DatePicker,
   Segmented,
@@ -42,27 +45,47 @@ const txMoment = (t) =>
 /* ---------------------- Main Page ---------------------- */
 function HistoryPage() {
   const [page, setPage] = useState(1);
+  const [historyView, setHistoryView] = useState("payments");
   const { transactions, isLoading, isFetching } = useTransactionsHistory(
     page,
     ITEMS_PER_PAGE
   );
+  const {
+    bets,
+    isLoading: betsLoading,
+    isFetching: betsFetching,
+  } = useBetHistory(page, ITEMS_PER_PAGE);
 
   const [dateFilter, setDateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [customRange, setCustomRange] = useState([null, null]);
 
   // Handle both direct response and axios wrapped response
-  const data =
-    transactions?.data?.data ??
-    transactions?.data?.transactions ??
-    transactions?.data ??
-    transactions?.transactions ??
-    [];
+  const paymentData = transactions?.data ?? [];
+  const betData = bets?.data ?? [];
+  const data = historyView === "payments"
+    ? paymentData.map((transaction) => ({
+        ...transaction,
+        transactionCode:
+          transaction.receipt || transaction.externalId || transaction._id,
+        tax: transaction.taxAmount ?? 0,
+        transactionDescription: `${transaction.provider || "Payment"} ${transaction.type}`,
+      }))
+    : betData.map((bet) => ({
+        ...bet,
+        transactionCode: bet.betId || bet._id,
+        type: bet.source,
+        amount: bet.stake,
+        tax: 0,
+        transactionDescription: `${bet.game} — ${bet.selectionLabel}`,
+      }));
   const totalItems =
-    transactions?.data?.totalItems ?? transactions?.totalItems ?? 0;
+    historyView === "payments"
+      ? transactions?.meta?.total ?? 0
+      : bets?.meta?.total ?? 0;
 
   // Filtering
-  const filterByDate = (t) => {
+  const filterByDate = useCallback((t) => {
     const m = txMoment(t);
     if (!m?.isValid()) return false;
     switch (dateFilter) {
@@ -85,17 +108,16 @@ function HistoryPage() {
       default:
         return true;
     }
-  };
-  const filterByType = (t) =>
-    typeFilter === "all" ? true : (t?.type || "").toLowerCase() === typeFilter;
+  }, [customRange, dateFilter]);
+  const filterByType = useCallback(
+    (t) =>
+      typeFilter === "all" ? true : (t?.type || "").toLowerCase() === typeFilter,
+    [typeFilter]
+  );
 
   const filteredTransactions = useMemo(() => {
     return data
-      .filter(
-        (t) =>
-          (t?.status || "").toLowerCase() !== "pending" &&
-          Boolean(t?.uniqueID || t?.transactionCode || t?._id)
-      )
+      .filter((t) => Boolean(t?.transactionCode || t?._id))
       .filter(filterByDate)
       .filter(filterByType)
       .sort(
@@ -107,23 +129,34 @@ function HistoryPage() {
   const { totalCount, depositsSum, withdrawalsSum, taxSum } = useMemo(() => {
     return filteredTransactions.reduce(
       (acc, t) => {
+        const status = (t?.status || "").toLowerCase();
+        const amt = Number(t.amount || 0);
+        if (historyView === "bets") {
+          if (status === "won") acc.totalCount += 1;
+          acc.depositsSum += amt;
+          acc.withdrawalsSum += Number(t.payout || 0);
+          return acc;
+        }
+
         const isSuccess = ["success", "complete", "completed"].includes(
-          (t?.status || "").toLowerCase()
+          status
         );
         if (!isSuccess) return acc;
 
         acc.totalCount += 1;
-        const amt = Number(t.amount || 0);
         const tax = Number(t.tax || 0);
         const kind = (t?.type || "").toLowerCase();
         if (kind === "deposit") acc.depositsSum += amt;
-        if (kind === "withdraw") acc.withdrawalsSum += amt;
+        if (kind === "withdrawal") acc.withdrawalsSum += amt;
         acc.taxSum += tax;
         return acc;
       },
       { totalCount: 0, depositsSum: 0, withdrawalsSum: 0, taxSum: 0 }
     );
-  }, [filteredTransactions]);
+  }, [filteredTransactions, historyView]);
+
+  const currentLoading = historyView === "payments" ? isLoading : betsLoading;
+  const currentFetching = historyView === "payments" ? isFetching : betsFetching;
 
   const formatCurrency = (n) =>
     new Intl.NumberFormat("en-KE", {
@@ -146,13 +179,29 @@ function HistoryPage() {
         <div className="px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-2 ">
             <h3 className="font-semibold text-lg text-[#9789CD]/90">
-              Transactions
+              History
             </h3>
             <Badge
               count={filteredTransactions.length}
               style={{ backgroundColor: "#6b7280" }}
             />
           </div>
+        </div>
+
+        <div className="px-4 pb-3 max-w-7xl mx-auto">
+          <Segmented
+            block
+            value={historyView}
+            onChange={(value) => {
+              setHistoryView(value);
+              setTypeFilter("all");
+              setPage(1);
+            }}
+            options={[
+              { label: "Deposits & Withdrawals", value: "payments" },
+              { label: "My Bets", value: "bets" },
+            ]}
+          />
         </div>
 
         {/* Filters */}
@@ -203,8 +252,16 @@ function HistoryPage() {
                   className="w-full"
                   options={[
                     { label: "All", value: "all" },
-                    { label: "Deposits", value: "deposit" },
-                    { label: "Withdrawals", value: "withdrawal" },
+                    ...(historyView === "payments"
+                      ? [
+                          { label: "Deposits", value: "deposit" },
+                          { label: "Withdrawals", value: "withdrawal" },
+                          { label: "Cashback", value: "cashback" },
+                        ]
+                      : [
+                          { label: "Sportsbook", value: "sportsbook" },
+                          { label: "Virtual", value: "virtual" },
+                        ]),
                   ]}
                 />
               </div>
@@ -230,19 +287,19 @@ function HistoryPage() {
       {/* Summary tiles */}
       <section className="px-4 pt-3 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <SummaryTile label="Total" value={totalCount} />
-          <SummaryTile label="Deposits" value={formatCurrency(depositsSum)} />
+          <SummaryTile label={historyView === "payments" ? "Completed" : "Settled wins"} value={totalCount} />
+          <SummaryTile label={historyView === "payments" ? "Deposits" : "Staked"} value={formatCurrency(depositsSum)} />
           <SummaryTile
-            label="Withdrawals"
+            label={historyView === "payments" ? "Withdrawals" : "Payouts"}
             value={formatCurrency(withdrawalsSum)}
           />
-          <SummaryTile label="Total Tax" value={formatCurrency(taxSum)} />
+          <SummaryTile label={historyView === "payments" ? "Total Tax" : "Records"} value={historyView === "payments" ? formatCurrency(taxSum) : totalItems} />
         </div>
       </section>
 
       {/* Transactions list */}
       <main className="flex-1 px-4 pb-24 pt-3 max-w-6xl mx-auto w-full">
-        {isLoading ? (
+        {currentLoading ? (
           <div className="flex justify-center items-center h-64">
             <Loader />
           </div>
@@ -277,7 +334,7 @@ function HistoryPage() {
                   onChange={(newPage) => setPage(newPage)}
                   showSizeChanger={false}
                   showQuickJumper={false}
-                  disabled={isFetching}
+                  disabled={currentFetching}
                 />
               </div>
             )}
@@ -310,12 +367,18 @@ function TransactionCard({
   description,
   formatCurrency,
 }) {
-  const isSuccess = (status || "").toLowerCase() === "success";
+  const normalizedStatus = (status || "").toLowerCase();
+  const isSuccess = ["success", "complete", "completed", "won"].includes(
+    normalizedStatus
+  );
+  const isPending = ["pending", "open"].includes(normalizedStatus);
   const isDeposit = (type || "").toLowerCase() === "deposit";
 
   const ringClass = isSuccess
     ? "ring-1 ring-green-500/20 hover:ring-green-500/40"
-    : "ring-1 ring-red-500/20 hover:ring-red-500/40";
+    : isPending
+      ? "ring-1 ring-amber-500/20 hover:ring-amber-500/40"
+      : "ring-1 ring-red-500/20 hover:ring-red-500/40";
 
   const icon = isDeposit ? (
     <FiArrowDownRight className="text-emerald-400" size={18} />
@@ -334,7 +397,7 @@ function TransactionCard({
           </div>
           <div>
             <p className="text-sm font-semibold text-[#9789CD]/90 capitalize">
-              {type || "—"}
+              {(type || "—").replaceAll("_", " ")}
             </p>
             <p className="text-xs text-[#9789CD]/90">{formatTimeOnly(time)}</p>
           </div>
@@ -355,7 +418,7 @@ function TransactionCard({
       )}
 
       <div className="mt-3 flex items-center justify-between">
-        {isSuccess ? (
+        {reference ? (
           <button
             type="button"
             onClick={() => {
@@ -397,7 +460,7 @@ function TransactionCard({
             — — —
           </code>
         )}
-        <Tag color={isSuccess ? "green" : "red"} className="capitalize">
+        <Tag color={isSuccess ? "green" : isPending ? "gold" : "red"} className="capitalize">
           {status}
         </Tag>
       </div>

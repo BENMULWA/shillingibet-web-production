@@ -9,7 +9,7 @@ import {
   FiSearch, FiSettings, FiMail, FiChevronDown,
   FiUser, FiClock, FiLogOut, FiDollarSign
 } from "react-icons/fi";
-import { FaWhatsapp } from "react-icons/fa";
+// import { FaWhatsapp } from "react-icons/fa";
 import { HiGift } from "react-icons/hi";
 import { BsChatRightText } from "react-icons/bs";
 
@@ -114,7 +114,7 @@ export default function Navbar({
       <div className="flex items-center gap-2 md:gap-3">
         {isAuth ? (
           <>
-            {/* WhatsApp Icon */}
+            {/* WhatsApp Icon
             <a
               href="https://wa.me/yourphonenumber"
               target="_blank"
@@ -122,6 +122,7 @@ export default function Navbar({
             >
               <FaWhatsapp size={18} className="text-white" />
             </a>
+            */}
 
             {/* Search Icon */}
             <button

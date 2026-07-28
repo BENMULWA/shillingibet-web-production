@@ -24,12 +24,21 @@ export class PaymentService extends BaseClass {
       const response = await fetchAPI("users/me", "GET", null, this.token);
       // GET /users/me returns the authenticated user at data.data. Read this
       // path before considering legacy response shapes so balance is not lost.
-      return (
+      const user =
         response?.data?.data ??
         response?.data?.user ??
         response?.data ??
-        response
-      );
+        response;
+
+      return {
+        ...user,
+        referralBonus:
+          user?.referral?.bonusEarned ?? user?.referralBonus ?? 0,
+        referralsCount:
+          user?.referral?.referredUsersCount ?? user?.referralsCount ?? 0,
+        referralCode:
+          user?.referral?.code ?? user?.referralCode ?? null,
+      };
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }
@@ -49,9 +58,26 @@ export class PaymentService extends BaseClass {
       throw new Error(error?.message || "Something went wrong");
     }
   }
-  async transactionHistory() {
+  async transactionHistory(page = 1, limit = 20) {
     try {
-      return await fetchAPI("transactions", "GET", null, this.token);
+      return await fetchAPI(
+        `transactions?page=${page}&limit=${limit}`,
+        "GET",
+        null,
+        this.token
+      );
+    } catch (error) {
+      throw new Error(error?.message || "Something went wrong");
+    }
+  }
+  async betHistory(page = 1, limit = 20) {
+    try {
+      return await fetchAPI(
+        `bets/history?page=${page}&limit=${limit}`,
+        "GET",
+        null,
+        this.token
+      );
     } catch (error) {
       throw new Error(error?.message || "Something went wrong");
     }

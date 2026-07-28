@@ -2,11 +2,13 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const socialIcons = [
+    /*
     {
       src: "https://img.icons8.com/color/48/whatsapp--v1.png",
       alt: "whatsapp",
       link: "https://wa.me/254103102336",
     },
+    */
     {
       src: "https://img.icons8.com/color/48/facebook-new.png",
       alt: "facebook",
@@ -113,13 +115,6 @@ const Footer = () => {
                 >
                   info@shilingibet.com
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleLinkClick("tel:+254103102336")}
-                  className="text-left transition-colors hover:text-primary"
-                >
-                  +254 103 102 336
-                </button>
               </div>
             </div>
           </div>
@@ -129,7 +124,6 @@ const Footer = () => {
               <h3 className="mb-2 text-sm font-bold text-white">Responsible Gaming</h3>
               <p className="text-xs leading-relaxed">
                 Real-money gambling is for adults only. Play responsibly and only bet with what you can afford.
-                For support, call <span className="font-semibold text-white">0800 724835</span>.
               </p>
             </div>
 

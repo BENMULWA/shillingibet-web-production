@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { 
-  FiMail, FiPhone, FiMessageSquare, FiInfo,
+  FiMail, /* FiPhone, */ FiMessageSquare, FiInfo,
   FiChevronRight, FiShield, FiCreditCard, FiUser, FiZap 
 } from "react-icons/fi";
 import { BsChatRightDots } from "react-icons/bs";
@@ -54,12 +54,13 @@ export default function SupportPage() {
     },
     {
       id: "email",
-      label: "Email Support",
+      label: "Email Info",
       icon: <FiMail size={20} />,
-      desc: "support@shilingibet.com",
+      desc: "info@shilingibet.com",
       color: "bg-white/5 text-white hover:bg-white/10",
-      action: () => { window.location.href = "mailto:support@shilingibet.com"; }
+      action: () => { window.location.href = "mailto:info@shilingibet.com"; }
     },
+    /*
     {
       id: "phone",
       label: "Phone Support",
@@ -68,6 +69,7 @@ export default function SupportPage() {
       color: "bg-white/5 text-white hover:bg-white/10",
       action: () => { window.location.href = "tel:0800724835"; }
     },
+    */
   ];
 
   return (

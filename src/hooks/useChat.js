@@ -1,7 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = "https://api.ganjibets.com";
+const API_URL = import.meta.env.VITE_API_URL || "";
+const SOCKET_URL = (
+  import.meta.env.VITE_SOCKET_URL ||
+  API_URL.replace(/\/api\/v1\/?$/, "") ||
+  window.location.origin
+).replace(/\/$/, "");
 
 export function useChat(token, { enabled = true } = {}) {
   const [socket, setSocket] = useState(null);
@@ -32,9 +37,13 @@ export function useChat(token, { enabled = true } = {}) {
 
     const cleanToken = token.replace("Bearer ", "");
 
-    const newSocket = io(SOCKET_URL, {
+    const newSocket = io(`${SOCKET_URL}/support-chat`, {
       auth: { token: cleanToken },
       transports: ["websocket"],
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      timeout: 10000,
     });
 
     newSocket.on("connect", () => {
