@@ -11,10 +11,11 @@ import toast from "react-hot-toast";
 import { debouncedWithdraw } from "../../utils/debounce";
 
 const SHOW_CRYPTO_UI = false;
+const SHOW_COMET_UI = false;
 const TABS = [
   "M-Pesa",
   ...(SHOW_CRYPTO_UI ? ["Crypto (USDT)"] : []),
-  "Comet App",
+  ...(SHOW_COMET_UI ? ["Comet App"] : []),
 ];
 const MIN_CRYPTO_WITHDRAWAL = 10;
 const TRC20_ADDRESS_LENGTH = 34;
@@ -303,7 +304,7 @@ export default function Withdraw() {
           )}
 
           {/* ── Comet App Tab ──────────────────────────────────────────────── */}
-          {activeTab === "Comet App" && (
+          {SHOW_COMET_UI && activeTab === "Comet App" && (
             <>
               {/* Comet App Logo / Header */}
               <div className="flex flex-col items-center gap-3 bg-[#07110b]/85 border border-white/10 rounded-2xl p-6">
