@@ -17,7 +17,7 @@
   position: fixed;
   bottom: 5rem;
   right: 1rem;
-  z-index: 50;
+  z-index: 2100;
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 9999px;
@@ -36,18 +36,11 @@
 }
 
 .support-fab.open {
-  background-color: #ef4444;
-  transform: rotate(90deg);
+  display: none;
 }
 
 .support-fab.open:hover {
   background-color: #dc2626;
-}
-
-@media (max-width: 768px) {
-  .support-fab.open {
-    display: none;
-  }
 }
 
 .support-fab-icon {
@@ -61,15 +54,18 @@
 .support-panel-wrapper {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 2000;
+  width: 100vw;
+  height: 100dvh;
 }
 
 @media (min-width: 768px) {
   .support-panel-wrapper {
     inset: auto;
-    bottom: 9rem;
+    bottom: 1rem;
     right: 1rem;
-    width: 24rem;
+    width: min(24rem, calc(100vw - 2rem));
+    height: min(44rem, calc(100dvh - 2rem));
   }
 }
 
@@ -80,6 +76,7 @@
   flex-direction: column;
   overflow: hidden;
   height: 100%;
+  width: 100%;
   border: none;
 }
 
@@ -87,8 +84,8 @@
   .support-panel {
     border-radius: 1rem;
     border: 1px solid var(--sw-border-light);
-    height: 80vh;
-    max-height: 700px;
+    height: 100%;
+    max-height: none;
   }
 }
 

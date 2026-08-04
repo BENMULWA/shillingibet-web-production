@@ -8,6 +8,7 @@ import HelpScreen from "./HelpScreen";
 import ChatScreen from "./ChatScreen";
 import { ChatProvider } from "../../../context/ChatProvider";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import "./SupportWidget.css";
 
 export default function SupportWidget({ token }) {
@@ -27,6 +28,15 @@ export default function SupportWidget({ token }) {
     return () => window.removeEventListener("open-support-chat", openWidget);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen || window.innerWidth >= 768) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   const handleStartChat = () => {
     if (!token) {
       setIsOpen(false);
@@ -40,7 +50,7 @@ export default function SupportWidget({ token }) {
     setShowChat(false);
   };
 
-  return (
+  return createPortal(
     <>
       {/* Floating Support Button */}
       <button
@@ -87,6 +97,7 @@ export default function SupportWidget({ token }) {
           </div>
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
