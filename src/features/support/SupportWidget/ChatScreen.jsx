@@ -1,18 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { FiArrowLeft, FiSend, FiPaperclip } from "react-icons/fi";
 import { BiSupport } from "react-icons/bi";
+import { useChatContext } from "../../../context/ChatProvider";
 
 export default function ChatScreen({ onBack }) {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: "system",
-      text: "Welcome to ShilingiBet Support! How can we help you today?",
-      time: new Date(),
-    },
-  ]);
+  const {
+    connected,
+    messages,
+    typingUsers,
+    sendMessage,
+    emitTyping,
+    emitStopTyping,
+  } = useChatContext();
   const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -31,31 +31,11 @@ export default function ChatScreen({ onBack }) {
     });
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage = {
-      id: Date.now(),
-      type: "user",
-      text: inputValue.trim(),
-      time: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+  const handleSend = () => {
+    if (!inputValue.trim() || !connected) return;
+    sendMessage(inputValue.trim());
     setInputValue("");
-    setIsTyping(true);
-
-    // TODO: Replace with your API call
-    setTimeout(() => {
-      const botResponse = {
-        id: Date.now() + 1,
-        type: "system",
-        text: "Thank you for your message. Our support team will get back to you shortly. In the meantime, you can check our Help section for quick answers.",
-        time: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
-      setIsTyping(false);
-    }, 1500);
+    emitStopTyping();
   };
 
   const handleKeyPress = (e) => {
@@ -80,7 +60,9 @@ export default function ChatScreen({ onBack }) {
             <p className="chat-header-name">ShilingiBet Support</p>
             <div className="chat-header-status">
               <span className="chat-header-status-dot"></span>
-              <span className="chat-header-status-text">Online</span>
+              <span className="chat-header-status-text">
+                {connected ? "Connected" : "Connecting..."}
+              </span>
             </div>
           </div>
         </div>
@@ -90,18 +72,18 @@ export default function ChatScreen({ onBack }) {
       <div className="chat-messages">
         {messages.map((message) => (
           <div
-            key={message.id}
-            className={`chat-message ${message.type}`}
+            key={message._id}
+            className={`chat-message ${message.senderType === "customer" ? "user" : "system"}`}
           >
             <div className="chat-message-bubble">
-              <p className="chat-message-text">{message.text}</p>
-              <p className="chat-message-time">{formatTime(message.time)}</p>
+              <p className="chat-message-text">{message.content}</p>
+              <p className="chat-message-time">{formatTime(message.createdAt)}</p>
             </div>
           </div>
         ))}
 
         {/* Typing indicator */}
-        {isTyping && (
+        {typingUsers.length > 0 && (
           <div className="chat-typing">
             <div className="chat-typing-bubble">
               <div className="chat-typing-dots">
@@ -126,14 +108,18 @@ export default function ChatScreen({ onBack }) {
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              emitTyping();
+            }}
+            onBlur={emitStopTyping}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
             className="chat-input"
           />
           <button
             onClick={handleSend}
-            disabled={!inputValue.trim()}
+            disabled={!inputValue.trim() || !connected}
             className={`chat-send-btn ${inputValue.trim() ? "active" : "inactive"}`}
           >
             <FiSend size={16} />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import { BiSupport } from "react-icons/bi";
 import BottomNav from "./BottomNav";
@@ -6,14 +6,33 @@ import HomeScreen from "./HomeScreen";
 import MessagesScreen from "./MessagesScreen";
 import HelpScreen from "./HelpScreen";
 import ChatScreen from "./ChatScreen";
+import { ChatProvider } from "../../../context/ChatProvider";
+import { useNavigate } from "react-router-dom";
 import "./SupportWidget.css";
 
-export default function SupportWidget() {
+export default function SupportWidget({ token }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [showChat, setShowChat] = useState(false);
+  const [topic, setTopic] = useState("general");
+
+  useEffect(() => {
+    const openWidget = (event) => {
+      setTopic(event?.detail?.topic || "general");
+      setShowChat(false);
+      setIsOpen(true);
+    };
+    window.addEventListener("open-support-chat", openWidget);
+    return () => window.removeEventListener("open-support-chat", openWidget);
+  }, []);
 
   const handleStartChat = () => {
+    if (!token) {
+      setIsOpen(false);
+      navigate("/login");
+      return;
+    }
     setShowChat(true);
   };
 
@@ -48,7 +67,9 @@ export default function SupportWidget() {
             </button>
 
             {showChat ? (
-              <ChatScreen onBack={handleBackFromChat} />
+              <ChatProvider token={token} enabled={showChat} topic={topic} mode="support">
+                <ChatScreen onBack={handleBackFromChat} />
+              </ChatProvider>
             ) : (
               <>
                 <div className="support-content">

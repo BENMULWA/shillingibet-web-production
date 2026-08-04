@@ -19,21 +19,6 @@ export function useChat(
   const [currentUser, setCurrentUser] = useState(null);
   const [typingUsers, setTypingUsers] = useState([]);
 
-  // ✅ Load cached messages (before socket connects)
-  useEffect(() => {
-    const saved = localStorage.getItem("chat_messages");
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    }
-  }, []);
-
-  // ✅ Save to localStorage whenever messages change
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem("chat_messages", JSON.stringify(messages));
-    }
-  }, [messages]);
-
   // SOCKET CONNECT
   useEffect(() => {
     if (!token || !enabled) return;

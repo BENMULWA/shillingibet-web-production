@@ -10,6 +10,7 @@ import { getStoredUser } from "../utils/authStorage";
 const AppDownloadPopup = lazy(() => import("../components/AppDownloadPopup"));
 const FloatingActions = lazy(() => import("../components/FloatingActions"));
 const ChatPanel = lazy(() => import("../features/chat/ChatPanel"));
+const SupportWidget = lazy(() => import("../features/support/SupportWidget/SupportWidget"));
 
 function DashboardLayout() {
   const location = useLocation();
@@ -19,8 +20,6 @@ function DashboardLayout() {
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [chatCollapsed, setChatCollapsed] = useState(false);
-  const [chatTopic, setChatTopic] = useState("general");
-  const [chatMode, setChatMode] = useState("community");
   const chatWidth = chatCollapsed ? 320 : 380;
   const isSomethingOpen = showSidebar || isAppModalOpen || showChat;
 
@@ -40,16 +39,6 @@ function DashboardLayout() {
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const openSupportChat = (event) => {
-      setChatTopic(event?.detail?.topic || "general");
-      setChatMode("support");
-      setShowChat(true);
-    };
-    window.addEventListener("open-support-chat", openSupportChat);
-    return () => window.removeEventListener("open-support-chat", openSupportChat);
   }, []);
 
   useEffect(() => {
@@ -150,8 +139,6 @@ function DashboardLayout() {
       <Suspense fallback={null}>
         <FloatingActions
           onOpenChat={() => {
-            setChatMode("community");
-            setChatTopic("general");
             setShowChat(true);
           }}
         />
@@ -165,11 +152,14 @@ function DashboardLayout() {
             onClose={() => setShowChat(false)}
             collapsed={chatCollapsed}
             onToggleCollapse={() => setChatCollapsed((prev) => !prev)}
-            topic={chatTopic}
-            mode={chatMode}
+            mode="community"
           />
         </Suspense>
       )}
+
+      <Suspense fallback={null}>
+        <SupportWidget token={cleanToken} />
+      </Suspense>
     </div>
   );
 }
