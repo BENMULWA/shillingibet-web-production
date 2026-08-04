@@ -7,9 +7,11 @@ export default function ChatPanel({
   collapsed,
   onClose,
   onToggleCollapse,
+  topic,
+  mode,
 }) {
   return (
-    <ChatProvider token={token} enabled={open}>
+    <ChatProvider token={token} enabled={open} topic={topic} mode={mode}>
       <ChatSidebar
         open={open}
         onClose={onClose}

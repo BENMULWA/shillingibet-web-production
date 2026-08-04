@@ -4,8 +4,14 @@ import { useChat } from "../hooks/useChat";
 
 const ChatContext = createContext(null);
 
-export function ChatProvider({ token, enabled = true, children }) {
-  const chat = useChat(token, { enabled });
+export function ChatProvider({
+  token,
+  enabled = true,
+  topic = "general",
+  mode = "community",
+  children,
+}) {
+  const chat = useChat(token, { enabled, topic, mode });
 
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
 }

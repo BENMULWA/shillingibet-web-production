@@ -8,7 +8,10 @@ const SOCKET_URL = (
   window.location.origin
 ).replace(/\/$/, "");
 
-export function useChat(token, { enabled = true } = {}) {
+export function useChat(
+  token,
+  { enabled = true, topic = "general", mode = "community" } = {}
+) {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -37,8 +40,9 @@ export function useChat(token, { enabled = true } = {}) {
 
     const cleanToken = token.replace("Bearer ", "");
 
-    const newSocket = io(`${SOCKET_URL}/support-chat`, {
-      auth: { token: cleanToken },
+    const namespace = mode === "support" ? "support-chat" : "community-chat";
+    const newSocket = io(`${SOCKET_URL}/${namespace}`, {
+      auth: { token: cleanToken, topic },
       transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 10,
@@ -89,7 +93,7 @@ export function useChat(token, { enabled = true } = {}) {
     setSocket(newSocket);
 
     return () => newSocket.disconnect();
-  }, [token, enabled]);
+  }, [token, enabled, topic, mode]);
 
   // SEND MESSAGE
   const sendMessage = useCallback(
@@ -122,5 +126,6 @@ export function useChat(token, { enabled = true } = {}) {
     sendMessage,
     emitTyping,
     emitStopTyping,
+    mode,
   };
 }

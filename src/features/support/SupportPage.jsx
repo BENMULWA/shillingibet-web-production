@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { 
   FiMail, /* FiPhone, */ FiMessageSquare, FiInfo,
   FiChevronRight, FiShield, FiCreditCard, FiUser, FiZap 
@@ -6,7 +5,13 @@ import {
 import { BsChatRightDots } from "react-icons/bs";
 
 export default function SupportPage() {
-  const navigate = useNavigate();
+  const openSupportChat = (topic = "general") => {
+    window.dispatchEvent(
+      new CustomEvent("open-support-chat", {
+        detail: { topic },
+      })
+    );
+  };
 
   const quickQuestions = [
     { 
@@ -14,28 +19,28 @@ export default function SupportPage() {
       label: "Deposit Issue", 
       icon: <FiCreditCard className="text-primary" />, 
       desc: "Instant help with your deposits",
-      to: "/deposit" 
+      topic: "deposit"
     },
     { 
       id: "withdrawal", 
       label: "Withdrawal Help", 
       icon: <FiZap className="text-orange-400" />, 
       desc: "Track or request your winnings",
-      to: "/withdraw" 
+      topic: "withdrawal"
     },
     { 
       id: "account", 
       label: "Account Problem", 
       icon: <FiUser className="text-blue-400" />, 
       desc: "Login, verification and security",
-      to: "/profile" 
+      topic: "account"
     },
     { 
       id: "how-to-play", 
       label: "How to Play", 
       icon: <FiInfo className="text-green-400" />, 
       desc: "Learn our games and rules",
-      to: "/casino" 
+      topic: "how-to-play"
     },
   ];
 
@@ -46,11 +51,7 @@ export default function SupportPage() {
       icon: <FiMessageSquare size={20} />,
       desc: "Speak with our team instantly",
       color: "bg-primary text-black",
-      action: () => { 
-        if (typeof window.openSupportChat === 'function') {
-          window.openSupportChat();
-        }
-      }
+      action: () => openSupportChat("general")
     },
     {
       id: "email",
@@ -91,7 +92,7 @@ export default function SupportPage() {
             {quickQuestions.map((q) => (
               <button 
                 key={q.id}
-                onClick={() => navigate(q.to)}
+                onClick={() => openSupportChat(q.topic)}
                 className="flex items-center gap-4 p-5 bg-surface border border-white/5 rounded-2xl hover:border-primary/30 transition-all group text-left shadow-xl"
               >
                 <div className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl group-hover:bg-primary/10 transition-colors text-2xl">
@@ -146,11 +147,7 @@ export default function SupportPage() {
             <h3 className="text-xl font-black text-white">Welcome!</h3>
             <p className="text-sm text-gray-400">Our agents typically respond in under 5 minutes.</p>
             <button 
-              onClick={() => {
-                if (typeof window.openSupportChat === 'function') {
-                  window.openSupportChat();
-                }
-              }}
+              onClick={() => openSupportChat("general")}
               className="w-full py-4 bg-primary text-black font-black text-sm uppercase tracking-wider rounded-xl shadow-[0_0_20px_rgba(24acc15,0.25)] hover:scale-[1.02] transition-all"
             >
               Start Conversation

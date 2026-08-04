@@ -3,13 +3,13 @@ import { MdKeyboardTab } from "react-icons/md";
 import { useChatContext } from "../../../context/ChatProvider";
 
 export default function ChatHeader({ onClose, collapsed, onToggleCollapse }) {
-  const { activeUsers } = useChatContext();
+  const { activeUsers, mode } = useChatContext();
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-secondary h-16 border-l-2 border-primary/40">
       {/* Language Selector */}
       <h1 className="text-[#b7c4ba] font-bold">
         {" "}
-        Let's Chat • {activeUsers} Online
+        {mode === "support" ? "Support Chat" : `Let's Chat • ${activeUsers} Online`}
       </h1>
 
       <div className="flex items-center gap-3">

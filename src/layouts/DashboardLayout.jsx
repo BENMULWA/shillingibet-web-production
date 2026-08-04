@@ -19,6 +19,8 @@ function DashboardLayout() {
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [chatCollapsed, setChatCollapsed] = useState(false);
+  const [chatTopic, setChatTopic] = useState("general");
+  const [chatMode, setChatMode] = useState("community");
   const chatWidth = chatCollapsed ? 320 : 380;
   const isSomethingOpen = showSidebar || isAppModalOpen || showChat;
 
@@ -41,7 +43,11 @@ function DashboardLayout() {
   }, []);
 
   useEffect(() => {
-    const openSupportChat = () => setShowChat(true);
+    const openSupportChat = (event) => {
+      setChatTopic(event?.detail?.topic || "general");
+      setChatMode("support");
+      setShowChat(true);
+    };
     window.addEventListener("open-support-chat", openSupportChat);
     return () => window.removeEventListener("open-support-chat", openSupportChat);
   }, []);
@@ -142,7 +148,13 @@ function DashboardLayout() {
       )}
 
       <Suspense fallback={null}>
-        <FloatingActions onOpenChat={() => setShowChat(true)} />
+        <FloatingActions
+          onOpenChat={() => {
+            setChatMode("community");
+            setChatTopic("general");
+            setShowChat(true);
+          }}
+        />
       </Suspense>
 
       {showChat && (
@@ -153,6 +165,8 @@ function DashboardLayout() {
             onClose={() => setShowChat(false)}
             collapsed={chatCollapsed}
             onToggleCollapse={() => setChatCollapsed((prev) => !prev)}
+            topic={chatTopic}
+            mode={chatMode}
           />
         </Suspense>
       )}
