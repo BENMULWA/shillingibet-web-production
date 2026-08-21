@@ -44,31 +44,13 @@ const PromotionsDetailsPage = lazy(() => import("./features/promotions/Promotion
 const SupportPage  = lazy(() => import("./features/support/SupportPage"));
 const SearchPage   = lazy(() => import("./pages/SearchPage"));
 const ComingSoonPage = lazy(() => import("./pages/ComingSoonPage"));
+const DownloadPage = lazy(() => import("./pages/DownloadPage"));
+const Legals = lazy(() => import("./features/auth/Legals"));
 const JackpotPage = lazy(() => import("./features/jackpot/JackpotPage"));
 const JackpotResultsPage = lazy(() => import("./features/jackpot/JackpotResultsPage"));
 const JackpotDrawDetailPage = lazy(() => import("./features/jackpot/JackpotDrawDetailPage"));
 const JackpotHistoryPage = lazy(() => import("./features/jackpot/JackpotHistoryPage"));
 const JackpotBetDetailPage = lazy(() => import("./features/jackpot/JackpotBetDetailPage"));
-
-/* ── Download page (inline) ── */
-const DownloadPage = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 text-center">
-    <img src="/shilingibet.png" alt="ShilingiBet" className="w-40 mb-8" />
-    <h1 className="text-white text-2xl font-black mb-3">Download Our App</h1>
-    <p className="text-green-300 text-sm mb-8 max-w-xs">
-      Get the best betting experience on your mobile device. Fast, secure & always available.
-    </p>
-    <div className="flex flex-col gap-4 w-full max-w-xs">
-      <a href="/app-1.png" download className="bg-primary text-black font-black py-4 rounded-xl text-base hover:bg-yellow-400 transition-colors">
-        📱 Download for Android
-      </a>
-      <a href="/app-2.png" download className="bg-accent text-white font-black py-4 rounded-xl text-base hover:bg-accent-hover transition-colors">
-        🍎 Download for iOS
-      </a>
-    </div>
-    <p className="text-gray-500 text-xs mt-8">Version 1.0.0 · Requires Android 5.0+ or iOS 13+</p>
-  </div>
-);
 
 /* ── Protected wrapper ── */
 const Protected = ({ children }) => (
@@ -99,6 +81,7 @@ function App() {
           {/* ── Public pages ── */}
           <Route index element={<HomePage />} />
           <Route path="download" element={<DownloadPage />} />
+          <Route path="legal" element={<Legals />} />
           <Route path="search"   element={<SearchPage />} />
           <Route path="sports" element={<ComingSoonPage />} />
           <Route path="jackpot" element={<Protected><JackpotPage /></Protected>} />

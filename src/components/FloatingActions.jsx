@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaXmark } from "react-icons/fa6";
 
-export default function FloatingActions({ onOpenChat }) {
-  const [showSupport, setShowSupport] = useState(true);
+export default function FloatingActions() {
   const [showDeposit, setShowDeposit] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,32 +56,6 @@ export default function FloatingActions({ onOpenChat }) {
         </div>
       )}
 
-      {showSupport && (
-        <div
-          className={`pointer-events-none fixed right-4 bottom-24 z-40 ${mobileHomeVisibility}`}
-        >
-          <button
-            type="button"
-            onClick={() => setShowSupport(false)}
-            className="floating-support-close pointer-events-auto"
-            aria-label="Hide support shortcut"
-          >
-            <FaXmark />
-          </button>
-          <button
-            type="button"
-            onClick={onOpenChat}
-            className="floating-support pointer-events-auto"
-            aria-label="Open support chat"
-          >
-            <img
-              src="/icons/callsupport.png"
-              alt=""
-              className="floating-support-image"
-            />
-          </button>
-        </div>
-      )}
     </>
   );
 }

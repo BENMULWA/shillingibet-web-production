@@ -1,15 +1,18 @@
 
 
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
+import { usePwaInstall } from "../hooks/usePwaInstall";
 
 export const BANNER_DISMISSED_KEY = "downloadBannerDismissed";
 
 export default function DownloadBanner({
   title = "Get ShilingiBet App",
-  href = "",
   sticky = true,
 }) {
+  const { installed } = usePwaInstall();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [visible, setVisible] = useState(() => {
     return localStorage.getItem(BANNER_DISMISSED_KEY) !== "true";
   });
@@ -19,7 +22,7 @@ export default function DownloadBanner({
     localStorage.setItem(BANNER_DISMISSED_KEY, "true");
   };
 
-  if (!visible) return null;
+  if (!visible || installed || location.pathname === "/download") return null;
 
   return (
     <div className={`${sticky ? "sticky top-0 z-50" : ""} w-full md:hidden`}>
@@ -87,13 +90,9 @@ export default function DownloadBanner({
           </div>
 
           {/* Animated Open button */}
-          <a
-            href={href}
-            download
-            onClick={(e) => {
-              e.preventDefault();
-              toast.success("Coming Soon!");
-            }}
+          <button
+            type="button"
+            onClick={() => navigate("/download")}
             className="flex items-center gap-1.5 rounded-full shimmer-btn px-4 py-1.5 hover:scale-105 transition-transform cursor-pointer"
           >
             <svg
@@ -112,7 +111,7 @@ export default function DownloadBanner({
             <span className="text-black font-semibold text-xs uppercase tracking-wide">
               Open
             </span>
-          </a>
+          </button>
         </div>
       </div>
     </div>

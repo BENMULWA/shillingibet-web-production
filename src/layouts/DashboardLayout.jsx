@@ -8,7 +8,6 @@ import HomePage from "../pages/HomePage";
 import { getStoredUser } from "../utils/authStorage";
 
 const AppDownloadPopup = lazy(() => import("../components/AppDownloadPopup"));
-const FloatingActions = lazy(() => import("../components/FloatingActions"));
 const ChatPanel = lazy(() => import("../features/chat/ChatPanel"));
 const SupportWidget = lazy(() => import("../features/support/SupportWidget/SupportWidget"));
 
@@ -84,35 +83,48 @@ function DashboardLayout() {
   const isGameRoute =
     location.pathname === "/aviator" ||
     location.pathname.startsWith("/virtual/");
+  const isDownloadRoute = location.pathname === "/download";
 
   return (
     <div
-      className="betting-table-bg flex flex-col h-screen text-textColor no-scrollbar transition-all duration-300"
-      style={{ marginRight: showChat && !isMobile ? `${chatWidth}px` : "0px" }}
+      className={`${isDownloadRoute ? "bg-white" : "betting-table-bg"} flex flex-col h-screen text-textColor no-scrollbar transition-all duration-300`}
+      style={{ marginRight: showChat && !isMobile && !isDownloadRoute ? `${chatWidth}px` : "0px" }}
     >
-      <DownloadBanner />
-      <Navbar collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} onMenuClick={() => setShowSidebar(true)} />
+      {!isDownloadRoute && <DownloadBanner />}
+      {!isDownloadRoute && (
+        <Navbar collapsed={collapsed} setCollapsed={setCollapsed} isMobile={isMobile} onMenuClick={() => setShowSidebar(true)} />
+      )}
 
       <div
-        className={`relative z-[1] flex flex-1 overflow-hidden no-scrollbar md:gap-2 lg:gap-2 ${
-          isGameRoute ? "p-0 md:px-2 md:pt-4" : "px-0 pt-4 md:px-2"
+        className={`relative z-[1] flex flex-1 overflow-hidden no-scrollbar ${
+          isDownloadRoute ? "" : "md:gap-2 lg:gap-2"
+        } ${
+          isDownloadRoute
+            ? "p-0"
+            : isGameRoute
+              ? "p-0 md:px-2 md:pt-4"
+              : "px-0 pt-4 md:px-2"
         }`}
       >
-        <Sidebar
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-          isMobile={isMobile}
-          showSidebar={showSidebar}
-          setShowSidebar={setShowSidebar}
-        />
+        {!isDownloadRoute && (
+          <Sidebar
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            isMobile={isMobile}
+            showSidebar={showSidebar}
+            setShowSidebar={setShowSidebar}
+          />
+        )}
         <main
-          className={`flex-1 overflow-y-auto pb-[calc(6rem+env(safe-area-inset-bottom))] appscroll no-scrollbar md:pb-0 ${
+          className={`flex-1 overflow-y-auto appscroll no-scrollbar ${
+            isDownloadRoute ? "pb-0" : "pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0"
+          } ${
             isGameRoute ? "overflow-hidden" : ""
           }`}
         >
           <div
             className={`mx-auto w-full max-w-[3000px] ${
-              isGameRoute ? "p-0" : "lg:px-4 2xl:px-8"
+              isGameRoute || isDownloadRoute ? "p-0" : "lg:px-4 2xl:px-8"
             }`}
           >
             {isAuthOverlayRoute && <HomePage />}
@@ -121,7 +133,7 @@ function DashboardLayout() {
         </main>
       </div>
 
-      {isMobile && !isGameRoute && (
+      {isMobile && !isGameRoute && !isDownloadRoute && (
         <BottomNav
           onMenuClick={() => setShowSidebar(true)}
           onChatClick={() => setShowChat((prev) => !prev)}
@@ -130,21 +142,13 @@ function DashboardLayout() {
         />
       )}
 
-      {isAppModalOpen && (
+      {isAppModalOpen && !isDownloadRoute && (
         <Suspense fallback={null}>
           <AppDownloadPopup isOpen={isAppModalOpen} onClose={() => setIsAppModalOpen(false)} />
         </Suspense>
       )}
 
-      <Suspense fallback={null}>
-        <FloatingActions
-          onOpenChat={() => {
-            setShowChat(true);
-          }}
-        />
-      </Suspense>
-
-      {showChat && (
+      {showChat && !isDownloadRoute && (
         <Suspense fallback={null}>
           <ChatPanel
             token={cleanToken}
@@ -157,9 +161,11 @@ function DashboardLayout() {
         </Suspense>
       )}
 
-      <Suspense fallback={null}>
-        <SupportWidget token={cleanToken} />
-      </Suspense>
+      {!isDownloadRoute && (
+        <Suspense fallback={null}>
+          <SupportWidget token={cleanToken} />
+        </Suspense>
+      )}
     </div>
   );
 }

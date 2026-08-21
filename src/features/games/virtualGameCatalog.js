@@ -83,7 +83,17 @@ export function buildEuroVirtualGames(providerGames = []) {
 }
 
 function byDisplayOrder(a, b) {
-  return Number(a.display_order ?? 0) - Number(b.display_order ?? 0);
+  const aHasValue = a.display_order !== null && a.display_order !== undefined && a.display_order !== "";
+  const bHasValue = b.display_order !== null && b.display_order !== undefined && b.display_order !== "";
+  const aOrder = Number(a.display_order);
+  const bOrder = Number(b.display_order);
+  const aHasOrder = aHasValue && Number.isFinite(aOrder);
+  const bHasOrder = bHasValue && Number.isFinite(bOrder);
+
+  if (aHasOrder && bHasOrder) return aOrder - bOrder;
+  if (aHasOrder) return -1;
+  if (bHasOrder) return 1;
+  return 0;
 }
 
 export function categorizeGames(games = []) {
@@ -95,6 +105,9 @@ export function categorizeGames(games = []) {
     mostPopular: sorted((game) => game.is_popular === true),
     crashGames: sorted((game) => game.category === "crash"),
     virtualGames: sorted((game) => game.category === "virtual"),
-    others: sorted((game) => game.category === "others"),
+    // Keep newly added or uncategorized provider games visible at the bottom.
+    others: sorted(
+      (game) => !["crash", "virtual"].includes(game.category)
+    ),
   };
 }

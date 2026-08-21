@@ -3,13 +3,15 @@
 /* CSS Variables */
 :root {
   --sw-primary: #f9ce36;
-  --sw-secondary: rgb(25, 25, 57);
-  --sw-background: rgb(17, 17, 41);
-  --sw-text-color: rgb(151, 137, 205);
-  --sw-text-muted: rgba(151, 137, 205, 0.5);
-  --sw-text-light: rgba(151, 137, 205, 0.6);
-  --sw-border-color: rgba(151, 137, 205, 0.1);
-  --sw-border-light: rgba(151, 137, 205, 0.2);
+  --sw-accent: #00c853;
+  --sw-accent-dark: #008f3c;
+  --sw-secondary: #0d1711;
+  --sw-background: #050806;
+  --sw-text-color: #d7e1d9;
+  --sw-text-muted: rgba(183, 196, 186, 0.55);
+  --sw-text-light: rgba(183, 196, 186, 0.75);
+  --sw-border-color: rgba(249, 206, 54, 0.12);
+  --sw-border-light: rgba(249, 206, 54, 0.3);
 }
 
 /* ===== SupportWidget.jsx ===== */
@@ -71,7 +73,7 @@
 
 .support-panel {
   background-color: var(--sw-secondary);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -120,7 +122,7 @@
 .support-header {
   position: relative;
   padding: 1.5rem 1.25rem 2rem;
-  background: linear-gradient(to bottom right, var(--sw-primary), rgba(249, 206, 54, 0.9), rgba(249, 206, 54, 0.8));
+  background: linear-gradient(135deg, var(--sw-accent), #00b84d 58%, var(--sw-accent-dark));
   border-radius: 1rem 1rem 0 0;
 }
 
@@ -152,11 +154,11 @@
   height: 2.25rem;
   border-radius: 9999px;
   background-color: var(--sw-secondary);
-  border: 2px solid var(--sw-primary);
+  border: 2px solid rgba(249, 206, 54, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--sw-text-color);
+  color: var(--sw-primary);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -191,14 +193,14 @@
 
 .support-status-text {
   font-size: 0.75rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
 .support-header-greeting {
   font-size: 1.5rem;
   font-weight: 700;
-  color: black;
+  color: white;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -206,13 +208,13 @@
 
 .support-header-subtitle {
   font-size: 1rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.82);
   margin-top: 0.25rem;
 }
 
 /* ===== MessageCard.jsx ===== */
 .message-card {
-  background-color: rgba(17, 17, 41, 0.5);
+  background-color: rgba(5, 8, 6, 0.68);
   margin: 1rem;
   border-radius: 0.75rem;
   padding: 1rem;
@@ -269,12 +271,12 @@
 }
 
 .help-item:hover {
-  background-color: rgba(17, 17, 41, 0.5);
+  background-color: rgba(0, 200, 83, 0.08);
 }
 
 .help-item-label {
   font-size: 0.875rem;
-  color: rgba(151, 137, 205, 0.8);
+  color: var(--sw-text-light);
   transition: color 0.2s ease;
 }
 
@@ -344,7 +346,7 @@
 }
 
 .home-topics-list {
-  background-color: rgba(17, 17, 41, 0.5);
+  background-color: rgba(5, 8, 6, 0.68);
   border-radius: 0.75rem;
   padding: 0.75rem;
 }
@@ -462,7 +464,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 0.75rem;
-  background-color: rgba(151, 137, 205, 0.1);
+  background-color: rgba(0, 200, 83, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -490,7 +492,7 @@
 }
 
 .help-search-input::placeholder {
-  color: rgba(151, 137, 205, 0.4);
+  color: var(--sw-text-muted);
 }
 
 .help-faq {
@@ -507,7 +509,7 @@
 }
 
 .help-faq-list {
-  background-color: rgba(17, 17, 41, 0.5);
+  background-color: rgba(5, 8, 6, 0.68);
   border-radius: 0.75rem;
   padding: 0.5rem;
 }
@@ -572,7 +574,7 @@
 }
 
 .chat-header {
-  background: linear-gradient(to right, var(--sw-primary), rgba(249, 206, 54, 0.8));
+  background: linear-gradient(135deg, var(--sw-accent), var(--sw-accent-dark));
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -597,7 +599,7 @@
 }
 
 .chat-back-btn svg {
-  color: black;
+  color: white;
 }
 
 .chat-header-info {
@@ -623,7 +625,7 @@
 
 .chat-header-name {
   font-weight: 600;
-  color: black;
+  color: white;
   font-size: 0.875rem;
 }
 
@@ -642,7 +644,7 @@
 
 .chat-header-status-text {
   font-size: 0.75rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .chat-messages {
@@ -680,7 +682,7 @@
 }
 
 .chat-message.system .chat-message-bubble {
-  background-color: rgba(17, 17, 41, 0.7);
+  background-color: rgba(5, 8, 6, 0.82);
   color: var(--sw-text-color);
   border-bottom-left-radius: 0.375rem;
 }
@@ -699,7 +701,7 @@
 }
 
 .chat-message.system .chat-message-time {
-  color: rgba(151, 137, 205, 0.5);
+  color: var(--sw-text-muted);
 }
 
 .chat-typing {
@@ -708,7 +710,7 @@
 }
 
 .chat-typing-bubble {
-  background-color: rgba(17, 17, 41, 0.7);
+  background-color: rgba(5, 8, 6, 0.82);
   border-radius: 1rem;
   border-bottom-left-radius: 0.375rem;
   padding: 0.75rem 1rem;
@@ -722,7 +724,7 @@
 .chat-typing-dot {
   width: 0.5rem;
   height: 0.5rem;
-  background-color: rgba(151, 137, 205, 0.5);
+  background-color: var(--sw-text-muted);
   border-radius: 9999px;
   animation: bounce 1s infinite;
 }
@@ -746,7 +748,7 @@
 
 .chat-input-wrapper {
   padding: 0.75rem;
-  background-color: rgba(25, 25, 57, 0.8);
+  background-color: rgba(13, 23, 17, 0.9);
   backdrop-filter: blur(4px);
 }
 
@@ -769,7 +771,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 0.75rem;
-  background-color: rgba(151, 137, 205, 0.1);
+  background-color: rgba(0, 200, 83, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -802,7 +804,7 @@
 }
 
 .chat-input::placeholder {
-  color: rgba(151, 137, 205, 0.4);
+  color: var(--sw-text-muted);
 }
 
 .chat-send-btn {
@@ -829,7 +831,7 @@
 }
 
 .chat-send-btn.inactive {
-  background-color: rgba(151, 137, 205, 0.1);
-  color: rgba(151, 137, 205, 0.3);
+  background-color: rgba(0, 200, 83, 0.08);
+  color: var(--sw-text-muted);
   transform: scale(0.95);
 }

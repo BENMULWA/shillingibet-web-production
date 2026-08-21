@@ -54,7 +54,20 @@ export function useChat(
     });
 
     newSocket.on("chat:new_message", (msg) => {
-      setMessages((prev) => [...prev, msg]);
+      setMessages((prev) => {
+        if (prev.some((message) => message._id === msg._id)) return prev;
+        if (msg.clientId) {
+          const pendingIndex = prev.findIndex(
+            (message) => message.clientId === msg.clientId
+          );
+          if (pendingIndex >= 0) {
+            return prev.map((message, index) =>
+              index === pendingIndex ? msg : message
+            );
+          }
+        }
+        return [...prev, msg];
+      });
     });
 
     newSocket.on("chat:user_joined", (data) => {
@@ -85,13 +98,30 @@ export function useChat(
     (content, replyTo = null) => {
       if (!socket || !content.trim()) return;
 
+      const clientId = window.crypto?.randomUUID?.() || `local-${Date.now()}`;
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: clientId,
+          clientId,
+          senderType: "customer",
+          senderUsername: currentUser?.username || currentUser?.name || "You",
+          content: content.trim(),
+          messageType: "text",
+          replyTo,
+          createdAt: new Date().toISOString(),
+          pending: true,
+        },
+      ]);
+
       socket.emit("chat:send_message", {
         content,
         messageType: "text",
+        clientId,
         ...(replyTo && { replyTo }),
       });
     },
-    [socket]
+    [currentUser, socket]
   );
 
   const emitTyping = useCallback(() => {

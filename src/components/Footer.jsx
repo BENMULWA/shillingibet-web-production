@@ -87,8 +87,7 @@ const Footer = () => {
             </div>
 
             <a
-              href="/app/shilingibet.apk"
-              download
+              href="/download"
               className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
             >
               Download App

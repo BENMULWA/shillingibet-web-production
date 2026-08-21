@@ -1,9 +1,11 @@
 import { FiX } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { usePwaInstall } from "../hooks/usePwaInstall";
 
 export default function AppDownloadPopup({ isOpen, onClose }) {
   const [isMobile, setIsMobile] = useState(false);
+  const { installed, install } = usePwaInstall();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -13,7 +15,21 @@ export default function AppDownloadPopup({ isOpen, onClose }) {
   }, []);
 
   // Only show on mobile
-  if (!isOpen || !isMobile) return null;
+  const handleInstall = async () => {
+    const accepted = await install();
+    if (accepted) {
+      onClose();
+      return;
+    }
+
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    toast(isIos
+      ? "To install: tap Share, then Add to Home Screen."
+      : "Open your browser menu and choose Install app or Add to Home screen."
+    );
+  };
+
+  if (!isOpen || !isMobile || installed) return null;
 
   return (
     <>
@@ -33,10 +49,10 @@ export default function AppDownloadPopup({ isOpen, onClose }) {
 
           {/* Title */}
           <h2 className="text-2xl font-extrabold text-center text-[#d7e1d9]">
-            Get Our Android App
+            Get the ShilingiBet App
           </h2>
           <p className="text-sm text-[#aab8ad] text-center mb-6">
-            Never Miss Anything, Download Now.
+            Install it on your home screen for quick access.
           </p>
 
           {/* Android Icon */}
@@ -47,16 +63,13 @@ export default function AppDownloadPopup({ isOpen, onClose }) {
           />
 
           {/* Install button */}
-          <a
-            href="/ndege.apk"
-            onClick={(e) => {
-              e.preventDefault();
-              toast.success("Coming Soon!");
-            }}
+          <button
+            type="button"
+            onClick={handleInstall}
             className="block w-full bg-[#f9ce36] text-black font-bold py-3 rounded-xl mb-5 transition-all duration-300 text-center cursor-pointer"
           >
             🚀 Install Now
-          </a>
+          </button>
 
           {/* Close button */}
           <button
