@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { FaPlay } from "react-icons/fa";
 import BaseClass from "../services/BaseClass";
 
-const FALLBACK_GAME_IMAGE = "/virtuals.png";
-
 const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, linkToPath }) {
   const baseClass = new BaseClass();
   const game = gameName || title?.toLowerCase();
@@ -16,14 +14,9 @@ const SpribeBetsCard = memo(function SpribeBetsCard({ src, title, gameName, link
         {/* Image Section */}
         <div className="relative aspect-square w-full overflow-hidden bg-[#050806]">
           <img
-            src={src || FALLBACK_GAME_IMAGE}
+            src={src}
             alt={title || game}
             loading="lazy"
-            onError={(event) => {
-              const image = event.currentTarget;
-              image.onerror = null;
-              image.src = FALLBACK_GAME_IMAGE;
-            }}
             className="block h-full w-full object-cover transition-all duration-300"
           />
           {/* Default Dark Overlay */}

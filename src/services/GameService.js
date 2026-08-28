@@ -2,6 +2,18 @@ import { fetchAPI } from "../utils/FetchApi";
 import BaseClass from "./BaseClass";
 import { normalizeGameName } from "../features/games/virtualGameCatalog";
 
+const IMAGE_BASE_URL = (import.meta.env.VITE_IMAGE_URL || "").replace(/\/$/, "");
+
+const resolveThumbnailUrl = (thumbnail) => {
+  if (!thumbnail || /^(?:https?:)?\/\//i.test(thumbnail) || /^(?:data|blob):/i.test(thumbnail)) {
+    return thumbnail;
+  }
+
+  return IMAGE_BASE_URL
+    ? `${IMAGE_BASE_URL}/${String(thumbnail).replace(/^\/+/, "")}`
+    : thumbnail;
+};
+
 class GameService extends BaseClass {
   async getAllGames() {
     try {
@@ -16,13 +28,15 @@ class GameService extends BaseClass {
         .map((game) => {
           const gameUuid =
             game.game_uuid ?? game.game_uid ?? game.uuid ?? game.uid ?? game._id;
+          const thumbnail = resolveThumbnailUrl(game.thumbnail ?? game.image);
 
           return {
             ...game,
             game_uuid: gameUuid,
             _id: gameUuid,
             title: game.game_name,
-            image: game.thumbnail,
+            thumbnail,
+            image: thumbnail,
             linkPath: gameUuid
               ? `/virtual/${gameUuid}`
               : `/virtual/name/${normalizeGameName(game.game_name).replace(/\s+/g, "-")}`,

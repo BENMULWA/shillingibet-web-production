@@ -41,7 +41,7 @@ export default function HomePage() {
                 <SpribeBetsCard
                   key={game.game_uuid || game._id}
                   title={game.game_name || game.title}
-                  src={game.thumbnail || game.image || "/virtuals.png"}
+                  src={game.thumbnail || game.image}
                   gameID={game.game_uuid || game._id}
                   linkToPath={game.linkPath}
                 />
