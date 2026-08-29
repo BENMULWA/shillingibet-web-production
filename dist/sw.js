@@ -1,4 +1,4 @@
-const CACHE_VERSION = "shilingibet-v1";
+const CACHE_VERSION = "shilingibet-v2";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
