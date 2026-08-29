@@ -4,6 +4,7 @@ import { PaymentService } from "../../services/PaymentService";
 import { useBanner } from "../../context/BannerContext";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { notifyVirtualWalletRefresh } from "../../utils/virtualWalletSync";
 
 function PaymentView() {
   const [status, setStatus] = useState("Pending");
@@ -39,6 +40,7 @@ function PaymentView() {
           const txCode = response?.data?.data?.transactionCode ?? response?.data?.transactionCode ?? response?.transactionCode;
           setTransactionCode(txCode);
           queryClient.invalidateQueries({ queryKey: ["user-balance"] });
+          notifyVirtualWalletRefresh();
         }
 
         if (newStatus === "success" && response?.data?.banner?.showBanner) {

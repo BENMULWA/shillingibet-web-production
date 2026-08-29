@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 
 import Loader from "../../components/Loader";
 import { useGameSession } from "../../hooks/useGames";
+import { VIRTUAL_WALLET_REFRESH_EVENT } from "../../utils/virtualWalletSync";
 
 export default function GameLauncher({ game, gameUuid, title }) {
   const { launchGameAsync, isLoading } = useGameSession();
@@ -92,6 +93,12 @@ export default function GameLauncher({ game, gameUuid, title }) {
     window.addEventListener("message", handleProviderMessage);
     return () => window.removeEventListener("message", handleProviderMessage);
   }, [queryClient, requestLaunch]);
+
+  useEffect(() => {
+    const refreshAfterDeposit = () => requestLaunch(true);
+    window.addEventListener(VIRTUAL_WALLET_REFRESH_EVENT, refreshAfterDeposit);
+    return () => window.removeEventListener(VIRTUAL_WALLET_REFRESH_EVENT, refreshAfterDeposit);
+  }, [requestLaunch]);
 
   if ((isLoading && !launchUrl) || isReconnecting) {
     return (

@@ -1,7 +1,13 @@
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { PaymentService } from "../services/PaymentService";
+import {
+  markDepositPending,
+  notifyIfDepositCredited,
+  notifyVirtualWalletRefresh,
+} from "../utils/virtualWalletSync";
 
 export function useDeposit() {
   const paymentService = new PaymentService();
@@ -14,6 +20,7 @@ export function useDeposit() {
   } = useMutation({
     mutationFn: paymentService.depositCash.bind(paymentService),
     onSuccess: (res) => {
+      markDepositPending(queryClient.getQueryData(["user-balance"])?.balance);
       toast.success(
         "Check your phone. When prompted, enter your M-Pesa pin on your phone to complete payment"
       ); // ✅ invalidate balance after deposit
@@ -87,6 +94,10 @@ export function useUpdateBalance() {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+
+  useEffect(() => {
+    if (balance?.balance != null) notifyIfDepositCredited(balance.balance);
+  }, [balance?.balance]);
 
   return { balance, isLoading };
 }
@@ -216,6 +227,7 @@ export function useFusionDeposit() {
   } = useMutation({
     mutationFn: paymentService.depositFusion.bind(paymentService),
     onSuccess: (res) => {
+      markDepositPending(queryClient.getQueryData(["user-balance"])?.balance);
       toast.success(
         res?.message || "Fusion Fi deposit order created successfully"
       );
@@ -235,8 +247,14 @@ export function useCryptoUpdateDeposit() {
   
   const {mutate: depositCrypto, isPending: isLoading, error} = useMutation({
     mutationFn: paymentService.updateCryptoWalletBalance?.bind(paymentService),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["user-balance"] });
+      if (
+        res?.status === "confirmed" ||
+        /success|confirmed|credited/i.test(res?.message || "")
+      ) {
+        notifyVirtualWalletRefresh();
+      }
       // window.location.reload();
     }
   })
