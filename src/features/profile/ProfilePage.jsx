@@ -1,14 +1,10 @@
 import { useState } from "react";
 import {
-  FaCrown,
   FaComments,
   FaTrash,
   FaSignOutAlt,
-  FaWallet,
   FaHistory,
-  FaCoins,
 } from "react-icons/fa";
-import { TfiGift } from "react-icons/tfi";
 import { IoWalletOutline, IoCopyOutline, IoCheckmark } from "react-icons/io5";
 import { MdOutlineAdd } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
@@ -47,7 +43,6 @@ export default function Profile() {
   const menuItems = [
     { icon: <BsBoxes />, label: "Refer & Earn", route: "refer" },
     { icon: <FaHistory />, label: "Transaction Records", route: "history" },
-    { icon: <FaCrown />, label: "Redeem Bonus", route: "redeem" },
     { icon: <FaComments />, label: "Chat with Support", onClick: () => navigate('/support') },
     { icon: <FaTrash />, label: "Delete Account", onClick: () => setShowDeleteModal(true) },
     { icon: <FaSignOutAlt />, label: isLoggingOut ? "Logging Out..." : "Log Out", onClick: () => setShowLogoutModal(true), isLogout: true },
@@ -78,81 +73,60 @@ export default function Profile() {
 
         {/* Wallet Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {/* Main Wallet */}
+          {/* Total Balance */}
           <div className="rounded-2xl bg-secondary p-5">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 flex items-center justify-center">
                 <img src="/icons/add-payment.png" alt="Wallet" className="w-full h-full object-contain" />
               </div>
-              <span className="text-sm text-[#9cae9f]">Main Wallet</span>
+              <span className="text-sm text-[#9cae9f]">Total Balance</span>
             </div>
             <div className="text-2xl font-bold text-white">
               {gettingBalance ? (
                 <BounceLoading fill="#f9ce36" barHeight={12} />
               ) : (
-                balance?.balance != null
-                  ? `KES ${Number(balance.balance).toLocaleString()}`
+                balance?.totalBalance != null
+                  ? `KES ${Number(balance.totalBalance).toLocaleString()}`
                   : "KES —"
               )}
             </div>
+            <p className="mt-2 text-xs text-[#75877a]">Cash and bonus funds</p>
           </div>
 
-          {/* Referral Bonus */}
+          {/* Bonus Balance */}
           <div className="rounded-2xl bg-secondary p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <img src="/icons/refer.png" alt="Referral" className="w-full h-full object-contain" />
-                </div>
-                <span className="text-sm text-[#9cae9f]">Referral</span>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img src="/icons/refer.png" alt="Bonus" className="w-full h-full object-contain" />
               </div>
-              <Link
-                to="/redeem?type=referral"
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  (balance?.referralBonus ?? 0) >= 10
-                    ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                    : "bg-gray-500/20 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                Redeem
-              </Link>
+              <span className="text-sm text-[#9cae9f]">Bonus Balance</span>
             </div>
             <div className="text-2xl font-bold text-white">
               {gettingBalance ? (
                 <BounceLoading fill="#f9ce36" barHeight={12} />
               ) : (
-                `KES ${balance?.referralBonus?.toLocaleString() ?? 0}`
+                `KES ${Number(balance?.bonusBalance ?? 0).toLocaleString()}`
               )}
             </div>
+            <p className="mt-2 text-xs text-[#75877a]">Available for betting only</p>
           </div>
 
-          {/* Cashback */}
+          {/* Withdrawable Balance */}
           <div className="rounded-2xl bg-secondary p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <img src="/icons/cashback.png" alt="Cashback" className="w-full h-full object-contain filter drop-shadow-lg" />
-                </div>
-                <span className="text-sm text-[#9cae9f]">Cashback</span>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img src="/icons/cashback.png" alt="Withdrawable" className="w-full h-full object-contain filter drop-shadow-lg" />
               </div>
-              <Link
-                to="/redeem?type=cashback"
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  (balance?.cashback ?? 0) >= 10
-                    ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                    : "bg-gray-500/20 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                Redeem
-              </Link>
+              <span className="text-sm text-[#9cae9f]">Withdrawable Balance</span>
             </div>
             <div className="text-2xl font-bold text-white">
               {gettingBalance ? (
                 <BounceLoading fill="#f9ce36" barHeight={12} />
               ) : (
-                `KES ${balance?.cashback?.toLocaleString() ?? 0}`
+                `KES ${Number(balance?.withdrawableBalance ?? 0).toLocaleString()}`
               )}
             </div>
+            <p className="mt-2 text-xs text-[#75877a]">Cash available to withdraw</p>
           </div>
         </div>
 
@@ -206,7 +180,7 @@ export default function Profile() {
                 <div>
                   <h2 className="text-lg font-bold text-white">Refer & Earn</h2>
                   <p className="text-sm text-[#9cae9f]">
-                    Win up to <span className="text-primary font-semibold">KES 350,000</span> weekly
+                    Earn <span className="text-primary font-semibold">KES 5</span> per verified referral
                   </p>
                 </div>
               </div>
@@ -253,13 +227,13 @@ export default function Profile() {
                     <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center mb-2">
                       <span className="text-primary text-sm font-bold">2</span>
                     </div>
-                    <p className="text-sm text-[#9cae9f]">Friend registers & deposits</p>
+                    <p className="text-sm text-[#9cae9f]">Friend registers and verifies their phone</p>
                   </div>
                   <div className="bg-background/30 rounded-xl p-4">
                     <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center mb-2">
                       <span className="text-primary text-sm font-bold">3</span>
                     </div>
-                    <p className="text-sm text-[#9cae9f]">Earn KES 10 + 5% bonus</p>
+                    <p className="text-sm text-[#9cae9f]">Earn a KES 5 betting bonus</p>
                   </div>
                 </div>
               </div>

@@ -6,19 +6,19 @@ const faqs = [
   {
     label: "How do I deposit funds?",
     answer:
-      "To deposit funds, go to your Profile and tap 'Deposit'. Enter an amount between KES 10 and KES 140,000 or select a preset amount. Complete the M-Pesa payment and your funds will appear instantly in your wallet. Note: A 5% tax is deducted from all deposits.",
+      "To deposit funds, go to your Profile and tap 'Deposit'. Enter an amount between KES 1 and KES 250,000 or select a preset amount. Complete the M-Pesa payment and your funds will appear in your wallet.",
     keywords: ["mpesa", "money", "add funds", "top up", "payment", "pay", "fund", "wallet", "balance"],
   },
   {
     label: "How do I withdraw my winnings?",
     answer:
-      "Go to Profile → Withdraw. Your M-Pesa number is pre-filled. Enter the amount you wish to withdraw (KES 100 - KES 70,000). A 5% tax will be deducted, and the remaining amount is sent instantly to your M-Pesa account.",
+      "Go to Profile → Withdraw. Your M-Pesa number is pre-filled. Enter an amount from KES 10 to KES 250,000, up to your withdrawable balance. Bonus funds cannot be withdrawn directly.",
     keywords: ["cash out", "cashout", "payout", "money", "mpesa", "receive", "get money", "winnings", "earnings"],
   },
   {
     label: "How does the Refer & Earn program work?",
     answer:
-      "Share your unique referral link from your Profile with friends. When they register and deposit, you earn 5% commission on every deposit they make. Your earnings appear in your 'Referral Bonus' wallet and can be redeemed to your main wallet (minimum KES 10 balance required). Referral bonuses can only be used on Aviator.",
+      "Share your unique referral link from your Profile. When a referred friend registers and verifies their phone, you receive a KES 5 bonus after security checks. Referral and welcome bonuses are added to your bonus balance and can only be used to place bets; they cannot be withdrawn or redeemed as cash.",
     keywords: ["invite", "friend", "share", "link", "commission", "bonus", "earn", "referral code", "promo"],
   },
   {
@@ -30,7 +30,7 @@ const faqs = [
   {
     label: "How do bonuses and cashback work?",
     answer:
-      "ShilingiBet offers Daily Cashback on your bets, Aviator Daily Cashback with free bets worth up to KES 5M daily, and Aviator Challenges (missions, races, tournaments) to win freebets, cash, and merchandise. To redeem bonuses, go to Profile → Redeem Bonus. Your account must be active within 30 days.",
+      "A verified new account may receive a KES 10 welcome bonus after security checks. Welcome and referral bonuses appear in your bonus balance and are used automatically when you place a bet. They cannot be withdrawn directly.",
     keywords: ["free", "freebet", "reward", "promo", "promotion", "daily", "challenge", "mission", "redeem"],
   },
   {

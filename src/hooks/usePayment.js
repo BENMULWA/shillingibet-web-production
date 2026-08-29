@@ -159,36 +159,6 @@ export function useIssueKey() {
 
   return { creatingKey, isLoading, error };
 }
-export default function useRedeemBonus() {
-  const navigate = useNavigate();
-  const paymentService = new PaymentService();
-  const queryClient = useQueryClient();
-  const {
-    mutate: redeemingBonus,
-    isPending: isLoading,
-    error,
-  } = useMutation({
-    mutationFn: paymentService.redeemBonus?.bind(paymentService),
-    onSuccess: (res) => {
-      if (res.status !== true) {
-        toast.error(
-          res?.data?.message ?? "Something went wrong try again later"
-        );
-      } else {
-        // ✅ Invalidate balance query after success
-        queryClient.invalidateQueries({ queryKey: ["user-balance"] });
-        navigate("/profile");
-        toast.success(res?.data?.message ?? "Bonus redeemed successfully");
-      }
-    },
-    onError: (err) => {
-      toast.error(err?.message ?? "Something went wrong");
-    },
-  });
-
-  return { redeemingBonus, isLoading, error };
-}
-
 export function useWithdrawCrypto() {
   const paymentService = new PaymentService();
   const queryClient = useQueryClient();

@@ -10,6 +10,7 @@ import {
   useFusionDeposit,
 } from "../../hooks/usePayment";
 import { BsInfoCircle } from "react-icons/bs";
+import { WALLET_LIMITS } from "../../utils/walletLimits";
 
 const depositAmounts = [
   { value: 49, hot: false },
@@ -132,8 +133,13 @@ export default function Deposit() {
       return;
     }
 
-    if (!amountNum || amountNum < 10) {
-      toast.error("Minimum Fusion Fi deposit is KES 10");
+    if (!amountNum || amountNum < WALLET_LIMITS.deposit.min) {
+      toast.error(`Minimum Fusion Fi deposit is KES ${WALLET_LIMITS.deposit.min}`);
+      return;
+    }
+
+    if (amountNum > WALLET_LIMITS.deposit.max) {
+      toast.error(`Maximum Fusion Fi deposit is KES ${WALLET_LIMITS.deposit.max.toLocaleString()}`);
       return;
     }
 
@@ -290,17 +296,20 @@ export default function Deposit() {
                 <input
                   type="number"
                   inputMode="numeric"
-                  min={10}
-                  max={140000}
+                  min={WALLET_LIMITS.deposit.min}
+                  max={WALLET_LIMITS.deposit.max}
                   placeholder="Amount (KES)"
                   className="w-full rounded-lg px-5 border border-primary/80 bg-[#07110b] py-3 text-white focus:outline-primary focus:ring-0 focus:border-primary placeholder:text-[#9cae9f]"
                   {...register("amount", {
                     required: "Amount is required",
                     valueAsNumber: true,
-                    min: { value: 10, message: "Minimum deposit is KES 10" },
+                    min: {
+                      value: WALLET_LIMITS.deposit.min,
+                      message: `Minimum deposit is KES ${WALLET_LIMITS.deposit.min}`,
+                    },
                     max: {
-                      value: 140000,
-                      message: "Maximum deposit is KES 140,000",
+                      value: WALLET_LIMITS.deposit.max,
+                      message: `Maximum deposit is KES ${WALLET_LIMITS.deposit.max.toLocaleString()}`,
                     },
                   })}
                   disabled={disabled}

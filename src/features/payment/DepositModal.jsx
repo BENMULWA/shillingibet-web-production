@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useDeposit } from "../../hooks/usePayment";
 import BaseClass from "../../services/BaseClass";
+import { WALLET_LIMITS } from "../../utils/walletLimits";
 
 export default function DepositModal({ onClose }) {
   const baseClass = new BaseClass();
@@ -112,14 +113,20 @@ export default function DepositModal({ onClose }) {
           <input
             type="number"
             inputMode="numeric"
-            min={10}
-            max={140000}
+            min={WALLET_LIMITS.deposit.min}
+            max={WALLET_LIMITS.deposit.max}
             className="w-full px-4 py-2 rounded-md bg-secondary text-[#b7c4ba] border border-[#444] outline-none mb-1 text-sm"
             {...register("amount", {
               required: "Amount is required",
               valueAsNumber: true,
-              min: { value: 10, message: "Minimum deposit is KES 10" },
-              max: { value: 140000, message: "Maximum deposit is KES 140,000" },
+              min: {
+                value: WALLET_LIMITS.deposit.min,
+                message: `Minimum deposit is KES ${WALLET_LIMITS.deposit.min}`,
+              },
+              max: {
+                value: WALLET_LIMITS.deposit.max,
+                message: `Maximum deposit is KES ${WALLET_LIMITS.deposit.max.toLocaleString()}`,
+              },
             })}
             disabled={disabled}
           />
@@ -129,7 +136,7 @@ export default function DepositModal({ onClose }) {
 
           {/* Note */}
           <p className="text-xs text-gray-400 mb-4 font-normal">
-            Maximum deposit amount is KES 140,000.00
+            Deposit range is KES {WALLET_LIMITS.deposit.min.toLocaleString()}–{WALLET_LIMITS.deposit.max.toLocaleString()}.
           </p>
 
           {/* Submit */}

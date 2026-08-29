@@ -5,7 +5,7 @@ const isLocalhost =
   window.location.hostname === "127.0.0.1";
 const SITE_KEY = isLocalhost
   ? "1x00000000000000000000AA"
-  : "0x4AAAAAACNGJeFXzN3t7n2k";
+  : import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAACNGJeFXzN3t7n2k";
 
 const Turnstile = forwardRef(function Turnstile(
   { onVerify, onError, onExpire },
@@ -22,6 +22,11 @@ const Turnstile = forwardRef(function Turnstile(
   const onExpireRef = useRef(onExpire);
 
   useEffect(() => {
+    if (!SITE_KEY) {
+      onErrorRef.current?.(new Error("Turnstile site key is not configured"));
+      return undefined;
+    }
+
     onVerifyRef.current = onVerify;
     onErrorRef.current = onError;
     onExpireRef.current = onExpire;
@@ -104,7 +109,7 @@ const Turnstile = forwardRef(function Turnstile(
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
-        } catch (e) {
+        } catch {
           // Ignore cleanup errors
         }
         widgetIdRef.current = null;

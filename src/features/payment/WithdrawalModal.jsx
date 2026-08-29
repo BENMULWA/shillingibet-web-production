@@ -10,6 +10,7 @@ import {
   useWithdraw,
 } from "../../hooks/usePayment";
 import { debouncedWithdraw } from "../../utils/debounce";
+import { WALLET_LIMITS } from "../../utils/walletLimits";
 
 export default function WithdrawalModal({ onClose }) {
   const [withdrawAmount, setWithdrawAmount] = useState(100);
@@ -17,25 +18,35 @@ export default function WithdrawalModal({ onClose }) {
   const { balance } = useUpdateBalance();
   const { withdrawingCash, isLoading: isWithdrawing } = useWithdraw();
   const baseClass = new BaseClass();
+  const withdrawableBalance = Number(balance?.withdrawableBalance ?? 0);
 
   const handlePresetClick = (val) => setWithdrawAmount(val);
   function handleWithdraw() {
     debouncedWithdraw(withdrawAmount, () => {
       if (isWithdrawing) return;
+      const requestedAmount = Number(withdrawAmount);
 
-      if (balance?.walletBalance === 0)
+      if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
+        return toast.error("Enter a valid withdrawal amount.");
+      }
+
+      if (withdrawableBalance === 0)
         return toast.error(
-          "You don't have enough amount to make this transaction"
+          "You don't have withdrawable funds. Bonus funds can only be used to bet."
         );
 
-      if (+withdrawAmount > balance?.walletBalance) {
+      if (requestedAmount > withdrawableBalance) {
         return toast.error(
-          "You don't have enough amount to make this transaction"
+          "The amount exceeds your withdrawable balance."
         );
       }
 
-      if (+withdrawAmount < 100) {
-        return toast.error("Withdrawals start at Ksh 100 and above.");
+      if (requestedAmount < WALLET_LIMITS.withdrawal.min) {
+        return toast.error(`Withdrawals start at KES ${WALLET_LIMITS.withdrawal.min}.`);
+      }
+
+      if (requestedAmount > WALLET_LIMITS.withdrawal.max) {
+        return toast.error(`Maximum withdrawal is KES ${WALLET_LIMITS.withdrawal.max.toLocaleString()}.`);
       }
 
       withdrawingCash(
@@ -109,7 +120,9 @@ export default function WithdrawalModal({ onClose }) {
 
           {/* Amount Input */}
           <input
-            type="text"
+            type="number"
+            min={WALLET_LIMITS.withdrawal.min}
+            max={WALLET_LIMITS.withdrawal.max}
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
             className="w-full px-4 py-2 rounded-md bg-secondary text-[#b7c4ba] border border-[#444] outline-none mb-2 text-sm"
@@ -117,7 +130,9 @@ export default function WithdrawalModal({ onClose }) {
 
           {/* Max Note */}
           <p className="text-xs text-[#b7c4ba] mb-4 font-normal">
-            Minimum withdrawal amount is KES 100.00
+            Withdrawable: KES {withdrawableBalance.toLocaleString()}. Allowed
+            range: KES {WALLET_LIMITS.withdrawal.min.toLocaleString()}–{WALLET_LIMITS.withdrawal.max.toLocaleString()}.
+            Bonus funds can only be used to bet.
           </p>
 
           {/* Deposit Button */}

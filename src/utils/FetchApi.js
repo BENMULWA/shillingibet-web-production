@@ -1,3 +1,5 @@
+import { getDeviceId } from "./device";
+
 const API_URL = import.meta.env.DEV ? "/api/v1" : import.meta.env.VITE_API_URL;
 
 export const fetchAPI = async (
@@ -10,6 +12,11 @@ export const fetchAPI = async (
     const headers = {
       "Content-Type": "application/json",
     };
+
+    const deviceId = getDeviceId();
+    if (deviceId) {
+      headers["X-Device-ID"] = deviceId;
+    }
 
     if (token) {
       // Strip any existing 'Bearer ' prefix to avoid double-Bearer headers

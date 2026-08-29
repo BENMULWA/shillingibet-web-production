@@ -29,9 +29,9 @@ export default function Navbar({
   const { balance } = useUpdateBalance();
   const { logOutFn } = useLogOut();
 
-  const mainBalance =
-    isAuth && balance?.balance != null
-      ? Number(balance.balance).toFixed(2)
+  const totalBalance =
+    isAuth && balance?.totalBalance != null
+      ? Number(balance.totalBalance).toFixed(2)
       : null;
 
   // Close dropdown when clicking outside
@@ -133,9 +133,12 @@ export default function Navbar({
             </button>
 
             {/* Balance Capsule */}
-            <div className="hidden items-center gap-1.5 rounded-full border border-white/5 bg-[#07110b] px-3 py-1.5 md:flex">
+            <div
+              className="hidden items-center gap-1.5 rounded-full border border-white/5 bg-[#07110b] px-3 py-1.5 md:flex"
+              title="Total balance, including wager-only bonus funds"
+            >
               <span className="text-sm font-bold text-white leading-none">
-                {mainBalance ?? "—"}
+                {totalBalance ?? "—"}
               </span>
               <span className="text-[10px] text-gray-400 font-normal">KES</span>
             </div>

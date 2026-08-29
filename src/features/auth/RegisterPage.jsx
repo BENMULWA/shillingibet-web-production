@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMdClose } from "react-icons/io";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -27,6 +27,8 @@ export default function Register() {
   const [isChecked, setIsChecked] = useState(true);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const turnstileRef = useRef(null);
 
   function handleClose() {
     setIsClosing(true);
@@ -34,8 +36,6 @@ export default function Register() {
       navigate(-1);
     }, 300);
   }
-  // const [turnstileToken, setTurnstileToken] = useState(null);
-  // const turnstileRef = useRef(null);
   const { showBanner } = useBanner();
   const { registerFn, isLoading } = useRegister();
   const navigate = useNavigate();
@@ -53,19 +53,17 @@ export default function Register() {
   }, [location]);
 
   function submitData(data) {
-    // if (!turnstileToken) {
-    //   toast.error("Please wait for security verification to complete");
-    //   return;
-    // }
+    if (!turnstileToken) {
+      toast.error("Please complete the security verification");
+      return;
+    }
 
     const phone = normalizeKenyanPhone(data.phone);
 
     registerFn(
-      { ...data, phone, referralCode: referral || "" },
+      { ...data, phone, referralCode: referral || "", turnstileToken },
       {
         onSuccess: (response) => {
-          // turnstileRef.current?.reset();
-          // setTurnstileToken(null);
           if (response?.status) {
             if (response?.banner?.showBanner) {
               showBanner(response?.banner?.currentBanner || "registration");
@@ -91,8 +89,8 @@ export default function Register() {
           }
         },
         onError: (error) => {
-          // turnstileRef.current?.reset();
-          // setTurnstileToken(null);
+          turnstileRef.current?.reset();
+          setTurnstileToken(null);
           toast.error(error?.message || "Something went wrong");
         },
       }
@@ -274,8 +272,7 @@ export default function Register() {
               </label>
             </div>
 
-            {/* Turnstile (uncomment when ready) */}
-            {/* <Turnstile
+            <Turnstile
               ref={turnstileRef}
               onVerify={(token) => setTurnstileToken(token)}
               onExpire={() => setTurnstileToken(null)}
@@ -283,12 +280,12 @@ export default function Register() {
                 setTurnstileToken(null);
                 toast.error("Security verification failed. Please refresh.");
               }}
-            /> */}
+            />
 
             {/* Submit */}
             <button
               type="submit"
-              disabled={!isChecked || isLoading}
+              disabled={!isChecked || !turnstileToken || isLoading}
               className="w-full bg-primary hover:brightness-105 text-black font-black py-4 rounded-xl text-lg flex items-center justify-center gap-2 transition-all shadow-[0_10px_30px_rgba(250,204,21,0.18)] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading

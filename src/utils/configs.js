@@ -3,10 +3,10 @@ export const promotionsData = {
     title: "Registration Bonus",
     image: "/5.jpg",
     intro:
-      "We are a hospitable betting platform! We might not give you tea, chapati, or cakes when you visit our site, but be guaranteed that when you register we instantly give you Ksh.10 Instant Stake.",
+      "Verify your phone after registration to receive a Ksh.10 welcome betting bonus.",
     steps: [
-      "Play with Ksh.10 to start your journey to making your first million.",
-      "Use Ksh.10 to prove the haters wrong; tell them starting in life only requires a partner like ShilingiBet who believes in your potential to be great and Rich!",
+      "Register and successfully verify your phone number.",
+      "After security checks, Ksh.10 is added to your bonus balance for betting only.",
     ],
     note: "Terms and Conditions Apply!",
   },
@@ -14,11 +14,11 @@ export const promotionsData = {
     title: "Refer & Earn",
     image: "/3.jpg",
     intro:
-      "Invite your friends to ShilingiBet and get rewarded instantly. Every successful referral puts real money in your wallet.",
+      "Invite friends to ShilingiBet and earn a Ksh.5 betting bonus for each successful referral.",
     steps: [
       "Share your unique referral link with friends.",
-      "When your friend registers and deposits at least Ksh.10, you instantly earn Ksh.10 as a referral bonus.",
-      "Additionally, you earn 5% of every deposit your friend makes thereafter.",
+      "Your friend registers with your referral link and verifies their phone.",
+      "After security checks, Ksh.5 is added to your bonus balance for betting only.",
     ],
     
     note: "Terms and Conditions Apply!",

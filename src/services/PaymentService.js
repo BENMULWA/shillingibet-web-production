@@ -1,7 +1,33 @@
 import { fetchAPI } from "../utils/FetchApi";
+import { getDeviceId } from "../utils/device";
 import BaseClass from "./BaseClass";
 
 const API_URL = import.meta.env.DEV ? "/api/v1" : import.meta.env.VITE_API_URL;
+
+const moneyValue = (value, fallback = 0) => {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : fallback;
+};
+
+const normalizeWallet = (user = {}) => {
+  const wallet = user?.wallet ?? {};
+  const totalBalance = moneyValue(wallet.totalBalance ?? user.balance);
+  const bonusBalance = moneyValue(
+    wallet.bonusBalance ?? user.bonusBalance,
+    0
+  );
+  const withdrawableBalance = moneyValue(
+    wallet.withdrawableBalance,
+    Math.max(0, totalBalance - bonusBalance)
+  );
+
+  return {
+    totalBalance,
+    bonusBalance,
+    withdrawableBalance,
+    currency: wallet.currency ?? "KES",
+  };
+};
 
 export class PaymentService extends BaseClass {
   constructor() {
@@ -29,9 +55,17 @@ export class PaymentService extends BaseClass {
         response?.data?.user ??
         response?.data ??
         response;
+      const wallet = normalizeWallet(user);
 
       return {
         ...user,
+        wallet,
+        // Keep the existing UI working while it is migrated to the explicit
+        // total, bonus, and withdrawable wallet fields.
+        balance: wallet.totalBalance,
+        totalBalance: wallet.totalBalance,
+        bonusBalance: wallet.bonusBalance,
+        withdrawableBalance: wallet.withdrawableBalance,
         referralBonus:
           user?.referral?.bonusEarned ?? user?.referralBonus ?? 0,
         referralsCount:
@@ -152,18 +186,6 @@ export class PaymentService extends BaseClass {
     }
   }
 
-  async redeemBonus({ amount, type }) {
-    const payload = {
-      amount: +amount,
-      type,
-    };
-    try {
-      return await fetchAPI("user/redeem-bonus", "POST", payload, this.token);
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
-  }
-
   async updateCryptoWalletBalance(updateBalanceData) {
     try {
       const { transactionId } = updateBalanceData?.updateBalanceData || updateBalanceData || {};
@@ -176,6 +198,10 @@ export class PaymentService extends BaseClass {
       headers.append("Content-Type", "application/json");
       if (this.token) {
         headers.append("Authorization", `Bearer ${this.token}`);
+      }
+      const deviceId = getDeviceId();
+      if (deviceId) {
+        headers.append("X-Device-ID", deviceId);
       }
 
       const payload = JSON.stringify({

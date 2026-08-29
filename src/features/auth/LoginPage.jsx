@@ -96,8 +96,6 @@ const LoginModal = ({ onClose }) => {
       { phone: normalizedPhone, password },
       {
         onSuccess: (data) => {
-          console.log("LOGIN SUCCESS RESPONSE:", data); // View the whole response
-          console.log("LOGIN TOKEN:", data?.token || data?.data?.token || data?.access_token);
           if (!data?.user) return;
           if (!isUserPhoneVerified(data?.user)) {
             clearStoredUser();

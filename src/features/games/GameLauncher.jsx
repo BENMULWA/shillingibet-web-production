@@ -127,15 +127,21 @@ export default function GameLauncher({ game, gameUuid, title }) {
   }
 
   return (
-    <iframe
-      ref={iframeRef}
-      key={launchUrl}
-      src={launchUrl}
-      title={title}
-      allow="fullscreen; autoplay"
-      allowFullScreen
-      onError={() => requestLaunch(true)}
-      className="block h-[calc(100dvh-134px)] w-full rounded-none border-0 md:h-[calc(100dvh-64px)] md:rounded-[4px]"
-    />
+    <div className="flex h-[calc(100dvh-134px)] flex-col md:h-[calc(100dvh-64px)]">
+      <p className="bg-primary/10 px-3 py-1.5 text-center text-xs text-[#b7c4ba]">
+        Bonus funds are used first when you place a bet. Winnings are added to
+        your cash balance.
+      </p>
+      <iframe
+        ref={iframeRef}
+        key={launchUrl}
+        src={launchUrl}
+        title={title}
+        allow="fullscreen; autoplay"
+        allowFullScreen
+        onError={() => requestLaunch(true)}
+        className="block min-h-0 flex-1 w-full rounded-none border-0 md:rounded-[4px]"
+      />
+    </div>
   );
 }

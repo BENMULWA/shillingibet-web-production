@@ -9,6 +9,7 @@ import { BsInfoCircle, BsCheckCircleFill, BsXCircleFill } from "react-icons/bs";
 import { SiTether } from "react-icons/si";
 import toast from "react-hot-toast";
 import { debouncedWithdraw } from "../../utils/debounce";
+import { WALLET_LIMITS } from "../../utils/walletLimits";
 
 const SHOW_CRYPTO_UI = false;
 const SHOW_COMET_UI = false;
@@ -49,6 +50,7 @@ export default function Withdraw() {
   const phone = baseClass?.phone;
 
   const { balance } = useUpdateBalance();
+  const withdrawableBalance = Number(balance?.withdrawableBalance ?? 0);
   const { withdrawingCash, isLoading: isWithdrawing } = useWithdraw();
   const { withdrawCrypto, isLoading: isCryptoWithdrawing, data: cryptoResult, reset: resetCrypto } = useWithdrawCrypto();
   const cryptoAmountNumber = Number(cryptoAmount);
@@ -61,17 +63,28 @@ export default function Withdraw() {
   function handleWithdraw() {
     debouncedWithdraw(amount, () => {
       if (isWithdrawing) return;
+      const requestedAmount = Number(amount);
 
-      if (!balance?.balance || balance?.balance === 0) {
-        return toast.error("You don't have enough amount to make this transaction");
+      if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
+        return toast.error("Enter a valid withdrawal amount.");
       }
 
-      if (+amount > balance?.balance) {
-        return toast.error("You don't have enough amount to make this transaction");
+      if (withdrawableBalance === 0) {
+        return toast.error(
+          "You don't have withdrawable funds. Bonus funds can only be used to bet."
+        );
       }
 
-      if (+amount < 100) {
-        return toast.error("Withdrawals start at Ksh 100 and above.");
+      if (requestedAmount > withdrawableBalance) {
+        return toast.error("The amount exceeds your withdrawable balance.");
+      }
+
+      if (requestedAmount < WALLET_LIMITS.withdrawal.min) {
+        return toast.error(`Withdrawals start at KES ${WALLET_LIMITS.withdrawal.min}.`);
+      }
+
+      if (requestedAmount > WALLET_LIMITS.withdrawal.max) {
+        return toast.error(`Maximum withdrawal is KES ${WALLET_LIMITS.withdrawal.max.toLocaleString()}.`);
       }
 
       withdrawingCash(
@@ -210,7 +223,11 @@ export default function Withdraw() {
 
           <p className="text-primary font-semibold">
             Balance Withdrawable (KES) :{" "}
-            {balance?.balance?.toLocaleString() ?? 0}
+            {withdrawableBalance.toLocaleString()}
+          </p>
+
+          <p className="text-xs text-[#9cae9f]">
+            Bonus funds are excluded because they can only be used to place bets.
           </p>
 
           {/* Tabs */}
@@ -242,6 +259,9 @@ export default function Withdraw() {
               />
 
               <input
+                type="number"
+                min={WALLET_LIMITS.withdrawal.min}
+                max={WALLET_LIMITS.withdrawal.max}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className="w-full rounded-lg px-5 py-3 border border-primary/40 bg-[#07110b] text-white placeholder:text-[#9cae9f] focus:outline-none focus:border-primary"
@@ -288,7 +308,9 @@ export default function Withdraw() {
                   <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
                   <p>
                     Withdrawal range is{" "}
-                    <span className="font-semibold text-primary">KES 100 – 70,000</span>.
+                    <span className="font-semibold text-primary">
+                      KES {WALLET_LIMITS.withdrawal.min.toLocaleString()}–{WALLET_LIMITS.withdrawal.max.toLocaleString()}
+                    </span>.
                   </p>
                 </div>
 
@@ -381,7 +403,7 @@ export default function Withdraw() {
                 <div className="flex justify-between gap-4">
                   <span className="text-[#9cae9f]">Withdrawable balance</span>
                   <span className="font-semibold text-primary">
-                    KES {balance?.balance?.toLocaleString() ?? 0}
+                    KES {withdrawableBalance.toLocaleString()}
                   </span>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-[#9cae9f]">

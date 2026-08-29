@@ -34,12 +34,13 @@ export class AuthService extends BaseClass {
     }
   }
 
-  async register({ phone, password, referralCode = "" }) {
+  async register({ phone, password, referralCode = "", turnstileToken }) {
     try {
       const response = await fetchAPI("users/register", "POST", {
         phone: normalizeKenyanPhone(phone),
         password,
         ...(referralCode ? { referralCode } : {}),
+        turnstileToken,
       });
       return normalizeAuthResponse(response);
     } catch (error) {

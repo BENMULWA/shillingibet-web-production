@@ -28,7 +28,6 @@ const VirtualGamePage  = lazy(() => import("./features/games/VirtualGamePage"));
 const ProfilePage      = lazy(() => import("./features/profile/ProfilePage"));
 const HistoryPage      = lazy(() => import("./features/profile/HistoryPage"));
 const ReferAndEarnPage = lazy(() => import("./features/profile/ReferAndEarnPage"));
-const RedeemBonusPage  = lazy(() => import("./features/profile/RedeemBonusPage"));
 
 /* ── Payment feature ── */
 const DepositPage             = lazy(() => import("./features/payment/DepositPage"));
@@ -103,7 +102,6 @@ function App() {
           <Route path="profile" element={<Protected><ProfilePage /></Protected>} />
           <Route path="history" element={<Protected><HistoryPage /></Protected>} />
           <Route path="refer"   element={<Protected><ReferAndEarnPage /></Protected>} />
-          <Route path="redeem"  element={<Protected><RedeemBonusPage /></Protected>} />
 
           {/* ── Payment (protected) ── */}
           <Route path="deposit"                 element={<Protected><DepositPage /></Protected>} />

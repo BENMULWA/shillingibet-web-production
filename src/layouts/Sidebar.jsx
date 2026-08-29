@@ -5,7 +5,7 @@ import {
   FiPhone, FiMessageSquare, FiMail, FiChevronDown,
   FiLogOut, FiSearch, FiGlobe, FiHome
 } from "react-icons/fi";
-import { BsStarFill, BsTrophyFill, BsTicketFill } from "react-icons/bs";
+import { BsStarFill } from "react-icons/bs";
 import { HiUserGroup } from "react-icons/hi";
 import SidebarItem from "./SidebarItem";
 import BaseClass from "../services/BaseClass";
@@ -214,12 +214,6 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
             to="/withdraw"
             onClick={closeMobile}
           />
-          <SidebarItem
-            label="Redeem Bonus"
-            icon="/icons/cashback.png"
-            to="/redeem"
-            onClick={closeMobile}
-          />
         </div>
       )}
 
@@ -241,18 +235,6 @@ export default function Sidebar({ isMobile, showSidebar, setShowSidebar, collaps
             to="/refer"
             requiresAuth={true}
           />
-          {/* <PromoAction
-            label="Promotion Rank"
-            icon={<BsTrophyFill />}
-            to="/refer"
-            requiresAuth={true}
-          />
-          <PromoAction
-            label="Redemption Code"
-            icon={<BsTicketFill />}
-            to="/redeem"
-            requiresAuth={true}
-          /> */}
         </div>
       )}
 

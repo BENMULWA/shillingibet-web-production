@@ -14,8 +14,7 @@ export default function ReferAndEarn() {
   const referralCode = base?.referralCode;
   const referralLink = `https://www.shilingibet.com/register?ref=${referralCode}`;
   const { balance } = useUpdateBalance();
-  // calculate total bonus
-  const bonusTotal = (balance?.referralBonus ?? 0) + (balance?.cashback ?? 0);
+  const bonusTotal = balance?.referralBonus ?? 0;
   const referralStats = balance?.referralsCount ?? 0;
 
   const copyToClipboard = () => {
@@ -48,7 +47,7 @@ export default function ReferAndEarn() {
             Refer Friends, Earn Rewards!
           </h4>
           <p className="text-[#9cae9f] text-sm mb-6">
-            Invite friends and earn rewards on every deposit they make.
+            Earn a KES 5 betting bonus when a referred friend verifies their phone.
           </p>
 
           {/* Referral Stats */}
@@ -139,8 +138,8 @@ export default function ReferAndEarn() {
             </h2>
             <ul className="text-[#9cae9f] space-y-2 text-sm">
               <li>• Invite your friends using your referral link</li>
-              <li>• They register, deposit, and place bets</li>
-              <li>• You earn 5% bonus on every deposit they make</li>
+              <li>• They register and successfully verify their phone</li>
+              <li>• After security checks, you earn a KES 5 bonus for betting only</li>
             </ul>
           </div>
         </div>

@@ -162,7 +162,7 @@ function JackpotPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 w-full lg:w-auto lg:min-w-[520px]">
-              <StatCard label="Main balance" value={formatKES(balance?.balance)} icon={<FiTrendingUp />} />
+              <StatCard label="Total balance" value={formatKES(balance?.totalBalance)} icon={<FiTrendingUp />} />
               <StatCard label="Active bet amount" value={formatKES(draw?.betAmount)} icon={<BsTrophyFill />} />
               <StatCard label="Total bets" value={draw?.totalBets ?? 0} icon={<FiUsers />} />
               <StatCard
