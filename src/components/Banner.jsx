@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 
 const images = [
-  '/1.jpg',
-  '/2.jpg',
-  '/3.jpg',
-  '/4.jpg',
-  '/5.jpg',
+  '/1s.jpg',
+  '/2s.jpg',
+  '/3s.jpg',
+  '/4s.jpg',
+  '/5s.jpg',
 ];
 
 const Banner = () => {
