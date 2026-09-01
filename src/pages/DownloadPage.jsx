@@ -28,10 +28,10 @@ import { useNavigate } from "react-router-dom";
 import { usePwaInstall } from "../hooks/usePwaInstall";
 
 const screenshots = [
-  { src: "/register-banner.webp", label: "Join ShilingiBet" },
-  { src: "/refer-banner.png", label: "Refer and earn" },
-  { src: "/cashback-banner.png", label: "Daily cashback" },
-  { src: "/a1.png", label: "Play exciting games" },
+  { src: "/pl1.png", label: "Join ShilingiBet" },
+  { src: "/pl2.png", label: "Refer and earn" },
+  { src: "/pl3.png", label: "Daily cashback" },
+  { src: "/pl4.png", label: "Play exciting games" },
 ];
 
 const features = [
@@ -164,7 +164,11 @@ export default function DownloadPage() {
           >
             <ArrowLeft size={21} />
           </button>
-          <img src="/app-icon.svg" alt="" className="ml-1 h-7 w-7 rounded-lg" />
+          <img
+            src="/pwa-192.webp"
+            alt="ShilingiBet"
+            className="ml-1 h-7 w-7 rounded-full"
+          />
           <span className="ml-3 text-lg font-semibold">ShilingiBet Apps</span>
           <div className="ml-auto flex items-center gap-1">
             <button type="button" onClick={() => navigate("/search")} className="rounded-full p-2 hover:bg-[#edf3ef]" aria-label="Search"><Search size={21} /></button>
@@ -243,14 +247,14 @@ export default function DownloadPage() {
             {screenshots.map((screenshot) => (
               <figure
                 key={screenshot.src}
-                className="relative aspect-[3/4] w-[128px] shrink-0 snap-start overflow-hidden rounded-xl bg-[#07120b] shadow-sm"
+                className="relative aspect-[410/834] w-[128px] shrink-0 snap-start overflow-hidden rounded-xl bg-[#07120b] shadow-sm"
               >
                 <img
                   src={screenshot.src}
                   alt={screenshot.label}
                   onError={(event) => {
                     event.currentTarget.onerror = null;
-                    event.currentTarget.src = "/register-banner.webp";
+                    event.currentTarget.src = "/pl1.png";
                   }}
                   className="h-full w-full object-cover"
                 />
