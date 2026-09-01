@@ -201,7 +201,7 @@ export default function Register() {
                   placeholder="Create a password"
                   {...register("password", {
                     required: "Password is required",
-                    minLength: { value: 6, message: "At least 6 characters" },
+                    minLength: { value: 6, message: "Password must contain at least 6 characters" },
                   })}
                   className="w-full bg-surface border border-zinc-800 rounded-xl px-4 py-4 text-white text-base placeholder:text-zinc-500 outline-none focus:border-primary transition-colors"
                 />
@@ -218,7 +218,7 @@ export default function Register() {
               </div>
               {errors.password
                 ? <p className="text-red-400 text-xs">{errors.password.message}</p>
-                : <p className="text-xs text-zinc-600">Password must be at least 6 characters</p>
+                : <p className="text-xs text-zinc-600">Password must contain at least 6 characters</p>
               }
             </div>
 

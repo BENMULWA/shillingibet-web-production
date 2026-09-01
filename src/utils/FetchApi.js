@@ -2,6 +2,26 @@ import { getDeviceId } from "./device";
 
 const API_URL = import.meta.env.DEV ? "/api/v1" : import.meta.env.VITE_API_URL;
 
+const getApiErrorMessage = (result, fallbackMessage) => {
+  const details = Array.isArray(result?.details) ? result.details : [];
+  const detailMessages = details
+    .map((detail) =>
+      typeof detail === "string" ? detail : detail?.message
+    )
+    .filter(Boolean);
+
+  if (detailMessages.length > 0) {
+    return [...new Set(detailMessages)].join(". ");
+  }
+
+  return (
+    result?.message ||
+    result?.status_description ||
+    result?.error ||
+    fallbackMessage
+  );
+};
+
 export const fetchAPI = async (
   url,
   method = "GET",
@@ -60,12 +80,7 @@ export const fetchAPI = async (
           ? "Session expired. Please log in again."
           : "Something went wrong";
 
-      const apiError = new Error(
-        result?.message ||
-          result?.status_description ||
-          result?.error ||
-          fallbackMessage
-      );
+      const apiError = new Error(getApiErrorMessage(result, fallbackMessage));
       apiError.response = result;
       apiError.status = response.status;
       throw apiError;

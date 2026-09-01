@@ -16,7 +16,11 @@ export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const phone = normalizeKenyanPhone(searchParams.get("phone") || "");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const { handleSubmit, register } = useForm();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm();
 
   function submitData(formData) {
     const otp = formData.code;
@@ -124,7 +128,13 @@ export default function ResetPassword() {
                 <input
                   type={passwordVisible ? "text" : "password"}
                   placeholder="Enter new password"
-                  {...register("password", { required: true })}
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must contain at least 6 characters",
+                    },
+                  })}
                     className="w-full bg-surface border border-zinc-800 rounded-xl px-4 py-4 text-white text-base placeholder:text-zinc-500 outline-none focus:border-primary transition-colors"
                   required
                 />
@@ -139,6 +149,13 @@ export default function ResetPassword() {
                   }
                 </button>
               </div>
+              {errors.password ? (
+                <p className="text-xs text-red-400">{errors.password.message}</p>
+              ) : (
+                <p className="text-xs text-zinc-600">
+                  Password must contain at least 6 characters
+                </p>
+              )}
             </div>
 
             {/* Submit */}
