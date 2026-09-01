@@ -1,7 +1,7 @@
 export const promotionsData = {
   registration: {
     title: "Registration Bonus",
-    image: "/5.jpg",
+    image: "/5s.jpg",
     intro:
       "Verify your phone after registration to receive a Ksh.10 welcome betting bonus.",
     steps: [
@@ -12,7 +12,7 @@ export const promotionsData = {
   },
   refer: {
     title: "Refer & Earn",
-    image: "/3.jpg",
+    image: "/3s.jpg",
     intro:
       "Invite friends to ShilingiBet and earn a Ksh.5 betting bonus for each successful referral.",
     steps: [
@@ -25,7 +25,7 @@ export const promotionsData = {
   },
   "daily-cashback": {
     title: "Daily Cashback",
-    image: "/2.jpg",
+    image: "/2s.jpg",
     description:
       "Get 5% cashback daily on bets lost, plus fastest deposits and withdrawals.",
     intro: `It is our promise to give you the quickest and most honest deposits and withdrawals while rewarding you with **Daily Cashback**.`,
@@ -40,7 +40,7 @@ export const promotionsData = {
   },
   "aviator-daily": {
     title: "KSH.5,000,000 Daily Rains & Freebets",
-    image: "/4.jpg",
+    image: "/4s.jpg",
     description: "Daily Freebets & Free Rains worth Ksh.5M every day.",
     intro: `This offer is for all the players who enjoy the benefits of Aviator Rains and Freebets.`,
     steps: [
@@ -52,7 +52,7 @@ export const promotionsData = {
   },
   "aviator-challenges": {
     title: "Aviator Challenges",
-    image: "/1.jpg",
+    image: "/1s.jpg",
     intro:
       "The perfect combination of thrill, excitement and cash is here. Play Aviator on ShilingiBet and stand a chance to join Missions, Races, and Tournaments to win Big Rewards.",
     steps: [

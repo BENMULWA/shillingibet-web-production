@@ -1,3 +1,5 @@
+import { FaPhoneAlt } from "react-icons/fa";
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -29,11 +31,13 @@ const Footer = () => {
       alt: "tiktok",
       link: "https://www.tiktok.com/@shilingibet",
     },
+    /*
     {
       src: "https://img.icons8.com/color/48/youtube-play.png",
       alt: "youtube",
       link: "https://youtube.com/@shilingibet",
     },
+    */
   ];
 
   const handleLinkClick = (link) => {
@@ -107,6 +111,14 @@ const Footer = () => {
             <div>
               <h3 className="mb-3 text-sm font-bold text-white">Contact</h3>
               <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleLinkClick("tel:+254789713403")}
+                  className="flex items-center gap-2 text-left transition-colors hover:text-primary"
+                >
+                  <FaPhoneAlt className="text-primary" aria-hidden="true" />
+                  Call 0789 713403
+                </button>
                 <button
                   type="button"
                   onClick={() => handleLinkClick("mailto:info@shilingibet.com")}
