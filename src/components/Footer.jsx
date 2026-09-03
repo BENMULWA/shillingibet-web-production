@@ -113,7 +113,7 @@ const Footer = () => {
               <div className="flex flex-col gap-2">
                 <button
                   type="button"
-                  onClick={() => handleLinkClick("tel:+254789713403")}
+                  onClick={() => handleLinkClick("tel:")}
                   className="flex items-center gap-2 text-left transition-colors hover:text-primary"
                 >
                   <FaPhoneAlt className="text-primary" aria-hidden="true" />
