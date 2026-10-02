@@ -1,12 +1,17 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { FiClock, FiGrid, FiHome, FiPlus, FiUser } from "react-icons/fi";
 
 import BaseClass from "../services/BaseClass";
 
+// Five-tab layout with a raised centre Deposit action, the pattern Kenyan
+// players know from SportPesa/Odibets: browse on the left, money in the
+// middle, account on the right.
 const NAV_ITEMS = [
-  { icon: "/icons/house.png", label: "Home", path: "/" },
-  { icon: "/aviator.svg", label: "Aviator", path: "/aviator", auth: true },
-  { icon: "/icons/add-payment.png", label: "Deposit", path: "/deposit", auth: true },
-  { icon: "/icons/boy.png", label: "Profile", path: "/profile", auth: true },
+  { icon: FiHome, label: "Home", path: "/" },
+  { icon: FiGrid, label: "Games", path: "/search" },
+  { icon: FiPlus, label: "Deposit", path: "/deposit", auth: true, primary: true },
+  { icon: FiClock, label: "My Bets", path: "/history", auth: true },
+  { icon: FiUser, label: "Account", path: "/profile", auth: true },
 ];
 
 export default function BottomNav({ closeAll, isSomethingOpen }) {
@@ -29,15 +34,32 @@ export default function BottomNav({ closeAll, isSomethingOpen }) {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 px-2 pb-[max(0.4rem,env(safe-area-inset-bottom))] md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-50 md:hidden">
       <nav
         aria-label="Primary navigation"
-        className="relative mx-auto flex h-[76px] max-w-lg items-stretch overflow-hidden rounded-[22px] border border-white/10 bg-[linear-gradient(145deg,rgba(16,25,19,0.98),rgba(5,9,7,0.99))] px-1 shadow-[0_-8px_35px_rgba(0,0,0,0.55),0_10px_30px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
+        className="relative mx-auto flex h-[64px] max-w-lg items-stretch border-t border-white/10 bg-[#07110b]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+        style={{ height: "calc(64px + env(safe-area-inset-bottom))" }}
       >
-        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-yellow-300/60 to-transparent" />
-
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.path);
+          const Icon = item.icon;
+
+          if (item.primary) {
+            return (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => handleNavigation(item)}
+                aria-current={active ? "page" : undefined}
+                className="group relative flex min-w-0 flex-1 flex-col items-center justify-end gap-0.5 pb-2 outline-none"
+              >
+                <span className="absolute -top-5 flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#07110b] bg-primary text-black shadow-[0_6px_20px_rgba(250,204,21,0.45)] transition-transform group-active:scale-90">
+                  <Icon size={26} strokeWidth={3} aria-hidden="true" />
+                </span>
+                <span className="text-[11px] font-extrabold text-primary">{item.label}</span>
+              </button>
+            );
+          }
 
           return (
             <button
@@ -45,39 +67,15 @@ export default function BottomNav({ closeAll, isSomethingOpen }) {
               type="button"
               onClick={() => handleNavigation(item)}
               aria-current={active ? "page" : undefined}
-              className="group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 outline-none"
+              className={`group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 outline-none transition-colors ${
+                active ? "text-primary" : "text-white/60 active:text-white"
+              }`}
             >
               {active && (
-                <span className="absolute inset-x-2 inset-y-2 rounded-2xl border border-yellow-300/20 bg-gradient-to-b from-yellow-300/15 to-yellow-500/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_20px_rgba(250,204,21,0.08)]" />
+                <span className="absolute top-0 h-0.5 w-8 rounded-full bg-primary shadow-[0_0_8px_rgba(250,204,21,0.7)]" />
               )}
-
-              <span
-                className={`relative flex h-9 w-11 items-center justify-center rounded-xl transition-all duration-300 ${
-                  active
-                    ? "-translate-y-0.5 text-yellow-300 drop-shadow-[0_0_9px_rgba(250,204,21,0.5)]"
-                    : "text-white/40 group-active:scale-90 group-active:text-white/70"
-                }`}
-              >
-                <img
-                  src={item.icon}
-                  alt=""
-                  aria-hidden="true"
-                  className={`h-7 w-7 object-contain transition-all duration-300 ${
-                    active ? "scale-110 saturate-125" : "opacity-55 saturate-50"
-                  }`}
-                />
-                {active && (
-                  <span className="absolute -bottom-0.5 h-1 w-1 rounded-full bg-yellow-300 shadow-[0_0_8px_2px_rgba(250,204,21,0.55)]" />
-                )}
-              </span>
-
-              <span
-                className={`relative truncate text-[10px] font-extrabold tracking-wide transition-colors ${
-                  active ? "text-yellow-300" : "text-white/40"
-                }`}
-              >
-                {item.label}
-              </span>
+              <Icon size={21} aria-hidden="true" className="transition-transform group-active:scale-90" />
+              <span className="truncate text-[11px] font-bold">{item.label}</span>
             </button>
           );
         })}

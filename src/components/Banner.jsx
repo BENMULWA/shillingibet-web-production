@@ -5,7 +5,6 @@ const images = [
   '/2s.jpg',
   '/3s.jpg',
   '/4s.jpg',
-  '/5s.jpg',
 ];
 
 const Banner = () => {

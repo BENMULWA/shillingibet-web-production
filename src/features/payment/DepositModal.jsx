@@ -5,9 +5,10 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useDeposit } from "../../hooks/usePayment";
 import BaseClass from "../../services/BaseClass";
-import { WALLET_LIMITS } from "../../utils/walletLimits";
+import { useWalletLimits } from "../../hooks/useWalletLimits";
 
 export default function DepositModal({ onClose }) {
+  const limits = useWalletLimits();
   const baseClass = new BaseClass();
   const { makingPayment, isLoading } = useDeposit();
 
@@ -113,19 +114,21 @@ export default function DepositModal({ onClose }) {
           <input
             type="number"
             inputMode="numeric"
-            min={WALLET_LIMITS.deposit.min}
-            max={WALLET_LIMITS.deposit.max}
+            step={1}
+            min={limits.deposit.min}
+            max={limits.deposit.max}
             className="w-full px-4 py-2 rounded-md bg-secondary text-[#b7c4ba] border border-[#444] outline-none mb-1 text-sm"
             {...register("amount", {
               required: "Amount is required",
               valueAsNumber: true,
+              validate: (value) => Number.isInteger(value) || "Enter a whole amount in KES",
               min: {
-                value: WALLET_LIMITS.deposit.min,
-                message: `Minimum deposit is KES ${WALLET_LIMITS.deposit.min}`,
+                value: limits.deposit.min,
+                message: `Minimum deposit is KES ${limits.deposit.min}`,
               },
               max: {
-                value: WALLET_LIMITS.deposit.max,
-                message: `Maximum deposit is KES ${WALLET_LIMITS.deposit.max.toLocaleString()}`,
+                value: limits.deposit.max,
+                message: `Maximum deposit is KES ${limits.deposit.max.toLocaleString()}`,
               },
             })}
             disabled={disabled}
@@ -136,7 +139,7 @@ export default function DepositModal({ onClose }) {
 
           {/* Note */}
           <p className="text-xs text-gray-400 mb-4 font-normal">
-            Deposit range is KES {WALLET_LIMITS.deposit.min.toLocaleString()}–{WALLET_LIMITS.deposit.max.toLocaleString()}.
+            Deposit range is KES {limits.deposit.min.toLocaleString()}–{limits.deposit.max.toLocaleString()}.
           </p>
 
           {/* Submit */}

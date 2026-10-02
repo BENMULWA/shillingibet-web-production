@@ -186,31 +186,6 @@ export function useWithdrawCrypto() {
   return { withdrawCrypto, isLoading, data, reset };
 }
 
-export function useFusionDeposit() {
-  const paymentService = new PaymentService();
-  const queryClient = useQueryClient();
-
-  const {
-    mutate: depositViaFusion,
-    isPending: isLoading,
-    error,
-  } = useMutation({
-    mutationFn: paymentService.depositFusion.bind(paymentService),
-    onSuccess: (res) => {
-      markDepositPending(queryClient.getQueryData(["user-balance"])?.balance);
-      toast.success(
-        res?.message || "Fusion Fi deposit order created successfully"
-      );
-      queryClient.invalidateQueries({ queryKey: ["user-balance"] });
-    },
-    onError: (err) => {
-      toast.error(err?.message || "Something went wrong");
-    },
-  });
-
-  return { depositViaFusion, isLoading, error };
-}
-
 export function useCryptoUpdateDeposit() {
   const paymentService = new PaymentService();
     const queryClient = useQueryClient();

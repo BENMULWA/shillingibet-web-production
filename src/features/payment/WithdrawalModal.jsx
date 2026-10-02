@@ -10,9 +10,10 @@ import {
   useWithdraw,
 } from "../../hooks/usePayment";
 import { debouncedWithdraw } from "../../utils/debounce";
-import { WALLET_LIMITS } from "../../utils/walletLimits";
+import { useWalletLimits } from "../../hooks/useWalletLimits";
 
 export default function WithdrawalModal({ onClose }) {
+  const limits = useWalletLimits();
   const [withdrawAmount, setWithdrawAmount] = useState(100);
   const presetAmounts = [100, 250, 500, 1000, 1500];
   const { balance } = useUpdateBalance();
@@ -41,12 +42,16 @@ export default function WithdrawalModal({ onClose }) {
         );
       }
 
-      if (requestedAmount < WALLET_LIMITS.withdrawal.min) {
-        return toast.error(`Withdrawals start at KES ${WALLET_LIMITS.withdrawal.min}.`);
+      if (!Number.isInteger(requestedAmount)) {
+        return toast.error("Enter a whole amount in KES.");
       }
 
-      if (requestedAmount > WALLET_LIMITS.withdrawal.max) {
-        return toast.error(`Maximum withdrawal is KES ${WALLET_LIMITS.withdrawal.max.toLocaleString()}.`);
+      if (requestedAmount < limits.withdrawal.min) {
+        return toast.error(`Withdrawals start at KES ${limits.withdrawal.min}.`);
+      }
+
+      if (requestedAmount > limits.withdrawal.max) {
+        return toast.error(`Maximum withdrawal is KES ${limits.withdrawal.max.toLocaleString()}.`);
       }
 
       withdrawingCash(
@@ -121,8 +126,9 @@ export default function WithdrawalModal({ onClose }) {
           {/* Amount Input */}
           <input
             type="number"
-            min={WALLET_LIMITS.withdrawal.min}
-            max={WALLET_LIMITS.withdrawal.max}
+            step={1}
+            min={limits.withdrawal.min}
+            max={limits.withdrawal.max}
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
             className="w-full px-4 py-2 rounded-md bg-secondary text-[#b7c4ba] border border-[#444] outline-none mb-2 text-sm"
@@ -131,7 +137,8 @@ export default function WithdrawalModal({ onClose }) {
           {/* Max Note */}
           <p className="text-xs text-[#b7c4ba] mb-4 font-normal">
             Withdrawable: KES {withdrawableBalance.toLocaleString()}. Allowed
-            range: KES {WALLET_LIMITS.withdrawal.min.toLocaleString()}–{WALLET_LIMITS.withdrawal.max.toLocaleString()}.
+            range: KES {limits.withdrawal.min.toLocaleString()}–{limits.withdrawal.max.toLocaleString()},
+            up to KES {limits.withdrawal.dailyLimit.toLocaleString()} per day.
             Bonus funds can only be used to bet.
           </p>
 

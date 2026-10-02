@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Copy, Check } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -7,10 +7,19 @@ import BaseClass from "../../services/BaseClass";
 import {
   useDeposit,
   useCryptoUpdateDeposit,
-  useFusionDeposit,
 } from "../../hooks/usePayment";
-import { BsInfoCircle } from "react-icons/bs";
-import { WALLET_LIMITS } from "../../utils/walletLimits";
+import { useUsdKesRate } from "../../hooks/useUsdKesRate";
+import { useWalletLimits } from "../../hooks/useWalletLimits";
+import CryptoStatusCard from "./CryptoStatusCard";
+import {
+  CELO_DEPOSIT_ADDRESS,
+  CELO_NETWORK,
+  connectMinipay,
+  getMinipayProvider,
+  isMinipayAvailable,
+  isMinipayConfigured,
+  sendUsdtOnCelo,
+} from "../../utils/celoMinipay";
 
 const depositAmounts = [
   { value: 49, hot: false },
@@ -25,52 +34,35 @@ const depositAmounts = [
 ];
 
 const SHOW_CRYPTO_UI = false;
-// Fusion Fi integration remains implemented; only its deposit UI is hidden.
-const SHOW_FUSION_UI = false;
-
-const getFusionCheckoutUrl = (response) => {
-  const candidates = [
-    response?.checkout_url,
-    response?.checkoutUrl,
-    response?.payment_url,
-    response?.paymentUrl,
-    response?.url,
-    response?.link,
-    response?.provider?.checkout_url,
-    response?.provider?.checkoutUrl,
-    response?.provider?.payment_url,
-    response?.provider?.paymentUrl,
-    response?.provider?.url,
-    response?.provider?.link,
-    response?.provider?.order?.checkout_url,
-    response?.provider?.order?.checkoutUrl,
-    response?.provider?.order?.payment_url,
-    response?.provider?.order?.paymentUrl,
-    response?.provider?.order?.url,
-    response?.provider?.order?.link,
-    response?.order?.checkout_url,
-    response?.order?.checkoutUrl,
-    response?.order?.payment_url,
-    response?.order?.paymentUrl,
-    response?.order?.url,
-    response?.order?.link,
-  ];
-
-  return candidates.find(
-    (value) => typeof value === "string" && /^https?:\/\//i.test(value)
-  );
-};
+// MiniPay/Celo USDT deposits. Stays hidden until VITE_USDT_CELO_ADDRESS and
+// VITE_CELO_DEPOSIT_ADDRESS are configured (see celoMinipay.js) so we never
+// show a "pay" button pointing at an unset address.
+// Hidden until the backend has a /wallet/crypto/deposit route to credit MiniPay payments.
+const SHOW_MINIPAY_UI = false;
 
 export default function Deposit() {
+  const limits = useWalletLimits();
   const baseClass = new BaseClass();
 
-  const [tab, setTab] = useState("mobile"); // "mobile" | "crypto" | "comet"
+  const [tab, setTab] = useState("mobile"); // "mobile" | "crypto" | "comet" | "minipay"
   const [copied, setCopied] = useState(false);
   const [transactionID, setTransactionID] = useState("");
 
-  // Fusion Fi state
-  const [fusionEmail, setFusionEmail] = useState("");
-  const [fusionAmount, setFusionAmount] = useState("");
+  // MiniPay / Celo USDT state
+  const [minipayDetected, setMinipayDetected] = useState(false);
+  const [minipayAmount, setMinipayAmount] = useState(100);
+  const [minipayView, setMinipayView] = useState("form"); // 'form' | 'connecting' | 'processing' | 'waiting' | 'success' | 'failed'
+  const [minipayMessage, setMinipayMessage] = useState("");
+  const [minipayManualTxHash, setMinipayManualTxHash] = useState("");
+
+  useEffect(() => {
+    setMinipayDetected(isMinipayAvailable());
+  }, []);
+
+  const { kesPerUsd } = useUsdKesRate();
+  const estimatedUsdt =
+    kesPerUsd && minipayAmount ? (Number(minipayAmount) / kesPerUsd).toFixed(2) : null;
+
   // Crypto: M-Pesa-style processing view — 'form' | 'processing' | 'success' | 'failed' | 'waiting'
   const [cryptoView, setCryptoView] = useState("form");
   const [cryptoResultMessage, setCryptoResultMessage] = useState("");
@@ -80,7 +72,6 @@ export default function Deposit() {
 
   const { makingPayment, isLoading } = useDeposit();
   const { depositCrypto: updatingCryptoBalance, isLoading: isDepositingCrypto } = useCryptoUpdateDeposit();
-  const { depositViaFusion, isLoading: isFusionLoading } = useFusionDeposit();
 
   const {
     register,
@@ -122,51 +113,6 @@ export default function Deposit() {
     setCopied(true);
     toast.success("Address copied!");
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleFusionDeposit = () => {
-    const email = fusionEmail.trim();
-    const amountNum = Number(fusionAmount);
-
-    if (!email || !email.includes("@")) {
-      toast.error("Please enter a valid Fusion Fi email");
-      return;
-    }
-
-    if (!amountNum || amountNum < WALLET_LIMITS.deposit.min) {
-      toast.error(`Minimum Fusion Fi deposit is KES ${WALLET_LIMITS.deposit.min}`);
-      return;
-    }
-
-    if (amountNum > WALLET_LIMITS.deposit.max) {
-      toast.error(`Maximum Fusion Fi deposit is KES ${WALLET_LIMITS.deposit.max.toLocaleString()}`);
-      return;
-    }
-
-    depositViaFusion(
-      {
-        amount: amountNum,
-        email,
-        currency: "KES",
-        comment: `shilingibet-deposit-${baseClass.userId || "guest"}`,
-        description: "ShilingiBet wallet deposit",
-      },
-      {
-        onSuccess: (response) => {
-          setFusionAmount("");
-
-          const checkoutUrl = getFusionCheckoutUrl(response);
-          if (checkoutUrl) {
-            window.location.href = checkoutUrl;
-            return;
-          }
-
-          toast.success(
-            "Fusion Fi order created. Complete the payment from the provider page once it becomes available."
-          );
-        },
-      }
-    );
   };
 
   const handleCryptoDeposit = async (e) => {
@@ -230,6 +176,107 @@ export default function Deposit() {
     setCryptoResultMessage("");
   };
 
+  const submitCeloTxForVerification = (txHash) => {
+    setMinipayView("processing");
+
+    updatingCryptoBalance(
+      { updateBalanceData: { transactionId: txHash, chain: "celo" } },
+      {
+        onSuccess: (res) => {
+          if (res.status === "confirmed") {
+            const message = res.alreadyUsed
+              ? `Transaction already processed. Amount: ${res.confirmedAmount} USDT, Reward: KES ${res.rewardKes}`
+              : res.message || `Deposit confirmed! Amount: ${res.confirmedAmount} USDT, Reward: KES ${res.rewardKes}`;
+            setMinipayMessage(message);
+            setMinipayView("success");
+            setMinipayManualTxHash("");
+          } else if (res.status === "waiting_confirmation") {
+            setMinipayMessage(
+              res.message || "No matching deposit found yet. Please try again shortly."
+            );
+            setMinipayView("waiting");
+          } else if (res.message && /success|confirmed|credited/i.test(res.message)) {
+            setMinipayMessage(res.message);
+            setMinipayView("success");
+            setMinipayManualTxHash("");
+          } else {
+            setMinipayMessage(res.message || "Failed to process deposit");
+            setMinipayView("failed");
+          }
+        },
+        onError: (err) => {
+          const msg = err?.message ?? "Something went wrong";
+          if (/success|successful|confirmed|credited/i.test(msg)) {
+            setMinipayMessage(msg);
+            setMinipayView("success");
+            setMinipayManualTxHash("");
+          } else {
+            setMinipayMessage(msg);
+            setMinipayView("failed");
+          }
+        },
+      }
+    );
+  };
+
+  const handleMinipayPay = async () => {
+    if (!isMinipayConfigured()) {
+      toast.error("Crypto deposits aren't set up yet. Please try again later.");
+      return;
+    }
+
+    const amountNum = Number(minipayAmount);
+    if (!amountNum || amountNum < limits.deposit.min) {
+      toast.error(`Minimum deposit is KES ${limits.deposit.min}`);
+      return;
+    }
+    if (amountNum > limits.deposit.max) {
+      toast.error(`Maximum deposit is KES ${limits.deposit.max.toLocaleString()}`);
+      return;
+    }
+    if (!kesPerUsd) {
+      toast.error("Couldn't fetch the exchange rate. Please try again.");
+      return;
+    }
+
+    const provider = getMinipayProvider();
+    if (!provider) {
+      toast.error("Open ShilingiBet inside the MiniPay app to pay this way.");
+      return;
+    }
+
+    try {
+      setMinipayView("connecting");
+      const fromAddress = await connectMinipay(provider);
+
+      const usdtAmount = (amountNum / kesPerUsd).toFixed(6);
+      const txHash = await sendUsdtOnCelo({
+        provider,
+        fromAddress,
+        amountHuman: usdtAmount,
+      });
+
+      submitCeloTxForVerification(txHash);
+    } catch (err) {
+      setMinipayView("failed");
+      setMinipayMessage(err?.message || "MiniPay payment was cancelled or failed");
+    }
+  };
+
+  const handleMinipayManualSubmit = (e) => {
+    e.preventDefault();
+    if (!minipayManualTxHash.trim()) {
+      toast.error("Please enter a valid transaction hash");
+      return;
+    }
+    submitCeloTxForVerification(minipayManualTxHash.trim());
+  };
+
+  const resetMinipayView = () => {
+    setMinipayView("form");
+    setMinipayMessage("");
+  };
+
   return (
     <div className="md:min-h-screen text-[#b7c4ba] flex justify-center px-3 md:px-4 py-4 md:py-6">
       <div className="w-full max-w-md md:max-w-5xl md:bg-surface/80 rounded-xl overflow-hidden shadow-lg border border-white/5">
@@ -269,17 +316,17 @@ export default function Deposit() {
                 Crypto (USDT)
               </button>
             )}
-            {SHOW_FUSION_UI && (
+            {SHOW_MINIPAY_UI && (
               <button
                 type="button"
-                onClick={() => setTab("comet")}
+                onClick={() => setTab("minipay")}
                 className={`flex-1 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium transition-all ${
-                  tab === "comet"
+                  tab === "minipay"
                     ? "bg-primary text-black shadow-md"
                     : "text-[#9cae9f] hover:text-white"
                 }`}
               >
-                Fusion Fi
+                MiniPay (USDT)
               </button>
             )}
           </div>
@@ -296,20 +343,22 @@ export default function Deposit() {
                 <input
                   type="number"
                   inputMode="numeric"
-                  min={WALLET_LIMITS.deposit.min}
-                  max={WALLET_LIMITS.deposit.max}
+                  step={1}
+                  min={limits.deposit.min}
+                  max={limits.deposit.max}
                   placeholder="Amount (KES)"
                   className="w-full rounded-lg px-5 border border-primary/80 bg-[#07110b] py-3 text-white focus:outline-primary focus:ring-0 focus:border-primary placeholder:text-[#9cae9f]"
                   {...register("amount", {
                     required: "Amount is required",
                     valueAsNumber: true,
+                    validate: (value) => Number.isInteger(value) || "Enter a whole amount in KES",
                     min: {
-                      value: WALLET_LIMITS.deposit.min,
-                      message: `Minimum deposit is KES ${WALLET_LIMITS.deposit.min}`,
+                      value: limits.deposit.min,
+                      message: `Minimum deposit is KES ${limits.deposit.min}`,
                     },
                     max: {
-                      value: WALLET_LIMITS.deposit.max,
-                      message: `Maximum deposit is KES ${WALLET_LIMITS.deposit.max.toLocaleString()}`,
+                      value: limits.deposit.max,
+                      message: `Maximum deposit is KES ${limits.deposit.max.toLocaleString()}`,
                     },
                   })}
                   disabled={disabled}
@@ -401,239 +450,138 @@ export default function Deposit() {
 
           {/* CRYPTO TAB */}
           {SHOW_CRYPTO_UI && tab === "crypto" && cryptoView !== "form" && (
-            /* M-Pesa-style processing / result card */
-            <div className="w-full max-w-sm mx-auto bg-secondary rounded-2xl overflow-hidden">
-              <div className="pt-10 pb-8 px-6 flex flex-col items-center">
-                <div
-                  className={`relative w-20 h-20 rounded-full flex items-center justify-center mb-6 ${
-                    cryptoView === "success"
-                      ? "bg-green-500/15"
-                      : cryptoView === "failed"
-                      ? "bg-red-500/15"
-                      : "bg-primary/10"
-                  }`}
-                >
-                  {(cryptoView === "processing" || cryptoView === "waiting") && (
-                    <svg
-                      className="w-10 h-10 text-primary animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                      />
-                      <path
-                        className="opacity-90"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                  )}
-                  {cryptoView === "success" && (
-                    <svg
-                      className="w-10 h-10 text-green-500"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        style={{
-                          strokeDasharray: 63,
-                          strokeDashoffset: 63,
-                          animation: "draw-circle 0.5s ease-out forwards",
-                        }}
-                      />
-                      <path
-                        d="M8 12l3 3 5-6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          strokeDasharray: 20,
-                          strokeDashoffset: 20,
-                          animation: "draw-check 0.4s ease-out 0.4s forwards",
-                        }}
-                      />
-                    </svg>
-                  )}
-                  {(cryptoView === "failed") && (
-                    <svg
-                      className="w-10 h-10 text-red-500"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        style={{
-                          strokeDasharray: 63,
-                          strokeDashoffset: 63,
-                          animation: "draw-circle 0.5s ease-out forwards",
-                        }}
-                      />
-                      <path
-                        d="M15 9L9 15"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        style={{
-                          strokeDasharray: 10,
-                          strokeDashoffset: 10,
-                          animation: "draw-x 0.3s ease-out 0.4s forwards",
-                        }}
-                      />
-                      <path
-                        d="M9 9L15 15"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        style={{
-                          strokeDasharray: 10,
-                          strokeDashoffset: 10,
-                          animation: "draw-x 0.3s ease-out 0.5s forwards",
-                        }}
-                      />
-                    </svg>
-                  )}
+            <CryptoStatusCard
+              view={cryptoView}
+              resultMessage={cryptoResultMessage}
+              onReset={resetCryptoView}
+            />
+          )}
+
+          {/* MINIPAY (CELO USDT) TAB */}
+          {SHOW_MINIPAY_UI && tab === "minipay" && minipayView !== "form" && (
+            <CryptoStatusCard
+              view={minipayView === "connecting" ? "processing" : minipayView}
+              resultMessage={
+                minipayView === "connecting"
+                  ? "Confirm the payment in MiniPay…"
+                  : minipayMessage
+              }
+              onReset={resetMinipayView}
+            />
+          )}
+
+          {SHOW_MINIPAY_UI && tab === "minipay" && minipayView === "form" && (
+            <div className="space-y-6">
+              {!isMinipayConfigured() && (
+                <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3 md:p-4">
+                  <p className="text-xs text-red-300 leading-relaxed">
+                    Crypto deposits aren&apos;t configured yet.
+                  </p>
                 </div>
-                <h2
-                  className={`text-xl font-bold mb-2 ${
-                    cryptoView === "success"
-                      ? "text-green-500"
-                      : cryptoView === "failed"
-                      ? "text-red-500"
-                      : "text-primary"
-                  }`}
-                >
-                  {cryptoView === "processing" && "Processing..."}
-                  {cryptoView === "waiting" && "Verifying..."}
-                  {cryptoView === "success" && "Deposit Successful!"}
-                  {cryptoView === "failed" && "Deposit Failed"}
-                </h2>
-                <p className="text-[#9cae9f] text-center text-sm leading-relaxed max-w-[280px]">
-                  {cryptoView === "processing" &&
-                    "Please wait while we confirm your payment. This may take a few moments."}
-                  {cryptoView === "waiting" && (cryptoResultMessage || "We're verifying your transaction on the blockchain. This usually takes 5-10 minutes.")}
-                  {cryptoView === "success" && (cryptoResultMessage || "Your funds have been added to your account successfully.")}
-                  {cryptoView === "failed" && (cryptoResultMessage || "We couldn't process your deposit. Please try again or contact support.")}
-                </p>
-              </div>
-              <div className="px-6 pb-6">
-                {(cryptoView === "processing" || cryptoView === "waiting") && (
-                  <div className="bg-background/30 rounded-lg p-3 mb-4">
-                    <p className="text-[#75877a] text-xs leading-relaxed text-center">
-                      Please don&apos;t close this page. Your payment is being
-                      verified on the blockchain.
+              )}
+
+              {minipayDetected ? (
+                <div className="bg-background/60 border border-primary/20 rounded-2xl p-4 md:p-6 space-y-6">
+                  <div>
+                    <p className="text-sm text-[#b7c4ba] mb-4">
+                      Enter an amount to pay with MiniPay ({CELO_NETWORK.label})
+                    </p>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      step={1}
+                      min={limits.deposit.min}
+                      max={limits.deposit.max}
+                      placeholder="Amount (KES)"
+                      value={minipayAmount}
+                      onChange={(e) => setMinipayAmount(e.target.value)}
+                      className="w-full rounded-lg px-5 border border-primary/80 bg-[#07110b] py-3 text-white focus:outline-primary focus:ring-0 focus:border-primary placeholder:text-[#9cae9f]"
+                    />
+                    <p className="text-xs text-[#75877a] mt-2">
+                      {estimatedUsdt
+                        ? `≈ ${estimatedUsdt} USDT (estimated — the amount credited is based on the live rate when your payment confirms)`
+                        : "Fetching exchange rate…"}
                     </p>
                   </div>
-                )}
-                {(cryptoView === "success" || cryptoView === "failed" || cryptoView === "waiting") && (
+
                   <button
                     type="button"
-                    onClick={resetCryptoView}
-                    className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all duration-200 active:scale-[0.98] ${
-                      cryptoView === "success"
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-primary hover:bg-primary/90 text-black"
-                    }`}
+                    onClick={handleMinipayPay}
+                    disabled={!isMinipayConfigured() || !kesPerUsd}
+                    className="w-full rounded-md bg-primary py-4 text-lg font-bold text-black transition hover:brightness-110 disabled:opacity-60"
                   >
-                    {cryptoView === "success" ? "Continue" : cryptoView === "waiting" ? "Back" : "Try Again"}
+                    Pay with MiniPay
                   </button>
-                )}
-              </div>
-            </div>
-          )}
-          {/* FUSION FI TAB */}
-          {SHOW_FUSION_UI && tab === "comet" && (
-            <div className="space-y-6">
-              {/* Fusion Fi Logo / Header */}
-              <div className="flex flex-col items-center gap-3 bg-background/60 border border-white/10 rounded-2xl p-6">
-                <img
-                  src="/fusion.png"
-                  alt="Fusion Fi"
-                  className="h-24 w-24 object-contain"
-                />
-                <div className="text-center">
-                  <h3 className="text-lg font-bold text-[#d7e1d9]">Fusion Fi</h3>
-                  <p className="text-xs text-[#75877a] mt-0.5">
-                    Create a hosted bill order and complete payment on Fusion Fi
-                  </p>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-background/60 border border-primary/20 rounded-2xl p-4 md:p-6 space-y-6 md:space-y-8">
+                  <div className="rounded-lg bg-primary/10 border border-primary/20 p-3 md:p-4">
+                    <p className="text-xs text-[#aab8ad] leading-relaxed">
+                      MiniPay wasn&apos;t detected. Open ShilingiBet inside the{" "}
+                      <span className="font-semibold text-primary">MiniPay</span> app for
+                      instant, one-tap payment — or send USDT on{" "}
+                      <span className="font-semibold text-primary">{CELO_NETWORK.label}</span>{" "}
+                      from any wallet and verify it below.
+                    </p>
+                  </div>
 
-              {/* Email Input */}
-              <div>
-                <label className="block text-xs md:text-sm text-[#9cae9f] mb-2">
-                  Fusion Fi Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="Enter your Fusion Fi email"
-                  value={fusionEmail}
-                  onChange={(e) => setFusionEmail(e.target.value)}
-                  className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-transparent text-[#d7e1d9] focus:outline-none focus:border-primary transition"
-                />
-              </div>
+                  <div>
+                    <div className="flex items-start md:items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                      <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-primary text-black font-bold text-base md:text-lg flex-shrink-0">
+                        1
+                      </div>
+                      <h3 className="text-base md:text-lg font-semibold text-[#d7e1d9] leading-tight">
+                        Send USDT ({CELO_NETWORK.label}) to this address:
+                      </h3>
+                    </div>
 
-              {/* Amount Input */}
-              <div>
-                <label className="block text-xs md:text-sm text-[#9cae9f] mb-2">
-                  Amount
-                </label>
-                <input
-                  type="number"
-                  placeholder="Enter amount (KES)"
-                  value={fusionAmount}
-                  onChange={(e) => setFusionAmount(e.target.value)}
-                  min={10}
-                  className="w-full rounded-lg px-5 py-3 border border-primary/40 placeholder:text-[#6f7f73] bg-transparent text-[#d7e1d9] focus:outline-none focus:border-primary transition"
-                />
-              </div>
+                    <div className="flex items-center gap-2 bg-secondary border border-primary/40 rounded-lg px-3 md:px-4 py-2.5 md:py-3.5">
+                      <span className="break-all text-primary font-mono text-xs md:text-sm flex-1 min-w-0">
+                        {CELO_DEPOSIT_ADDRESS || "Not configured yet"}
+                      </span>
+                      {CELO_DEPOSIT_ADDRESS && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(CELO_DEPOSIT_ADDRESS);
+                            toast.success("Address copied!");
+                          }}
+                          className="text-primary hover:text-primary/80 transition flex-shrink-0"
+                        >
+                          <Copy size={18} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
-              {/* Submit */}
-              <button
-                type="button"
-                onClick={handleFusionDeposit}
-                disabled={isFusionLoading}
-                className="w-full rounded-lg bg-primary py-4 text-lg font-bold text-black transition hover:brightness-110 disabled:opacity-60"
-              >
-                {isFusionLoading ? "Processing…" : "Continue to Fusion Fi"}
-              </button>
+                  <form onSubmit={handleMinipayManualSubmit}>
+                    <div className="flex items-start md:items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                      <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-primary text-black font-bold text-base md:text-lg flex-shrink-0">
+                        2
+                      </div>
+                      <h3 className="text-base md:text-lg font-semibold text-[#d7e1d9] leading-tight">
+                        Enter Transaction Hash:
+                      </h3>
+                    </div>
 
-              {/* Info */}
-              <div className="rounded-sm bg-background/60 p-4 text-sm text-textColor/80 space-y-3">
-                <div className="flex items-start gap-3">
-                  <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
-                  <p>
-                    The backend contract creates a pending Fusion Fi bill order
-                    first. Your wallet is credited only after the provider side
-                    is completed and reconciled.
-                  </p>
+                    <input
+                      type="text"
+                      placeholder="0x..."
+                      value={minipayManualTxHash}
+                      onChange={(e) => setMinipayManualTxHash(e.target.value)}
+                      className="w-full bg-secondary border border-primary/20 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-[#d7e1d9] placeholder:text-[#6f7f73] focus:outline-none focus:border-primary transition"
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={!minipayManualTxHash.trim()}
+                      className="mt-4 md:mt-6 w-full py-3 md:py-3.5 bg-primary text-black text-sm md:text-base font-semibold rounded-lg hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Submit Transaction Hash
+                    </button>
+                  </form>
                 </div>
-                <div className="flex items-start gap-3">
-                  <BsInfoCircle className="mt-0.5 text-primary text-lg shrink-0" />
-                  <p>
-                    Make sure you use your registered{" "}
-                    <span className="font-semibold text-primary">Fusion Fi email</span>.
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           )}
 

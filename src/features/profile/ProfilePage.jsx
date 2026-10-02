@@ -180,7 +180,7 @@ export default function Profile() {
                 <div>
                   <h2 className="text-lg font-bold text-white">Refer & Earn</h2>
                   <p className="text-sm text-[#9cae9f]">
-                    Earn <span className="text-primary font-semibold">KES 5</span> per verified referral
+                    Earn <span className="text-primary font-semibold">KES 10</span> per friend who deposits
                   </p>
                 </div>
               </div>
@@ -227,13 +227,13 @@ export default function Profile() {
                     <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center mb-2">
                       <span className="text-primary text-sm font-bold">2</span>
                     </div>
-                    <p className="text-sm text-[#9cae9f]">Friend registers and verifies their phone</p>
+                    <p className="text-sm text-[#9cae9f]">Friend registers and deposits KES 50+</p>
                   </div>
                   <div className="bg-background/30 rounded-xl p-4">
                     <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center mb-2">
                       <span className="text-primary text-sm font-bold">3</span>
                     </div>
-                    <p className="text-sm text-[#9cae9f]">Earn a KES 5 betting bonus</p>
+                    <p className="text-sm text-[#9cae9f]">Earn a KES 10 betting bonus</p>
                   </div>
                 </div>
               </div>

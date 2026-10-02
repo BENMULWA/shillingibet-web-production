@@ -47,7 +47,7 @@ export default function ReferAndEarn() {
             Refer Friends, Earn Rewards!
           </h4>
           <p className="text-[#9cae9f] text-sm mb-6">
-            Earn a KES 5 betting bonus when a referred friend verifies their phone.
+            Earn a KES 10 betting bonus when a referred friend deposits KES 50 or more.
           </p>
 
           {/* Referral Stats */}
@@ -138,8 +138,8 @@ export default function ReferAndEarn() {
             </h2>
             <ul className="text-[#9cae9f] space-y-2 text-sm">
               <li>• Invite your friends using your referral link</li>
-              <li>• They register and successfully verify their phone</li>
-              <li>• After security checks, you earn a KES 5 bonus for betting only</li>
+              <li>• They register and deposit a total of KES 50 or more</li>
+              <li>• After security checks, you earn a KES 10 bonus for betting only</li>
             </ul>
           </div>
         </div>

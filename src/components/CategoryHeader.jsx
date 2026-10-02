@@ -7,9 +7,7 @@ function CategoryHeader({
   onNext,
   src,
   icon: Icon,
-  provider = "imoon",
   showNav = true,
-  viewAllState,
 }) {
   return (
     <div className="flex items-center justify-between px-1 pb-2">

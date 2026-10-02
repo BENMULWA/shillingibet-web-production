@@ -16,7 +16,7 @@ const popularTopics = [
   {
     label: "How does the Refer & Earn program work?",
     answer:
-      "Share your unique referral link from your Profile. When a referred friend registers and verifies their phone, you receive a KES 5 betting bonus after security checks. Referral and welcome bonuses cannot be withdrawn directly.",
+      "Share your unique referral link from your Profile. When a referred friend registers and deposits a total of KES 50 or more, you receive a KES 10 betting bonus after security checks. Referral bonuses cannot be withdrawn directly.",
   },
   {
     label: "What games are available?",

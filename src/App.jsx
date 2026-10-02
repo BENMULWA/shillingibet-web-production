@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 /* ── Page loader ── */
@@ -45,11 +45,6 @@ const SearchPage   = lazy(() => import("./pages/SearchPage"));
 const ComingSoonPage = lazy(() => import("./pages/ComingSoonPage"));
 const DownloadPage = lazy(() => import("./pages/DownloadPage"));
 const Legals = lazy(() => import("./features/auth/Legals"));
-const JackpotPage = lazy(() => import("./features/jackpot/JackpotPage"));
-const JackpotResultsPage = lazy(() => import("./features/jackpot/JackpotResultsPage"));
-const JackpotDrawDetailPage = lazy(() => import("./features/jackpot/JackpotDrawDetailPage"));
-const JackpotHistoryPage = lazy(() => import("./features/jackpot/JackpotHistoryPage"));
-const JackpotBetDetailPage = lazy(() => import("./features/jackpot/JackpotBetDetailPage"));
 
 /* ── Protected wrapper ── */
 const Protected = ({ children }) => (
@@ -83,11 +78,8 @@ function App() {
           <Route path="legal" element={<Legals />} />
           <Route path="search"   element={<SearchPage />} />
           <Route path="sports" element={<ComingSoonPage />} />
-          <Route path="jackpot" element={<Protected><JackpotPage /></Protected>} />
-          <Route path="jackpot/results" element={<Protected><JackpotResultsPage /></Protected>} />
-          <Route path="jackpot/results/:drawId" element={<Protected><JackpotDrawDetailPage /></Protected>} />
-          <Route path="jackpot/my-bets" element={<Protected><JackpotHistoryPage /></Protected>} />
-          <Route path="jackpot/my-bets/:betId" element={<Protected><JackpotBetDetailPage /></Protected>} />
+          {/* Jackpot has no backend yet; send old links home instead of a broken page. */}
+          <Route path="jackpot/*" element={<Navigate to="/" replace />} />
 
           {/* ── Game launchers (protected) ── */}
           <Route path="aviator"            element={<Protected><AviatorPage /></Protected>} />

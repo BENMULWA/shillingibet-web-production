@@ -17,7 +17,7 @@ function PromotionsDetails() {
     );
   } // Handle CTA actions
   const handleCTA = () => {
-    if (id === "registration" || id === "refer") {
+    if (id === "refer") {
       navigate("/refer");
     } else if (id === "daily-cashback") {
       setOpenDeposit(true);

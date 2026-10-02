@@ -18,7 +18,7 @@ const faqs = [
   {
     label: "How does the Refer & Earn program work?",
     answer:
-      "Share your unique referral link from your Profile. When a referred friend registers and verifies their phone, you receive a KES 5 bonus after security checks. Referral and welcome bonuses are added to your bonus balance and can only be used to place bets; they cannot be withdrawn or redeemed as cash.",
+      "Share your unique referral link from your Profile. When a referred friend registers and deposits a total of KES 50 or more, you receive a KES 10 bonus after security checks. Referral bonuses are added to your bonus balance and can only be used to place bets; they cannot be withdrawn or redeemed as cash.",
     keywords: ["invite", "friend", "share", "link", "commission", "bonus", "earn", "referral code", "promo"],
   },
   {
@@ -30,7 +30,7 @@ const faqs = [
   {
     label: "How do bonuses and cashback work?",
     answer:
-      "A verified new account may receive a KES 10 welcome bonus after security checks. Welcome and referral bonuses appear in your bonus balance and are used automatically when you place a bet. They cannot be withdrawn directly.",
+      "Referral bonuses and free bets appear in your bonus balance and are used automatically when you place a bet. They cannot be withdrawn directly. Daily cashback is credited based on your net losses for the day.",
     keywords: ["free", "freebet", "reward", "promo", "promotion", "daily", "challenge", "mission", "redeem"],
   },
   {

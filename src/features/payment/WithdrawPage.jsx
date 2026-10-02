@@ -9,7 +9,7 @@ import { BsInfoCircle, BsCheckCircleFill, BsXCircleFill } from "react-icons/bs";
 import { SiTether } from "react-icons/si";
 import toast from "react-hot-toast";
 import { debouncedWithdraw } from "../../utils/debounce";
-import { WALLET_LIMITS } from "../../utils/walletLimits";
+import { useWalletLimits } from "../../hooks/useWalletLimits";
 
 const SHOW_CRYPTO_UI = false;
 const SHOW_COMET_UI = false;
@@ -30,6 +30,7 @@ function isValidTrc20Address(address) {
 }
 
 export default function Withdraw() {
+  const limits = useWalletLimits();
   const [activeTab, setActiveTab] = useState("M-Pesa");
 
   // M-Pesa state
@@ -79,12 +80,16 @@ export default function Withdraw() {
         return toast.error("The amount exceeds your withdrawable balance.");
       }
 
-      if (requestedAmount < WALLET_LIMITS.withdrawal.min) {
-        return toast.error(`Withdrawals start at KES ${WALLET_LIMITS.withdrawal.min}.`);
+      if (!Number.isInteger(requestedAmount)) {
+        return toast.error("Enter a whole amount in KES.");
       }
 
-      if (requestedAmount > WALLET_LIMITS.withdrawal.max) {
-        return toast.error(`Maximum withdrawal is KES ${WALLET_LIMITS.withdrawal.max.toLocaleString()}.`);
+      if (requestedAmount < limits.withdrawal.min) {
+        return toast.error(`Withdrawals start at KES ${limits.withdrawal.min}.`);
+      }
+
+      if (requestedAmount > limits.withdrawal.max) {
+        return toast.error(`Maximum withdrawal is KES ${limits.withdrawal.max.toLocaleString()}.`);
       }
 
       withdrawingCash(
@@ -260,8 +265,9 @@ export default function Withdraw() {
 
               <input
                 type="number"
-                min={WALLET_LIMITS.withdrawal.min}
-                max={WALLET_LIMITS.withdrawal.max}
+                step={1}
+                min={limits.withdrawal.min}
+                max={limits.withdrawal.max}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className="w-full rounded-lg px-5 py-3 border border-primary/40 bg-[#07110b] text-white placeholder:text-[#9cae9f] focus:outline-none focus:border-primary"
@@ -309,8 +315,13 @@ export default function Withdraw() {
                   <p>
                     Withdrawal range is{" "}
                     <span className="font-semibold text-primary">
-                      KES {WALLET_LIMITS.withdrawal.min.toLocaleString()}–{WALLET_LIMITS.withdrawal.max.toLocaleString()}
-                    </span>.
+                      KES {limits.withdrawal.min.toLocaleString()}–{limits.withdrawal.max.toLocaleString()}
+                    </span>{" "}
+                    per withdrawal, up to{" "}
+                    <span className="font-semibold text-primary">
+                      KES {limits.withdrawal.dailyLimit.toLocaleString()}
+                    </span>{" "}
+                    per day.
                   </p>
                 </div>
 

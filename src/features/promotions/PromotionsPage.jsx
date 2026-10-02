@@ -8,12 +8,6 @@ function Promotions() {
       <GoBack />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 p-3 mb-16 max-w-6xl mx-auto">
         <PromotionsCard
-          id="registration"
-          title="Registration Bonus"
-          description="Register and instantly get Ksh.20 Instant Stake to start playing."
-          src="/5s.jpg"
-        />
-        <PromotionsCard
           id="refer"
           title="Refer & Earn"
           description="Invite friends and earn weekly rewards every time they join Shilingibet."

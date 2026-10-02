@@ -164,31 +164,10 @@ export class PaymentService extends BaseClass {
     }
   }
 
-  async depositFusion({ amount, email, currency, comment, description, external_ref }) {
-    const payload = {
-      amount: +amount,
-      email,
-      ...(currency ? { currency } : {}),
-      ...(comment ? { comment } : {}),
-      ...(description ? { description } : {}),
-      ...(external_ref ? { external_ref } : {}),
-    };
-
-    try {
-      return await fetchAPI(
-        "wallet/billOrder",
-        "POST",
-        payload,
-        this.token
-      );
-    } catch (error) {
-      throw new Error(error?.message || "Something went wrong");
-    }
-  }
-
   async updateCryptoWalletBalance(updateBalanceData) {
     try {
-      const { transactionId } = updateBalanceData?.updateBalanceData || updateBalanceData || {};
+      const { transactionId, chain } =
+        updateBalanceData?.updateBalanceData || updateBalanceData || {};
 
       if (!transactionId) {
         throw new Error("Transaction ID is required");
@@ -206,6 +185,9 @@ export class PaymentService extends BaseClass {
 
       const payload = JSON.stringify({
         txId: transactionId,
+        // Omitted for the existing TRC20 flow so the backend keeps treating
+        // it as USDT/Tron by default; set explicitly for other chains.
+        ...(chain ? { chain } : {}),
       });
 
       const response = await fetch(

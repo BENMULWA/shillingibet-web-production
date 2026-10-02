@@ -1,24 +1,13 @@
 export const promotionsData = {
-  registration: {
-    title: "Registration Bonus",
-    image: "/5s.jpg",
-    intro:
-      "Verify your phone after registration to receive a Ksh.10 welcome betting bonus.",
-    steps: [
-      "Register and successfully verify your phone number.",
-      "After security checks, Ksh.10 is added to your bonus balance for betting only.",
-    ],
-    note: "Terms and Conditions Apply!",
-  },
   refer: {
     title: "Refer & Earn",
     image: "/3s.jpg",
     intro:
-      "Invite friends to ShilingiBet and earn a Ksh.5 betting bonus for each successful referral.",
+      "Invite friends to ShilingiBet and earn a Ksh.10 betting bonus for each successful referral.",
     steps: [
       "Share your unique referral link with friends.",
-      "Your friend registers with your referral link and verifies their phone.",
-      "After security checks, Ksh.5 is added to your bonus balance for betting only.",
+      "Your friend registers with your referral link and deposits a total of Ksh.50 or more.",
+      "After security checks, Ksh.10 is added to your bonus balance for betting only.",
     ],
     
     note: "Terms and Conditions Apply!",

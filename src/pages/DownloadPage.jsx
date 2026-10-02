@@ -37,7 +37,7 @@ const screenshots = [
 const features = [
   "Aviator, crash and virtual games",
   "Fast M-Pesa deposits and withdrawals",
-  "Jackpots, promotions and daily rewards",
+  "Promotions and daily cashback",
   "One-tap access from your home screen",
 ];
 
@@ -272,7 +272,7 @@ export default function DownloadPage() {
           </h2>
           <p className="mt-4 font-semibold">Step into the excitement with ShilingiBet</p>
           <p className="mt-3 max-w-3xl leading-7 text-[#435048]">
-            Discover an easy way to access virtual games, crash games, jackpots and promotions. The installable experience launches from your home screen and always stays up to date.
+            Discover an easy way to access virtual games, crash games and promotions. The installable experience launches from your home screen and always stays up to date.
           </p>
           <ul className="mt-4 space-y-2 text-[#435048]">
             {features.map((feature) => (
@@ -501,7 +501,7 @@ export default function DownloadPage() {
             <div className="flex flex-col">
               <a href="/" className="font-semibold hover:text-[#087f5b]">ShilingiBet</a>
               <a href="/promotions" className="hover:text-[#087f5b]">Promotions</a>
-              <a href="/jackpot" className="hover:text-[#087f5b]">Jackpots</a>
+              <a href="/promotions" className="hover:text-[#087f5b]">Promotions</a>
               <a href="/support" className="hover:text-[#087f5b]">Help centre</a>
               <a href="/support" className="hover:text-[#087f5b]">Responsible gaming</a>
             </div>

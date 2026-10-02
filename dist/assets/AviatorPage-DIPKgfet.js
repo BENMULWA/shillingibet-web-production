@@ -1,0 +1,1 @@
+import{j as t}from"./react-core-CwzQ6WTH.js";import{G as r}from"./GameLauncher-CL4x3S3t.js";import"./query-vendor-DQXxMmHe.js";import"./ui-vendor-DgCGWAVz.js";import"./Loader-CgtE-m0_.js";import"./index-F0f3N-8P.js";import"./icons-vendor-WU5atoEF.js";function n(){return t.jsx(r,{game:"aviator",title:"Aviator"})}export{n as default};

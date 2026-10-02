@@ -56,13 +56,25 @@ function DashboardLayout() {
     };
   }, []);
 
-  // Show popup once on first visit
+  // Show the install popup once, after the visitor has had time to look
+  // around — not as a blocking modal the moment they land.
   useEffect(() => {
-    const seen = localStorage.getItem("seenAppPopup");
-    if (!seen) {
-      setIsAppModalOpen(true);
-      localStorage.setItem("seenAppPopup", "true");
+    let seen = true;
+    try {
+      seen = Boolean(localStorage.getItem("seenAppPopup"));
+    } catch {
+      // storage unavailable (private mode) — just skip the popup
     }
+    if (seen) return undefined;
+    const timer = window.setTimeout(() => {
+      setIsAppModalOpen(true);
+      try {
+        localStorage.setItem("seenAppPopup", "true");
+      } catch {
+        // ignore
+      }
+    }, 30_000);
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Lock body scroll when overlays are open
@@ -117,7 +129,7 @@ function DashboardLayout() {
         )}
         <main
           className={`flex-1 overflow-y-auto appscroll no-scrollbar ${
-            isDownloadRoute ? "pb-0" : "pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0"
+            isDownloadRoute ? "pb-0" : "pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0"
           } ${
             isGameRoute ? "overflow-hidden" : ""
           }`}
@@ -142,7 +154,7 @@ function DashboardLayout() {
         />
       )}
 
-      {isAppModalOpen && !isDownloadRoute && (
+      {isAppModalOpen && !isDownloadRoute && !isGameRoute && !isAuthOverlayRoute && (
         <Suspense fallback={null}>
           <AppDownloadPopup isOpen={isAppModalOpen} onClose={() => setIsAppModalOpen(false)} />
         </Suspense>

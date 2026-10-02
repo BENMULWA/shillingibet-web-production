@@ -6,11 +6,10 @@ import { useLogOut } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 import { RiMenuUnfold3Line, RiMenuFold3Line } from "react-icons/ri";
 import {
-  FiSearch, FiSettings, FiMail, FiChevronDown,
+  FiSearch, FiChevronDown,
   FiUser, FiClock, FiLogOut, FiDollarSign
 } from "react-icons/fi";
 // import { FaWhatsapp } from "react-icons/fa";
-import { HiGift } from "react-icons/hi";
 import { BsChatRightText } from "react-icons/bs";
 
 export default function Navbar({
@@ -70,6 +69,7 @@ export default function Navbar({
         {!isMobile && (
           <button
             onClick={() => setCollapsed?.((prev) => !prev)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="p-1 rounded hover:bg-white/5 transition-colors"
           >
             {collapsed ? <RiMenuUnfold3Line size={30} /> : <RiMenuFold3Line size={30} />}
@@ -127,35 +127,37 @@ export default function Navbar({
             {/* Search Icon */}
             <button
               onClick={() => navigate('/search')}
-              className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-full transition-colors"
+              aria-label="Search games"
+              className="hidden md:flex w-8 h-8 items-center justify-center hover:bg-white/5 rounded-full transition-colors"
             >
               <FiSearch size={20} className="text-gray-300" />
             </button>
 
-            {/* Balance Capsule */}
-            <div
-              className="hidden items-center gap-1.5 rounded-full border border-white/5 bg-[#07110b] px-3 py-1.5 md:flex"
-              title="Total balance, including wager-only bonus funds"
-            >
-              <span className="text-sm font-bold text-white leading-none">
-                {totalBalance ?? "—"}
-              </span>
-              <span className="text-[10px] text-gray-400 font-normal">KES</span>
-            </div>
-
-            {/* Deposit Button */}
+            {/* Balance + Deposit — always visible, like other Kenyan betting sites */}
             <Link
               to="/deposit"
-              className="bg-primary hover:bg-yellow-400 text-black font-black text-xs px-4 py-2 rounded-lg uppercase transition-all shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+              className="flex items-center overflow-hidden rounded-lg border border-black/20 bg-[#07110b] shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+              title="Total balance, including wager-only bonus funds. Tap to deposit."
+              aria-label={`Balance KES ${totalBalance ?? "loading"}. Deposit`}
             >
-              Deposit
+              <span className="flex flex-col justify-center px-2.5 py-1 leading-none md:px-3">
+                <span className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">KES</span>
+                <span className="text-[13px] font-extrabold text-white md:text-sm">
+                  {totalBalance ?? "—"}
+                </span>
+              </span>
+              <span className="flex h-full items-center bg-primary px-2.5 py-2.5 text-[11px] font-black uppercase text-black transition-colors hover:bg-yellow-400 md:px-4 md:text-xs">
+                Deposit
+              </span>
             </Link>
 
             {/* Profile Dropdown */}
             <div className="relative group" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-1.5 p-1 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Account menu"
+                aria-expanded={dropdownOpen}
+                className="hidden md:flex items-center gap-1.5 p-1 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
               >
                 <img src="/prof-1.png" className="h-8 w-8 rounded-full object-cover" alt="Profile" />
                 <FiChevronDown size={14} className={`text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
@@ -168,7 +170,10 @@ export default function Navbar({
                     <FiUser size={16} /> Profile
                   </Link>
                   <Link to="/history" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5" onClick={() => setDropdownOpen(false)}>
-                    <FiClock size={16} /> History
+                    <FiClock size={16} /> My Bets &amp; History
+                  </Link>
+                  <Link to="/withdraw" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5" onClick={() => setDropdownOpen(false)}>
+                    <FiDollarSign size={16} /> Withdraw
                   </Link>
                   <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-white/5">
                     <FiLogOut size={16} /> Logout
@@ -180,6 +185,7 @@ export default function Navbar({
 
             <button
               onClick={() => navigate('/support')}
+              aria-label="Support"
               className="hidden lg:flex w-9 h-9 items-center justify-center bg-primary rounded-lg hover:brightness-110 transition-colors"
             >
               <BsChatRightText className="text-black" size={18} />
@@ -188,8 +194,8 @@ export default function Navbar({
           </>
         ) : (
           <div className="flex items-center gap-2">
-            <Link to="/login" className="px-4 py-1.5 text-sm font-bold text-white hover:text-primary">Login</Link>
-            <Link to="/register" className="px-5 py-2 bg-primary hover:bg-yellow-400 text-black font-black text-xs rounded-lg uppercase">Join</Link>
+            <Link to="/login" className="rounded-lg border border-white/30 px-3 py-2 text-xs font-extrabold uppercase text-white transition-colors hover:border-white hover:bg-white/10 md:px-4">Login</Link>
+            <Link to="/register" className="rounded-lg bg-primary px-4 py-2 text-xs font-black uppercase text-black shadow-[0_0_15px_rgba(245,197,24,0.25)] hover:bg-yellow-400 md:px-5">Register</Link>
           </div>
         )}
       </div>
