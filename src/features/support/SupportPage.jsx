@@ -1,8 +1,10 @@
 import { 
-  FiMail, /* FiPhone, */ FiMessageSquare, FiInfo,
+  FiMail, FiPhone, FiMessageSquare, FiInfo,
   FiChevronRight, FiShield, FiCreditCard, FiUser, FiZap 
 } from "react-icons/fi";
 import { BsChatRightDots } from "react-icons/bs";
+import { FaWhatsapp } from "react-icons/fa";
+import { SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL, buildSupportWhatsAppUrl } from "../../utils/supportContact";
 
 export default function SupportPage() {
   const openSupportChat = (topic = "general") => {
@@ -61,16 +63,22 @@ export default function SupportPage() {
       color: "bg-white/5 text-white hover:bg-white/10",
       action: () => { window.location.href = "mailto:info@shilingibet.com"; }
     },
-    /*
+    {
+      id: "whatsapp",
+      label: "WhatsApp",
+      icon: <FaWhatsapp size={20} />,
+      desc: SUPPORT_PHONE_DISPLAY,
+      color: "bg-[#25D366] text-white hover:brightness-110",
+      action: () => { window.open(buildSupportWhatsAppUrl(), "_blank", "noopener,noreferrer"); }
+    },
     {
       id: "phone",
-      label: "Phone Support",
+      label: "Call Support",
       icon: <FiPhone size={20} />,
-      desc: "0800 724 835 (Toll-Free)",
+      desc: SUPPORT_PHONE_DISPLAY,
       color: "bg-white/5 text-white hover:bg-white/10",
-      action: () => { window.location.href = "tel:0800724835"; }
+      action: () => { window.location.href = SUPPORT_PHONE_TEL; }
     },
-    */
   ];
 
   return (

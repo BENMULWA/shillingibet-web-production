@@ -4,6 +4,7 @@ import Navbar from "../layouts/Navbar";
 import BottomNav from "../layouts/BottomNav";
 import DownloadBanner from "../components/DownloadBanner";
 import Sidebar from "../layouts/Sidebar";
+import WhatsAppButton from "../components/WhatsAppButton";
 import HomePage from "../pages/HomePage";
 import { getStoredUser } from "../utils/authStorage";
 
@@ -172,6 +173,8 @@ function DashboardLayout() {
           />
         </Suspense>
       )}
+
+      {!isDownloadRoute && !isGameRoute && <WhatsAppButton />}
 
       {!isDownloadRoute && (
         <Suspense fallback={null}>

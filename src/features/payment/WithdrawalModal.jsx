@@ -137,8 +137,7 @@ export default function WithdrawalModal({ onClose }) {
           {/* Max Note */}
           <p className="text-xs text-[#b7c4ba] mb-4 font-normal">
             Withdrawable: KES {withdrawableBalance.toLocaleString()}. Allowed
-            range: KES {limits.withdrawal.min.toLocaleString()}–{limits.withdrawal.max.toLocaleString()},
-            up to KES {limits.withdrawal.dailyLimit.toLocaleString()} per day.
+            range: KES {limits.withdrawal.min.toLocaleString()}–{limits.withdrawal.max.toLocaleString()} per withdrawal.
             Bonus funds can only be used to bet.
           </p>
 

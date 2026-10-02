@@ -25,6 +25,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "../utils/supportContact";
 import { usePwaInstall } from "../hooks/usePwaInstall";
 
 const screenshots = [
@@ -472,10 +473,10 @@ export default function DownloadPage() {
               <Globe2 className="mt-0.5 shrink-0 text-[#667085]" size={19} />
               <span className="font-semibold">Website</span>
             </a>
-            {/* <a href="tel:0800724835" className="flex items-start gap-3 hover:text-[#087f5b]">
+            <a href={SUPPORT_PHONE_TEL} className="flex items-start gap-3 hover:text-[#087f5b]">
               <Phone className="mt-0.5 shrink-0 text-[#667085]" size={19} />
-              <span><strong className="font-semibold">Phone number</strong><br /><span className="text-sm">0800 724 835</span></span>
-            </a> */}
+              <span><strong className="font-semibold">Phone / WhatsApp</strong><br /><span className="text-sm">{SUPPORT_PHONE_DISPLAY}</span></span>
+            </a>
             <a href="mailto:info@shilingibet.com" className="flex items-start gap-3 hover:text-[#087f5b]">
               <Mail className="mt-0.5 shrink-0 text-[#667085]" size={19} />
               <span><strong className="font-semibold">Support email</strong><br /><span className="text-sm">info@shilingibet.com</span></span>

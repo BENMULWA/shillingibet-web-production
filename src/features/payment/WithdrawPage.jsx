@@ -317,11 +317,7 @@ export default function Withdraw() {
                     <span className="font-semibold text-primary">
                       KES {limits.withdrawal.min.toLocaleString()}–{limits.withdrawal.max.toLocaleString()}
                     </span>{" "}
-                    per withdrawal, up to{" "}
-                    <span className="font-semibold text-primary">
-                      KES {limits.withdrawal.dailyLimit.toLocaleString()}
-                    </span>{" "}
-                    per day.
+                    per withdrawal.
                   </p>
                 </div>
 

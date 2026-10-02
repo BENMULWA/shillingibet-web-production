@@ -1,4 +1,5 @@
 import { FaPhoneAlt } from "react-icons/fa";
+import { SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "../utils/supportContact";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,7 +9,7 @@ const Footer = () => {
     {
       src: "https://img.icons8.com/color/48/whatsapp--v1.png",
       alt: "whatsapp",
-      link: "https://wa.me/254103102336",
+      link: "https://wa.me/254714073826",
     },
     */
     {
@@ -113,11 +114,11 @@ const Footer = () => {
               <div className="flex flex-col gap-2">
                 <button
                   type="button"
-                  onClick={() => handleLinkClick("tel:")}
+                  onClick={() => handleLinkClick(SUPPORT_PHONE_TEL)}
                   className="flex items-center gap-2 text-left transition-colors hover:text-primary"
                 >
                   <FaPhoneAlt className="text-primary" aria-hidden="true" />
-                  Call 0789 713403
+                  Call {SUPPORT_PHONE_DISPLAY}
                 </button>
                 <button
                   type="button"
