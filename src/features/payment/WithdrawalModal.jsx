@@ -12,6 +12,8 @@ import {
 import { debouncedWithdraw } from "../../utils/debounce";
 import { useWalletLimits } from "../../hooks/useWalletLimits";
 
+// withdrwal page
+
 export default function WithdrawalModal({ onClose }) {
   const limits = useWalletLimits();
   const [withdrawAmount, setWithdrawAmount] = useState(100);
@@ -122,7 +124,7 @@ export default function WithdrawalModal({ onClose }) {
               </button>
             ))}
           </div>
-
+      
           {/* Amount Input */}
           <input
             type="number"
